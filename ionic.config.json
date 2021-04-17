@@ -1,0 +1,7 @@
+{
+  "name": "oxianimify",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
