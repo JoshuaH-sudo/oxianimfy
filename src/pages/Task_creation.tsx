@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import {
     EuiButton,
     EuiCheckboxGroup,
@@ -9,6 +9,7 @@ import {
     EuiTextArea,
 } from '@elastic/eui';
 import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/form/checkbox/checkbox_group';
+import { databaseContext } from '../App';
 
 interface ITaskData {
     [k: string]: any,
@@ -18,8 +19,8 @@ interface ITaskData {
     mesure: string | any,
 
 }
-const Task: React.FC = () => {
-    
+
+export const Task: React.FC = () => {
     const [newTask, setNewTask] = useState<ITaskData>({
         name: '',
         desc: '',
@@ -77,7 +78,7 @@ const Task: React.FC = () => {
         if (Object.keys(dotwIdMapping).find(() => dotwIdMapping['all'] != true)) {
             updateTaskValue('daysOfWeek', Object.keys(dotwIdMapping).filter(key => dotwIdMapping[key] == true))
         } else {
-            updateTaskValue('daysOfWeek',Object.values(dotwCheckboxList).map((item) => {
+            updateTaskValue('daysOfWeek', Object.values(dotwCheckboxList).map((item) => {
                 if (item.id != "all") {
                     return item.id
                 }
@@ -123,16 +124,23 @@ const Task: React.FC = () => {
 
     useEffect(() => {
         updateTaskValue('mesure', Object.keys(taskMesureIdMapping).find((item) => taskMesureIdMapping[item] == true))
-    },[taskMesureIdMapping])
+    }, [taskMesureIdMapping])
 
     function updateTaskValue(key: string, value: string | any) {
         const updatedTask = newTask
         updatedTask[key] = value
         setNewTask(updatedTask)
     }
+    const db_context = useContext(databaseContext);
+
 
     function createTask() {
-        console.log(newTask)
+
+        db_context.storeItem('task', newTask).then(() => {
+            db_context.retriveItem('task').then((result) => {
+                console.log(result)
+            })
+        })
     }
 
     return (
