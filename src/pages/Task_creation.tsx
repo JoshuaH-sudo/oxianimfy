@@ -7,9 +7,16 @@ import {
     EuiFormRow,
     EuiDescribedFormGroup,
     EuiTextArea,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiSpacer,
+    EuiPanel,
+    EuiFieldNumber,
+    EuiDatePicker
 } from '@elastic/eui';
 import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/form/checkbox/checkbox_group';
 import { databaseContext } from '../App';
+import moment from 'moment';
 
 interface ITaskData {
     [k: string]: any,
@@ -17,6 +24,7 @@ interface ITaskData {
     desc: string,
     [index: number]: { day: string };
     mesure: string | any,
+    unit: number
 
 }
 
@@ -25,7 +33,8 @@ export const Task: React.FC = () => {
         name: '',
         desc: '',
         daysOfWeek: [],
-        mesure: 'timer'
+        mesure: 'timer',
+        unit: 0
     })
 
     const [dotwCheckboxList, setDotwCheckboxList] = useState([
@@ -94,28 +103,37 @@ export const Task: React.FC = () => {
         {
             id: 'counter',
             label: 'Counter'
+        },
+        {
+            id: 'none',
+            label: 'None'
         }
     ]
 
     var taskMesureIdMapDefault: EuiCheckboxGroupIdToSelectedMap = {
         timer: true,
-        counter: false
+        counter: false,
+        none: false,
     }
 
     const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
 
     const onTaskMesureChange = (optionId: keyof object | string) => {
-        var newTaskMesureIdMap: EuiCheckboxGroupIdToSelectedMap = {}
-        if (optionId == "timer") {
-            newTaskMesureIdMap = {
-                timer: true,
-                counter: false
-            }
-        } else {
-            newTaskMesureIdMap = {
-                timer: false,
-                counter: true
-            }
+        var newTaskMesureIdMap: EuiCheckboxGroupIdToSelectedMap = {
+            timer: false,
+            counter: false,
+            none: false,
+        }
+        switch (optionId) {
+            case "timer":
+                newTaskMesureIdMap['timer'] = true
+                break
+            case "counter":
+                newTaskMesureIdMap['counter'] = true
+                break
+            case "none":
+                newTaskMesureIdMap['none'] = true
+                break
         }
 
         updateTaskValue('mesure', optionId)
@@ -143,6 +161,30 @@ export const Task: React.FC = () => {
         })
     }
 
+    const setCounter = (
+        <EuiFormRow label="Counter">
+            <EuiFieldNumber
+                onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+            />
+        </EuiFormRow>
+    )
+    const [startDate, setStartDate] = useState(moment());
+    const handleChange = (date: any) => {
+        setStartDate(date);
+      };
+    const setTimer = (
+        <EuiFormRow label="Timer">
+            <EuiDatePicker
+                showTimeSelect
+                showTimeSelectOnly
+                selected={startDate}
+                onChange={handleChange}
+                dateFormat="HH:mm:ss"
+                timeFormat="HH:mm:ss"
+            />
+        </EuiFormRow>
+    )
+
     return (
         <EuiDescribedFormGroup
             title={<h3>New task creation</h3>}
@@ -152,44 +194,57 @@ export const Task: React.FC = () => {
                 </Fragment>
             }
         >
-            <EuiForm component="form">
+            <EuiPanel paddingSize="l" >
 
-                <EuiFormRow label="Task name">
-                    <EuiFieldText
-                        name="name"
-                        onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
-                    />
-                </EuiFormRow>
+                <EuiForm component="form">
+                    <EuiFormRow label="Task name">
+                        <EuiFieldText
+                            name="name"
+                            onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                        />
+                    </EuiFormRow>
 
-                <EuiFormRow label="Task Description">
-                    <EuiTextArea
-                        name="desc"
-                        onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
-                    />
-                </EuiFormRow>
+                    <EuiFormRow label="Task Description">
+                        <EuiTextArea
+                            name="desc"
+                            onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                        />
+                    </EuiFormRow>
 
-                <EuiFormRow label="Days of the Week">
-                    <EuiCheckboxGroup
+                    <EuiSpacer />
 
-                        options={dotwCheckboxList}
-                        idToSelectedMap={dotwIdMapping}
-                        onChange={(id) => onDotwChange(id)}
-                    />
-                </EuiFormRow>
+                    <EuiFlexGroup>
+                        <EuiFlexItem>
+                            <EuiFormRow label="Days of the Week">
+                                <EuiCheckboxGroup
+                                    options={dotwCheckboxList}
+                                    idToSelectedMap={dotwIdMapping}
+                                    onChange={(id) => onDotwChange(id)}
+                                />
+                            </EuiFormRow>
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                            <EuiFormRow label="Timed or Counted Task">
+                                <EuiCheckboxGroup
+                                    options={taskMesureOptions}
+                                    idToSelectedMap={taskMesureIdMapping}
+                                    onChange={(id) => onTaskMesureChange(id)}
+                                />
+                            </EuiFormRow>
 
-                <EuiFormRow label="Timed or Counted Task">
-                    <EuiCheckboxGroup
-                        options={taskMesureOptions}
-                        idToSelectedMap={taskMesureIdMapping}
-                        onChange={(id) => onTaskMesureChange(id)}
-                    />
-                </EuiFormRow>
+                            {(newTask['mesure'] == 'timer') ? setTimer : ''}
+                            {(newTask['mesure'] == 'counter') ? setCounter : ''}
 
+                        </EuiFlexItem>
+                    </EuiFlexGroup>
 
-                <EuiButton fill onClick={() => createTask()}>
-                    Create
-                </EuiButton>
-            </EuiForm >
+                    <EuiSpacer />
+
+                    <EuiButton fill onClick={() => createTask()}>Create</EuiButton>
+                </EuiForm >
+
+            </EuiPanel>
+
         </EuiDescribedFormGroup>
     );
 };
