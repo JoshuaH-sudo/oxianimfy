@@ -27,11 +27,6 @@ export class database {
     retriveItem(key: string) {
         return new Promise(async (resolve, reject) => {
             await store.get(key).then((result) => {
-                store.forEach((key, value, index) => {
-                    console.log(key)
-                    console.log(value)
-                    console.log(index)
-                })
                 resolve(result)
             })
         })

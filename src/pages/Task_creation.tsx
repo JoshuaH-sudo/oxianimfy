@@ -14,18 +14,9 @@ import {
     EuiDatePicker,
 } from '@elastic/eui';
 import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/form/checkbox/checkbox_group';
+import { ITaskData } from '../utils/custom_types'
 import { databaseContext } from '../App';
 import moment from 'moment';
-
-interface ITaskData {
-    [k: string]: any,
-    name: string,
-    desc: string,
-    [index: number]: { day: string };
-    mesure: string | any,
-    unit: number | string
-
-}
 
 export const Task: React.FC = () => {
     const [newTask, setNewTask] = useState<ITaskData>({
@@ -136,6 +127,7 @@ export const Task: React.FC = () => {
         }
 
         updateTaskValue('mesure', optionId)
+        if (optionId == "none") updateTaskValue('unit', 0);
         setTaskMesureIdMapping(newTaskMesureIdMap);
     };
 
@@ -151,10 +143,8 @@ export const Task: React.FC = () => {
 
     const db_context = useContext(databaseContext);
     function createTask() {
-        db_context.storeItem('task', newTask).then(() => {
-            db_context.retriveItem('task').then((result) => {
-                console.log(result)
-            })
+        db_context.addTask(newTask).catch((error: Error) => {
+            console.log(error)
         })
     }
 
@@ -179,14 +169,13 @@ export const Task: React.FC = () => {
         }
     };
     useEffect(() => {
-        setDuration(moment.duration({ 
+        setDuration(moment.duration({
             hours: startDate.hours(),
             minutes: startDate.minutes(),
             seconds: startDate.seconds()
         }))
-        updateTaskValue("unit", duration)
-        console.log(duration)
-    },[startDate])
+        updateTaskValue("unit", JSON.stringify(duration))
+    }, [startDate])
 
     const setTimer = (
         <EuiFormRow
@@ -257,6 +246,7 @@ export const Task: React.FC = () => {
                 <EuiSpacer />
 
                 <EuiButton fill onClick={() => createTask()}>Create</EuiButton>
+                <EuiButton fill href="/play">Do tasks for today</EuiButton>
             </EuiForm >
         </EuiDescribedFormGroup>
     );
