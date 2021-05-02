@@ -10,8 +10,8 @@ const Page: React.FC = () => {
 
   return (
     <EuiPanel paddingSize="l" >
-      <EuiButton fill href="/task-creation">Create a New Task</EuiButton>
-      <EuiButton fill href="/play">Do tasks for today</EuiButton>
+      <EuiButton fill href="#/task-creation">Create a New Task</EuiButton>
+      <EuiButton fill href="#/play">Do tasks for today</EuiButton>
     </EuiPanel>
   );
 };

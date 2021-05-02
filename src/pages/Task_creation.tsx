@@ -246,7 +246,7 @@ export const Task: React.FC = () => {
                 <EuiSpacer />
 
                 <EuiButton fill onClick={() => createTask()}>Create</EuiButton>
-                <EuiButton fill href="/play">Do tasks for today</EuiButton>
+                <EuiButton fill href="#/play">Do tasks for today</EuiButton>
             </EuiForm >
         </EuiDescribedFormGroup>
     );

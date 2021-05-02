@@ -48,8 +48,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron": "npx cap open @capacitor-community/electron",
-    "sync": "ionic capacitor sync"
+    "electron": "ionic cap sync && npx cap open @capacitor-community/electron",
+    "sync": "ionic cap sync"
   },
   "eslintConfig": {
     "extends": [
