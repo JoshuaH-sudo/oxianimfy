@@ -7,8 +7,6 @@ import { Task_database } from './utils/task_database'
 const task_db = new Task_database()
 export var databaseContext = React.createContext(task_db);
 
-console.log(window)
-
 const App: React.FC = () => {
   return (
     <databaseContext.Provider value={task_db}>
