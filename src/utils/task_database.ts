@@ -6,12 +6,10 @@ export class Task_database {
     task_list: any[] = []
     constructor() {
         this.task_db = new database()
-        this.task_db.enumerateStorage()
         this.task_db.deleteStorage()
-        console.log('yeet')
+        this.task_db.enumerateStorage()
         this.getTasks().then((result: ITaskData[]) => {
             this.task_list = (typeof result == "object" && result != null) ? result : []
-            console.log(this.task_list)
         })
     }
 

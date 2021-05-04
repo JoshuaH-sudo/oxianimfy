@@ -8,53 +8,25 @@ export class database {
         this.createStorage();
     }
 
-    createStorage() {
-        return new Promise(async (resolve, reject) => {
-            await store.create().then(() => {
-                resolve(true)
-            }).catch((err: Error) => {
-                reject(err)
-            })
-        })
+    async createStorage() {
+        await store.create()
     }
 
-    storeItem(key: string, item: any) {
-        return new Promise(async (resolve, reject) => {
-            await store.set(key, item).then(() => {
-                resolve(true);
-            }).catch((err: Error) => {
-                reject(err)
-            })
-        })
+    async storeItem(key: string, item: any) {
+        await store.set(key, item)
     }
 
-    retriveItem(key: string) {
-        return new Promise(async (resolve, reject) => {
-            await store.get(key).then((result) => {
-                resolve(result)
-            }).catch((err: Error) => {
-                reject(err)
-            })
-        })
+    async retriveItem(key: string) {
+        await store.get(key)
     }
 
-    deleteStorage() {
-        return new Promise(async (resolve, reject) => {
-            await store.clear().then(() => {
-                resolve(true)
-            }).catch((err: Error) => {
-                reject(err)
-            })
-        })
+    async deleteStorage() {
+        await store.clear()
     }
 
-    enumerateStorage() {
-        return new Promise(async (resolve, reject) => {
-            await store.forEach((key, value, index) => {
-                console.log(key, value, index)
-            }).catch((err: Error) => {
-                reject(err)
-            })
+    async enumerateStorage() {
+        await store.forEach((key, value, index) => {
+            console.log(key, value, index)
         })
     }
 }
