@@ -143,7 +143,11 @@ export const Task: React.FC = () => {
 
     const db_context = useContext(databaseContext);
     function createTask() {
-        db_context.addTask(newTask).catch((error: Error) => {
+        db_context.addTask(newTask).then(() => {
+            db_context.getTasks().then((result) => {
+                console.log(result)
+            })
+        }).catch((error: Error) => {
             console.log(error)
         })
     }

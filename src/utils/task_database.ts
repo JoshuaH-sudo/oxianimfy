@@ -1,21 +1,25 @@
-import { database } from './database'
 import { ITaskData } from './custom_types'
+import { Storage } from '@ionic/storage';
 
 export class Task_database {
-    task_db: database
     task_list: any[] = []
+    store:Storage = new Storage();
+
     constructor() {
-        this.task_db = new database()
-        this.task_db.deleteStorage()
-        this.task_db.enumerateStorage()
+        this.createStorage()
+
         this.getTasks().then((result: ITaskData[]) => {
             this.task_list = (typeof result == "object" && result != null) ? result : []
         })
     }
 
+    async createStorage() {
+        await this.store.create()
+    }
+
     getTasks = () => {
-        return new Promise<any[]>((resolve, reject) => {
-            this.task_db.retriveItem('task').then((result: any) => {
+        return new Promise<any[]>(async (resolve, reject) => {
+            await this.store.get('task').then((result: any) => {
                 resolve(result)
             }).catch((err: Error) => {
                 reject(err)
@@ -24,10 +28,10 @@ export class Task_database {
     }
 
     addTask = (newTask: any) => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let newTaskList:any[] = this.task_list
             newTaskList.push(newTask)
-            this.task_db.storeItem('task', newTaskList).then(() => {
+            await this.store.set('task', newTaskList).then(() => {
                 resolve(true)
             }).catch((err: Error) => {
                 reject(err)

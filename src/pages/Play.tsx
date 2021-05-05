@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, Fragment } from 'react';
+import React, { useState, useContext, useEffect, Fragment, Component } from 'react';
 import {
     EuiButton,
     EuiPanel,
@@ -15,41 +15,50 @@ import Countdown from 'react-countdown';
 import moment from 'moment';
 
 interface ParentCompProps {
-    task_list?: React.ReactNode;
+    list?: React.ReactNode;
 }
 
-const Play: React.FC = () => {
-    const db_context = useContext(databaseContext);
+interface PlayInterface {
+    tasks_list: any[];
+}
 
-    const [tasks_list, set_tasks_list] = useState<ITaskData[]>([]);
-    useEffect(() => {
-        async function getTasks() {
-            console.log("yeet")
-            await db_context.getTasks().then((tasks: ITaskData[]) => {
-                set_tasks_list(tasks)
-            })
-            console.log(tasks_list)
+class Play extends Component<{}, PlayInterface> {
+    static contextType = databaseContext;
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            tasks_list: []
         }
+    }
 
-        getTasks()
-    })
+    retriveTasks() {
+        this.context.db_context.getTasks().then((tasks: ITaskData[]) => {
+            this.setState({ tasks_list: tasks })
+        })
+        console.log("yeet")
+        console.log(this.state.tasks_list)
+    }
 
-    const endGame = (
-        <EuiPanel paddingSize="l">
-            you finished all youur tasks hurray !!!!!
-            <EuiButton fill href="#/">Return</EuiButton>
-        </EuiPanel>
-    )
+    render() {
+        const endGame = (
+            <EuiPanel paddingSize="l">
+                <EuiText>you finished all youur tasks hurray !!!!!</EuiText>
+                <EuiButton fill href="#/">Return</EuiButton>
+            </EuiPanel>
+        )
 
-    return (
-        <div>
-        </div>
-    )
+        return (
+            <div>
+                { this.state.tasks_list == [] ? <Prepare list={this.state.tasks_list} /> : endGame}
+            </div>
+        )
+    }
+
 }
 
 const Prepare: React.FC<ParentCompProps> = (props) => {
 
-    const tasks_list: any = props.task_list ?? []
+    const tasks_list: any = props.list ?? []
     const [current_task_index, set_current_task_index] = useState<number>(0);
 
     const [current_counter, set_current_counter] = useState<number>(0);
