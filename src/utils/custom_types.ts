@@ -8,6 +8,11 @@ export interface ITaskData {
 
 }
 
+export interface taskRef {
+    uuid: string,
+    completed: boolean
+}
+
 export interface IScheduleData {
-    [index: string]: object[],
+    [index: string]: taskRef[],
 }

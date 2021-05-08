@@ -1,5 +1,5 @@
 import { ITaskData } from '../custom_types';
-import { Database } from './application_database';
+import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
@@ -13,16 +13,12 @@ export class Task_database {
         })
     }
 
-    async clearStorage() {
-        await this.store.clear();
-    }
-
-    async createStorage() {
-        await this.store.create()
-    }
-
     getTasks = async ()  => {
         return await this.store.get('task');
+    }
+
+    findTask = async (id: string) => {
+        return this.task_list.find((task) => task.id == id)
     }
 
     addTask = async (newTask: ITaskData) => {

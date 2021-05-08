@@ -47,7 +47,7 @@ class Play extends Component<{}, PlayInterface> {
     }
 
     retriveTasks() {
-        this.context.getTasksFromDB().then((tasks: ITaskData[]) => {
+        this.context.getTasksFromDBForToday().then((tasks: ITaskData[]) => {
             this.setState({ tasks_list: tasks ?? [] })
         })
     }

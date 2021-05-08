@@ -1,6 +1,5 @@
 import { IScheduleData, ITaskData } from '../custom_types';
-import { Database } from './application_database';
-import { v4 } from 'uuid'
+import { Database } from './database';
 import { Storage } from '@ionic/storage';
 
 
@@ -20,15 +19,7 @@ export class Schedule_database {
         this.store = app_database.store
         this.createScheduleDB()
     }
-
-    async clearStorage() {
-        await this.store.clear();
-    }
-
-    async createStorage() {
-        await this.store.create()
-    }
-
+    
     createScheduleDB = async () => {
         await this.store.keys().then(async (keys) => {
             if (keys.find(key => key == "schedule") == undefined) {
@@ -41,6 +32,10 @@ export class Schedule_database {
         }).catch(error => {
             console.log(error)
         })
+    }
+
+    getTasksFromSchedule = async () => {
+        return await this.store.get("schedule")
     }
 
     addTaskToSchedule = async (task: ITaskData) => {
