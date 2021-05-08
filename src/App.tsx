@@ -2,14 +2,14 @@ import '@ionic/react/css/core.css';
 import '@elastic/eui/dist/eui_theme_dark.css';
 import React from 'react';
 import Page from './pages/Page';
-import { Task_database } from './utils/task_database'
+import { Database_manager } from './utils/database_utils/database_manager'
 
-const task_db = new Task_database()
-export var databaseContext = React.createContext(task_db);
+const db_manager = new Database_manager()
+export var databaseContext = React.createContext(db_manager);
 
 const App: React.FC = () => {
   return (
-    <databaseContext.Provider value={task_db}>
+    <databaseContext.Provider value={db_manager}>
       <Page />
     </databaseContext.Provider>
   );

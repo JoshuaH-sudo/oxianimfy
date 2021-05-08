@@ -1,13 +1,13 @@
-import { ITaskData } from './custom_types';
-import { Storage } from '@ionic/storage';
+import { ITaskData } from '../custom_types';
+import { Database } from './database';
 import { v4 } from 'uuid'
+import { Storage } from '@ionic/storage';
 export class Task_database {
-    task_list: any[] = []
-    store:Storage = new Storage();
+    task_list: ITaskData[] = []
+    store:Storage;
 
-    constructor() {
-        this.createStorage()
-        this.clearStorage()
+    constructor(app_database: Database) {
+        this.store =  app_database.store
         this.getTasks().then((result: ITaskData[]) => {
             this.task_list = (typeof result == "object" && result != null) ? result : []
         })
@@ -31,9 +31,9 @@ export class Task_database {
         })
     }
 
-    addTask = (newTask: any) => {
+    addTask = (newTask: ITaskData) => {
         return new Promise(async (resolve, reject) => {
-            let newTaskList:any[] = this.task_list
+            let newTaskList:ITaskData[] = this.task_list
             newTask.id = v4()
             newTaskList.push(newTask)
             await this.store.set('task', newTaskList).then(() => {

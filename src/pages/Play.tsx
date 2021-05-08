@@ -142,7 +142,7 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
                 </EuiFlexItem>
 
                 {tasks_list[current_task_index].mesure == "counter" ? < Counter_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
-                {tasks_list[current_task_index].mesure == "Timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                {tasks_list[current_task_index].mesure == "timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
 
                 <EuiFlexItem grow={false}>
                     <EuiButton
