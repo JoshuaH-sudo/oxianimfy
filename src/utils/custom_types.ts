@@ -7,3 +7,7 @@ export interface ITaskData {
     unit: number | string
 
 }
+
+export interface IScheduleData {
+    [index: string]: object[],
+}

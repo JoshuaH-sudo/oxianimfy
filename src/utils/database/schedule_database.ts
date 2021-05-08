@@ -1,21 +1,23 @@
-import { ITaskData } from '../custom_types';
-import { Database } from './database';
+import { IScheduleData, ITaskData } from '../custom_types';
+import { Database } from './application_database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
+
+
 export class Schedule_database {
-    schedule: any = {
-        "monday" : {},
-        "tueday" : {},
-        "wenday" : {},
-        "thursday" : {},
-        "friday" : {},
-        "saturday" : {},
-        "sunday" : {}
+    schedule: IScheduleData = {
+        "monday": [],
+        "tueday": [],
+        "wenday": [],
+        "thursday": [],
+        "friday": [],
+        "saturday": [],
+        "sunday": []
     }
-    store:Storage;
-    
+    store: Storage;
+
     constructor(app_database: Database) {
-        this.store =  app_database.store
+        this.store = app_database.store
         this.createScheduleDB()
     }
 
@@ -28,10 +30,8 @@ export class Schedule_database {
     }
 
     createScheduleDB = async () => {
-
         await this.store.keys().then(async (keys) => {
-            console.log(keys)
-            if (keys.find( key => key == "schedule") == undefined) {
+            if (keys.find(key => key == "schedule") == undefined) {
                 await this.store.set("schedule", this.schedule)
             } else {
                 await this.store.get("schedule").then((result) => {
@@ -43,13 +43,16 @@ export class Schedule_database {
         })
     }
 
-    addTaskToSchedule = (task: ITaskData) => {
-        let newSchedule = this.schedule
+    addTaskToSchedule = async (task: ITaskData) => {
+        var newSchedule:IScheduleData = this.schedule
         task.daysOfWeek.forEach((day: string) => {
-            newSchedule[day].push(task.id)
+            const newRecord = {
+                uuid: task.id,
+                completed: false
+            }
+            newSchedule[day].push(newRecord)
         });
-        this.store.set("schedule", newSchedule).then(() => {
-            this.store.get("schedule")
-        })
+
+        await this.store.set("schedule", newSchedule)
     }
 }

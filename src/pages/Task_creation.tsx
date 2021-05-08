@@ -31,9 +31,9 @@ export const Task: React.FC = () => {
         { id: 'monday', label: 'Monday', disabled: false },
         { id: 'tueday', label: 'Tuesday', disabled: false },
         { id: 'wenday', label: 'Wensday', disabled: false },
-        { id: 'thurday', label: 'Thursday', disabled: false },
+        { id: 'thursday', label: 'Thursday', disabled: false },
         { id: 'friday', label: 'Friday', disabled: false },
-        { id: 'satday', label: 'Saturday', disabled: false },
+        { id: 'saturday', label: 'Saturday', disabled: false },
         { id: 'sunday', label: 'Sunday', disabled: false },
         { id: 'all', label: 'Every Day', disabled: false },
     ]);
@@ -45,7 +45,7 @@ export const Task: React.FC = () => {
         none: false,
     }
     const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
-    
+
     const [startDate, setStartDate] = useState(moment());
     const [duration, setDuration] = useState(moment.duration({
         hours: 0,
@@ -89,11 +89,11 @@ export const Task: React.FC = () => {
         if (Object.keys(dotwIdMapping).find(() => dotwIdMapping['all'] != true)) {
             updateTaskValue('daysOfWeek', Object.keys(dotwIdMapping).filter(key => dotwIdMapping[key] == true))
         } else {
-            updateTaskValue('daysOfWeek', Object.values(dotwCheckboxList).map((item) => {
-                if (item.id != "all") {
-                    return item.id
-                }
-            }))
+            //this is to allow retriveing only the item's id without getting undefined
+            updateTaskValue('daysOfWeek', dotwCheckboxList
+                .filter(item => item.id != "all" )
+                .map(filteredItems => filteredItems.id )
+            )
         }
     }, [dotwCheckboxList, dotwIdMapping])
 
@@ -147,8 +147,8 @@ export const Task: React.FC = () => {
 
     const db_context = useContext(databaseContext);
     function createTask() {
-        db_context.addTask(newTask).then(() => {
-            db_context.getTasks().then((result) => {
+        db_context.addTaskToDB(newTask).then(() => {
+            db_context.getTasksFromDB().then((result) => {
                 console.log(result)
             })
         }).catch((error: Error) => {
@@ -170,7 +170,7 @@ export const Task: React.FC = () => {
             setStartDate(date);
         }
     };
-    
+
     useEffect(() => {
         setDuration(moment.duration({
             hours: startDate.hours(),

@@ -33,7 +33,6 @@ interface PlayScreenProps {
     changeTask: Function;
 }
 
-
 class Play extends Component<{}, PlayInterface> {
     static contextType = databaseContext;
     constructor(props: any) {
@@ -48,7 +47,7 @@ class Play extends Component<{}, PlayInterface> {
     }
 
     retriveTasks() {
-        this.context.getTasks().then((tasks: ITaskData[]) => {
+        this.context.getTasksFromDB().then((tasks: ITaskData[]) => {
             this.setState({ tasks_list: tasks ?? [] })
         })
     }
