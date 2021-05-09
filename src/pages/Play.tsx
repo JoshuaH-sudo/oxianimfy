@@ -14,8 +14,9 @@ import { ITaskData } from '../utils/custom_types'
 import Countdown from 'react-countdown';
 import moment from 'moment';
 
-interface ParentCompProps {
+interface PrepareProps {
     list?: React.ReactNode;
+    context: any
 }
 
 interface TaskProps {
@@ -46,9 +47,9 @@ class Play extends Component<{}, PlayInterface> {
         this.retriveTasks()
     }
 
-    retriveTasks() {
+    retriveTasks = () => {
         this.context.getTasksFromDBForToday().then((tasks: ITaskData[]) => {
-            this.setState({ tasks_list: tasks ?? [] })
+            this.setState({ tasks_list: tasks ?? []})
         })
     }
 
@@ -62,20 +63,21 @@ class Play extends Component<{}, PlayInterface> {
 
         return (
             <div>
-                { this.state.tasks_list.length > 0 ? <Prepare list={this.state.tasks_list} /> : noGame}
+                { this.state.tasks_list.length > 0 ? <Prepare context={this.context} list={this.state.tasks_list} /> : noGame}
             </div>
         )
     }
 
 }
 
-const Prepare: React.FC<ParentCompProps> = (props) => {
+const Prepare: React.FC<PrepareProps> = (props) => {
     const tasks_list: any = props.list
     const [current_task_index, set_current_task_index] = useState<number>(0);
 
     const changeTask = (step: number) => {
         const set_num = current_task_index + step
         set_current_task_index(set_num > 0 ? set_num : current_task_index)
+        props.context.completeTask(tasks_list[current_task_index].id)
     }
 
     useEffect(() => {

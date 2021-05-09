@@ -9,10 +9,10 @@ export interface ITaskData {
 }
 
 export interface taskRef {
-    uuid: string,
+    [k: string]: any,
     completed: boolean
 }
 
 export interface IScheduleData {
-    [index: string]: taskRef[],
+    [index: string]: any | taskRef,
 }

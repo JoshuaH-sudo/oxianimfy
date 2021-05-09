@@ -7,7 +7,7 @@ export class Database {
         this.createStorage()
     }
 
-    async clearStorage() {
+    async deleteStorage() {
         await this.store.clear();
     }
 

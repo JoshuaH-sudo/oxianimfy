@@ -5,13 +5,13 @@ import { Storage } from '@ionic/storage';
 
 export class Schedule_database {
     schedule: IScheduleData = {
-        "monday": [],
-        "tueday": [],
-        "wenday": [],
-        "thursday": [],
-        "friday": [],
-        "saturday": [],
-        "sunday": []
+        "monday": {},
+        "tueday": {},
+        "wenday": {},
+        "thursday": {},
+        "friday": {},
+        "saturday": {},
+        "sunday": {}
     }
     store: Storage;
 
@@ -38,14 +38,19 @@ export class Schedule_database {
         return await this.store.get("schedule")
     }
 
+    updateSchedule = async (day: string, id: string, value: object) => {
+        var newSchedule:IScheduleData = this.schedule
+        newSchedule[day][id] = value 
+        await this.store.set("schedule", newSchedule)
+    }
+
     addTaskToSchedule = async (task: ITaskData) => {
         var newSchedule:IScheduleData = this.schedule
         task.daysOfWeek.forEach((day: string) => {
             const newRecord = {
-                uuid: task.id,
                 completed: false
             }
-            newSchedule[day].push(newRecord)
+            newSchedule[day][task.id] = newRecord
         });
 
         await this.store.set("schedule", newSchedule)

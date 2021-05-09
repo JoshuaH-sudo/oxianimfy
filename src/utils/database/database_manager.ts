@@ -15,8 +15,6 @@ export class Database_manager {
         this.task_db = new Task_database(this.app_db)
         this.schedule_db = new Schedule_database(this.app_db)
         this.app_storage = this.app_db.store
-
-
     }
 
     addTaskToDB = (newTask: ITaskData) => {
@@ -41,27 +39,37 @@ export class Database_manager {
         })
     }
 
+    completeTask = (completedTasksId: string) => {
+        let today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
+        return new Promise((resolve, reject) => {
+            const updatedValue = {
+                completed: true
+            }
+            this.schedule_db.updateSchedule(today, completedTasksId, updatedValue).then(() => {
+                resolve(true)
+            }).catch(error => {
+                reject(error)
+            })
+        })
+    }
+
     getTasksFromDBForToday = () => {
         return new Promise((resolve, reject) => {
-
             var retrivedTaskLists: ITaskData[] = []
+            this.schedule_db.getTasksFromSchedule().then((taskIdsList: IScheduleData) => {
 
-            this.schedule_db.getTasksFromSchedule().then((scheduleData: IScheduleData) => {
+                var today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
+                Object.keys(taskIdsList[today]).forEach((taskId: any) => {
+                    if (taskIdsList[today][taskId].completed == false) {
 
-                let taskIdsList: IScheduleData = scheduleData
-                let today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
-                console.log(taskIdsList)
-
-                taskIdsList[today].forEach((task: taskRef) => {
-                    this.task_db.findTask(task.uuid).then(foundTask => {
-                        if (foundTask) {
-                            retrivedTaskLists.push(foundTask)
-                        }
-                    })
+                        this.task_db.findTask(taskId).then((foundTask) => {
+                            if (foundTask) {
+                                retrivedTaskLists.push(foundTask)
+                            }
+                        })
+                    }
                 })
-                
                 resolve(retrivedTaskLists)
-
             }).catch((error) => {
                 reject(error)
             })

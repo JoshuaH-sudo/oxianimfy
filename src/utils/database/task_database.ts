@@ -18,13 +18,14 @@ export class Task_database {
     }
 
     findTask = async (id: string) => {
-        return this.task_list.find((task) => task.id == id)
+        let taskList:ITaskData[] = await this.store.get('task');
+        return taskList.find((task: ITaskData) => task.id == id)
     }
 
     addTask = async (newTask: ITaskData) => {
 
-        let newTaskList: ITaskData[] = this.task_list
-        newTask.id = v4()
+        let newTaskList:ITaskData[] = await this.store.get('task');
+        newTask.id = v4();
         newTaskList.push(newTask)
         return await this.store.set('task', newTaskList)
 
