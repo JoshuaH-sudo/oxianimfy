@@ -25,7 +25,7 @@ interface TaskProps {
 }
 
 interface PlayInterface {
-    tasks_list: any[];
+    tasks_list: any;
 }
 
 interface PlayScreenProps {
@@ -47,9 +47,12 @@ class Play extends Component<{}, PlayInterface> {
         this.retriveTasks()
     }
 
-    retriveTasks = () => {
-        this.context.getTasksFromDBForToday().then((tasks: ITaskData[]) => {
-            this.setState({ tasks_list: tasks ?? []})
+    retriveTasks() {
+        this.context.getTasksFromDBForToday().then((tasks: any) => {
+            console.log(tasks)
+            console.log(Object.keys(tasks))
+
+            this.setState({ tasks_list: tasks })
         })
     }
 
