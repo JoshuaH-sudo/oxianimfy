@@ -55,17 +55,26 @@ export class Database_manager {
 
     getTasksFromDBForToday = () => {
         return new Promise((resolve, reject) => {
-            var retrivedTaskLists: ITaskData[] = []
+            var retrivedTaskLists: any[]
             this.schedule_db.getTasksFromSchedule().then((taskIdsList: IScheduleData) => {
 
                 var today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
-                Object.keys(taskIdsList[today]).forEach(async (taskId: any) => {
-                    if (taskIdsList[today][taskId].completed == false) {
+                if (typeof taskIdsList != 'undefined') {
+                    Object.keys(taskIdsList[today]).forEach((taskId: any) => {
+                        if (taskIdsList[today][taskId].completed == false) {
 
-                        let foundTask = await this.task_db.findTask(taskId)
-                        if (foundTask) retrivedTaskLists.push(foundTask);
-                    }
-                })
+                            this.task_db.findTask(taskId).then((foundTask) => {
+                                console.log(foundTask)
+                                if (foundTask) retrivedTaskLists.push({
+                                    foundTask
+                                })
+                            })
+                    
+                        }
+                    })
+
+                }
+
                 console.log(retrivedTaskLists)
                 resolve(retrivedTaskLists)
             }).catch((error) => {

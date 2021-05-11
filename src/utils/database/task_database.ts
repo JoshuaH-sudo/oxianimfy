@@ -24,7 +24,7 @@ export class Task_database {
 
     addTask = async (newTask: ITaskData) => {
 
-        let newTaskList:ITaskData[] = await this.store.get('task');
+        let newTaskList:ITaskData[] = await this.store.get('task') ?? []
         newTask.id = v4();
         newTaskList.push(newTask)
         return await this.store.set('task', newTaskList)

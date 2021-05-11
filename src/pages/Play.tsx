@@ -50,9 +50,7 @@ class Play extends Component<{}, PlayInterface> {
     retriveTasks() {
         this.context.getTasksFromDBForToday().then((tasks: any) => {
             console.log(tasks)
-            console.log(Object.keys(tasks))
-
-            this.setState({ tasks_list: tasks })
+            if (tasks) this.setState({ tasks_list: tasks })
         })
     }
 
