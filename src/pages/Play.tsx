@@ -34,40 +34,36 @@ interface PlayScreenProps {
     changeTask: Function;
 }
 
-class Play extends Component<{}, PlayInterface> {
-    static contextType = databaseContext;
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            tasks_list: []
-        }
-    }
+const Play: React.FC<PlayInterface> = (props) => {
+    // static contextType = databaseContext;
+    const [tasks_list, set_tasks_list] = useState<any[]>([])
+    const context = useContext(databaseContext)
 
-    componentDidMount() {
-        this.retriveTasks()
-    }
-
-    retriveTasks() {
-        this.context.getTasksFromDBForToday().then((tasks: any) => {
-            console.log(tasks)
-            if (tasks) this.setState({ tasks_list: tasks })
+    useEffect(() => {
+        context.getTasksFromDBForToday().then((tasks: any[]) => {
+            if (tasks) set_tasks_list(tasks)
+        }).catch((error: any) => {
+            console.log(error)
         })
-    }
+    }, [])
 
-    render() {
-        const noGame = (
-            <EuiPanel paddingSize="l">
-                <EuiText>No tasks for today hurray</EuiText>
-                <EuiButton fill href="#/">Return</EuiButton>
-            </EuiPanel>
-        )
+    useEffect(() => {
+        console.log(tasks_list)
+        console.log(tasks_list.length)
+    },[tasks_list])
 
-        return (
-            <div>
-                { this.state.tasks_list.length > 0 ? <Prepare context={this.context} list={this.state.tasks_list} /> : noGame}
-            </div>
-        )
-    }
+    const noGame = (
+        <EuiPanel paddingSize="l">
+            <EuiText>No tasks for today hurray</EuiText>
+            <EuiButton fill href="#/">Return</EuiButton>
+        </EuiPanel>
+    )
+
+    return (
+        <div>
+            { tasks_list.length > 0 ? <Prepare context={context} list={tasks_list} /> : noGame}
+        </div>
+    )
 
 }
 
@@ -132,7 +128,7 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
 
     return (
         <div>
-            { task_intro }
+            { task_intro}
             <EuiFlexGroup justifyContent="spaceEvenly">
                 <EuiFlexItem grow={false}>
                     <EuiButton
@@ -199,7 +195,7 @@ const Counter_task: React.FC<TaskProps> = (props) => {
             </EuiFlexItem>
 
             <EuiFlexItem grow={false}>
-                { current_counter + '/' + task.unit }
+                {current_counter + '/' + task.unit}
             </EuiFlexItem>
 
             <EuiFlexItem grow={false}>

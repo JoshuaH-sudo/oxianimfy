@@ -53,34 +53,24 @@ export class Database_manager {
         })
     }
 
-    getTasksFromDBForToday = () => {
-        return new Promise((resolve, reject) => {
-            var retrivedTaskLists: any[]
-            this.schedule_db.getTasksFromSchedule().then((taskIdsList: IScheduleData) => {
+    getTasksFromDBForToday = async () => {
 
-                var today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
-                if (typeof taskIdsList != 'undefined') {
-                    Object.keys(taskIdsList[today]).forEach((taskId: any) => {
-                        if (taskIdsList[today][taskId].completed == false) {
+        var retrivedTaskLists: any[] = []
+        let taskIdsList = await this.schedule_db.getTasksFromSchedule()
+        var today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
+        if (taskIdsList) {
+            taskIdsList[today].forEach(async (task: any) => {
 
-                            this.task_db.findTask(taskId).then((foundTask) => {
-                                console.log(foundTask)
-                                if (foundTask) retrivedTaskLists.push({
-                                    foundTask
-                                })
-                            })
-                    
-                        }
-                    })
+                if (task.completed == false) {
+                    let foundTask = await this.task_db.findTask(task.taskId)
+
+                    if (foundTask) {
+                        retrivedTaskLists.push(foundTask)
+                    }
 
                 }
-
-                console.log(retrivedTaskLists)
-                resolve(retrivedTaskLists)
-            }).catch((error) => {
-                reject(error)
             })
-
-        })
+        }
+        return retrivedTaskLists
     }
 }

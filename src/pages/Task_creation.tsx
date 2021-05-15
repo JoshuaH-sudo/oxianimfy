@@ -30,7 +30,7 @@ export const Task: React.FC = () => {
     const [dotwCheckboxList, setDotwCheckboxList] = useState([
         { id: 'monday', label: 'Monday', disabled: false },
         { id: 'tuesday', label: 'Tuesday', disabled: false },
-        { id: 'wenday', label: 'Wensday', disabled: false },
+        { id: 'wednesday', label: 'Wednesday', disabled: false },
         { id: 'thursday', label: 'Thursday', disabled: false },
         { id: 'friday', label: 'Friday', disabled: false },
         { id: 'saturday', label: 'Saturday', disabled: false },
