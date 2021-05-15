@@ -28,18 +28,30 @@ export const Task: React.FC = () => {
     })
 
     const [dotwCheckboxList, setDotwCheckboxList] = useState([
-        { id: 'mon', label: 'Monday', disabled: false },
-        { id: 'tue', label: 'Tuesday', disabled: false },
-        { id: 'wen', label: 'Wensday', disabled: false },
-        { id: 'thur', label: 'Thursday', disabled: false },
-        { id: 'fri', label: 'Friday', disabled: false },
-        { id: 'sat', label: 'Saturday', disabled: false },
-        { id: 'sun', label: 'Sunday', disabled: false },
+        { id: 'monday', label: 'Monday', disabled: false },
+        { id: 'tuesday', label: 'Tuesday', disabled: false },
+        { id: 'wednesday', label: 'Wednesday', disabled: false },
+        { id: 'thursday', label: 'Thursday', disabled: false },
+        { id: 'friday', label: 'Friday', disabled: false },
+        { id: 'saturday', label: 'Saturday', disabled: false },
+        { id: 'sunday', label: 'Sunday', disabled: false },
         { id: 'all', label: 'Every Day', disabled: false },
     ]);
-
     const [dotwIdMapping, setDotwIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>({});
 
+    var taskMesureIdMapDefault: EuiCheckboxGroupIdToSelectedMap = {
+        timer: true,
+        counter: false,
+        none: false,
+    }
+    const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
+
+    const [startDate, setStartDate] = useState(moment());
+    const [duration, setDuration] = useState(moment.duration({
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+    }));
 
     const onDotwChange = (optionId: keyof object | string) => {
         //disable all other options and set them unchecked
@@ -77,11 +89,11 @@ export const Task: React.FC = () => {
         if (Object.keys(dotwIdMapping).find(() => dotwIdMapping['all'] != true)) {
             updateTaskValue('daysOfWeek', Object.keys(dotwIdMapping).filter(key => dotwIdMapping[key] == true))
         } else {
-            updateTaskValue('daysOfWeek', Object.values(dotwCheckboxList).map((item) => {
-                if (item.id != "all") {
-                    return item.id
-                }
-            }))
+            //this is to allow retriveing only the item's id without getting undefined
+            updateTaskValue('daysOfWeek', dotwCheckboxList
+                .filter(item => item.id != "all" )
+                .map(filteredItems => filteredItems.id )
+            )
         }
     }, [dotwCheckboxList, dotwIdMapping])
 
@@ -99,14 +111,6 @@ export const Task: React.FC = () => {
             label: 'None'
         }
     ]
-
-    var taskMesureIdMapDefault: EuiCheckboxGroupIdToSelectedMap = {
-        timer: true,
-        counter: false,
-        none: false,
-    }
-
-    const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
 
     const onTaskMesureChange = (optionId: keyof object | string) => {
         var newTaskMesureIdMap: EuiCheckboxGroupIdToSelectedMap = {
@@ -143,7 +147,7 @@ export const Task: React.FC = () => {
 
     const db_context = useContext(databaseContext);
     function createTask() {
-        db_context.addTask(newTask).catch((error: Error) => {
+        db_context.addTaskToDB(newTask).catch((error: Error) => {
             console.log(error)
         })
     }
@@ -157,17 +161,12 @@ export const Task: React.FC = () => {
         </EuiFormRow>
     )
 
-    const [startDate, setStartDate] = useState(moment());
-    const [duration, setDuration] = useState(moment.duration({
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    }));
     const handleChange = (date: moment.Moment) => {
         if (date) {
             setStartDate(date);
         }
     };
+
     useEffect(() => {
         setDuration(moment.duration({
             hours: startDate.hours(),

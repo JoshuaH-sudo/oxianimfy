@@ -7,3 +7,12 @@ export interface ITaskData {
     unit: number | string
 
 }
+
+export interface taskRef {
+    [k: string]: any,
+    completed: boolean
+}
+
+export interface IScheduleData {
+    [index: string]: any | taskRef,
+}
