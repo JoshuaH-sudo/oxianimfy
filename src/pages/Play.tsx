@@ -40,17 +40,10 @@ const Play: React.FC<PlayInterface> = (props) => {
     const context = useContext(databaseContext)
 
     useEffect(() => {
-        context.getTasksFromDBForToday().then((tasks: any[]) => {
-            if (tasks) set_tasks_list(tasks)
-        }).catch((error: any) => {
-            console.log(error)
-        })
+        context.getTasksFromDBForToday()
+            .then((tasks: any) => set_tasks_list(tasks))
+            .catch((error) => console.log(error))
     }, [])
-
-    useEffect(() => {
-        console.log(tasks_list)
-        console.log(tasks_list.length)
-    },[tasks_list])
 
     const noGame = (
         <EuiPanel paddingSize="l">
@@ -61,7 +54,7 @@ const Play: React.FC<PlayInterface> = (props) => {
 
     return (
         <div>
-            { tasks_list.length > 0 ? <Prepare context={context} list={tasks_list} /> : noGame}
+            { tasks_list ? <Prepare context={context} list={tasks_list} /> : noGame}
         </div>
     )
 
