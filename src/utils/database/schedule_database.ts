@@ -44,10 +44,9 @@ export class Schedule_database {
         var newSchedule:IScheduleData = await this.store.get("schedule")
         task.daysOfWeek.forEach((day: string) => {
             const newRecord = {
-                taskId: task.id,
                 completed: false
             }
-            newSchedule[day].push(newRecord)
+            newSchedule[day][task.id] = newRecord
         });
 
         await this.store.set("schedule", newSchedule)

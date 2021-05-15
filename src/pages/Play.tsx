@@ -67,12 +67,7 @@ const Prepare: React.FC<PrepareProps> = (props) => {
     const changeTask = (step: number) => {
         const set_num = current_task_index + step
         set_current_task_index(set_num > 0 ? set_num : current_task_index)
-        props.context.completeTask(tasks_list[current_task_index].id)
     }
-
-    useEffect(() => {
-        console.log(tasks_list[current_task_index])
-    }, [current_task_index])
 
     const playGame = (
         <Play_screen list={tasks_list} index={current_task_index} changeTask={changeTask} />
@@ -166,11 +161,14 @@ const Counter_task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
     const [current_counter, set_current_counter] = useState<number>(0);
+    const context = useContext(databaseContext)
 
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            props.changeTask(1)
+            context.completeTask(task.id).then(() => {
+                props.changeTask(1)
+            })
         } else {
             set_current_counter(set_num)
         }

@@ -39,18 +39,14 @@ export class Database_manager {
         })
     }
 
-    completeTask = (completedTasksId: string) => {
+    completeTask = async (completedTasksId: string) => {
         let today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
-        return new Promise((resolve, reject) => {
-            const updatedValue = {
-                completed: true
-            }
-            this.schedule_db.updateSchedule(today, completedTasksId, updatedValue).then(() => {
-                resolve(true)
-            }).catch(error => {
-                reject(error)
-            })
-        })
+
+        const updatedValue = {
+            completed: true
+        }
+
+        await this.schedule_db.updateSchedule(today, completedTasksId, updatedValue)
     }
 
     getTasksFromDBForToday = async () => {
@@ -58,19 +54,19 @@ export class Database_manager {
             let taskIdsList = await this.schedule_db.getTasksFromSchedule()
             const today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
 
-            return await Promise.all(taskIdsList[today].map( async (task: any) => {
-                if (task.completed == false) {
-                    return await this.task_db.findTask(task.taskId)
+            let promises: any[] = []
+            Object.keys(taskIdsList[today]).forEach((taskKey: string) => {
+                const entry = taskIdsList[today][taskKey]
+                if (entry.completed == false) {
+                    promises.push(
+                        this.task_db.findTask(taskKey)
+                    )
                 }
-            }))
+            })
+            
+            return await Promise.all(promises)
         } catch (error) {
             console.log(error)
         }
     }
-
-    asyncForEach = async (array: any, callback: any) => {
-        for (let index = 0; index < array.length; index++) {
-          await callback(array[index], index, array);
-        }
-      }
 }
