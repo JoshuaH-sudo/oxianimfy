@@ -52,7 +52,7 @@ export class Database_manager {
     getTasksFromDBForToday = async () => {
         try {
             let taskIdsList = await this.schedule_db.getTasksFromSchedule()
-            const today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
+            const today = this.schedule_db.getTodaysName()
 
             let promises: any[] = []
             Object.keys(taskIdsList[today]).forEach((taskKey: string) => {

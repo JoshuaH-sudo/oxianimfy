@@ -5,7 +5,6 @@ export class Database {
 
     constructor() {
         this.createStorage()
-        this.deleteStorage()
     }
 
     async deleteStorage() {
