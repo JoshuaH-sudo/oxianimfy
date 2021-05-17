@@ -46,12 +46,11 @@ export const Task: React.FC = () => {
     }
     const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
 
-    const [startDate, setStartDate] = useState(moment());
-    const [duration, setDuration] = useState(moment.duration({
+    const [duration, setDuration] = useState({
         hours: 0,
         minutes: 0,
         seconds: 0
-    }));
+    })
 
     const onDotwChange = (optionId: keyof object | string) => {
         //disable all other options and set them unchecked
@@ -91,8 +90,8 @@ export const Task: React.FC = () => {
         } else {
             //this is to allow retriveing only the item's id without getting undefined
             updateTaskValue('daysOfWeek', dotwCheckboxList
-                .filter(item => item.id != "all" )
-                .map(filteredItems => filteredItems.id )
+                .filter(item => item.id != "all")
+                .map(filteredItems => filteredItems.id)
             )
         }
     }, [dotwCheckboxList, dotwIdMapping])
@@ -161,35 +160,53 @@ export const Task: React.FC = () => {
         </EuiFormRow>
     )
 
-    const handleChange = (date: moment.Moment) => {
-        if (date) {
-            setStartDate(date);
-        }
+    const updateTimer = (event: any) => {        
+        let key = event.target.name
+        let value = event.target.value
+
+        const updateDuration = {
+            ...duration,
+            ...{
+                [key]: value
+            },
+        };
+
+        setDuration(updateDuration)
+        updateTaskValue("unit", JSON.stringify(moment.duration(updateDuration)))
     };
 
     useEffect(() => {
-        setDuration(moment.duration({
-            hours: startDate.hours(),
-            minutes: startDate.minutes(),
-            seconds: startDate.seconds()
-        }))
-        updateTaskValue("unit", JSON.stringify(duration))
-    }, [startDate])
+    }, [])
 
     const setTimer = (
-        <EuiFormRow
-            label="Timer"
-            helpText="Hours : Minute : Seconds"
-        >
-            <EuiDatePicker
-                showTimeSelect
-                showTimeSelectOnly
-                selected={startDate}
-                onChange={handleChange}
-                dateFormat="HH:mm:ss"
-                timeFormat="HH:mm:ss"
-            />
-        </EuiFormRow>
+        <EuiForm>
+            <EuiFormRow>
+                <EuiFieldNumber
+                    name='hours'
+                    onChange={updateTimer}
+                    prepend={'Hours'}
+                    value={duration['hours']}
+
+                />
+            </EuiFormRow>
+            <EuiFormRow>
+                <EuiFieldNumber
+                    name='minutes'
+                    onChange={updateTimer}
+                    prepend={'Minutes'}
+                    value={duration['minutes']}
+
+                />
+            </EuiFormRow>
+            <EuiFormRow>
+                <EuiFieldNumber
+                    name='seconds'
+                    onChange={updateTimer}
+                    prepend={'Seconds'}
+                    value={duration['seconds']}
+                />
+            </EuiFormRow>
+        </EuiForm>
     )
 
     return (

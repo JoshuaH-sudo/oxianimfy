@@ -148,11 +148,20 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     var timer_length = 0
     const duation = JSON.parse(task.unit as string)
     timer_length = moment.duration(duation).asMilliseconds()
-    console.log(timer_length)
-    console.log(duation)
+    const context = useContext(databaseContext)
+
+    const OnTimerFinish = () => {
+        context.completeTask(task.id).then(() => {
+            props.changeTask(1)
+        })
+    }
+
     return (
         <EuiFlexItem grow={false}>
-            <Countdown date={Date.now() + timer_length}></Countdown>
+            <Countdown 
+                date={Date.now() + timer_length}
+                onComplete={OnTimerFinish}
+            />
         </EuiFlexItem>
     )
 }

@@ -35,7 +35,6 @@ export class Schedule_database {
     resetTaskCompletenss = async () => {
         let newSchedule: IScheduleData = await this.store.get("schedule")
         const today = this.getTodaysName()
-        console.log(newSchedule)
         
         Object.keys(newSchedule).forEach((day: string) => {
             if (day != today) {
