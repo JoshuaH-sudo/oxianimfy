@@ -1,9 +1,13 @@
-import { ITaskData } from '../custom_types';
+import { ITaskData, ISetData } from '../custom_types';
 import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
     task_list: ITaskData[] = []
+    set_list: ISetData = {
+        "misc": []
+    }
+    
     store: Storage;
 
     constructor(app_database: Database) {
@@ -13,18 +17,18 @@ export class Task_database {
         })
     }
 
-    getTasks = async ()  => {
+    getTasks = async () => {
         return await this.store.get('task');
     }
 
     findTask = async (scheduleId: string) => {
-        let taskList:ITaskData[] = await this.store.get('task');
+        let taskList: ITaskData[] = await this.store.get('task');
         return taskList.find((task: ITaskData) => task.id == scheduleId)
     }
 
     addTask = async (newTask: ITaskData) => {
 
-        let newTaskList:ITaskData[] = await this.store.get('task') ?? []
+        let newTaskList: ITaskData[] = await this.store.get('task') ?? []
         newTask.id = v4();
         newTaskList.push(newTask)
         return await this.store.set('task', newTaskList)

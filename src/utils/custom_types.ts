@@ -8,6 +8,17 @@ export interface ITaskData {
 
 }
 
+export interface setRef {
+    [k: string]: any,
+    name: string,
+    desc: string,
+    [index: number]: { taskId: string, completed: boolean };
+}
+
+export interface ISetData {
+    [index: string]: any | setRef,
+}
+
 export interface taskRef {
     [k: string]: any,
     completed: boolean
