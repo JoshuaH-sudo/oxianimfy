@@ -40,8 +40,14 @@ const Play: React.FC<PlayInterface> = (props) => {
     const context = useContext(databaseContext)
 
     useEffect(() => {
-        context.getTasksFromDBForToday()
-            .then((tasks: any) => set_tasks_list(tasks))
+        context.getSetsFromDBForToday().then((sets: any) => {
+            console.log(sets)
+        })
+        context.getTasksFromSet('misc')
+            .then((tasks: any) => {
+                console.log(tasks)
+                set_tasks_list(tasks)
+            })
             .catch((error) => console.log(error))
     }, [])
 
@@ -151,7 +157,7 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     const context = useContext(databaseContext)
 
     const OnTimerFinish = () => {
-        context.completeTask(task.id).then(() => {
+        context.completeTask(task.id, 'misc').then(() => {
             props.changeTask(1)
         })
     }
@@ -175,7 +181,7 @@ const Counter_task: React.FC<TaskProps> = (props) => {
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            context.completeTask(task.id).then(() => {
+            context.completeTask(task.id, 'misc').then(() => {
                 props.changeTask(1)
             })
         } else {

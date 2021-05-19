@@ -244,7 +244,7 @@ export const Task: React.FC = () => {
                             />
                         </EuiFormRow>
 
-                        <EuiFormRow label="Days of the Week">
+                        <EuiFormRow label="Select set this task belongs to">
                             <EuiSuperSelect
                                 options={[
                                     {
@@ -252,6 +252,7 @@ export const Task: React.FC = () => {
                                         inputDisplay: 'default'
                                     }
                                 ]}
+                                valueOfSelected={'misc'}
                                 prepend="Groups"
                             />
                         </EuiFormRow>

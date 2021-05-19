@@ -1,10 +1,12 @@
-import { ITaskData, ISetData } from '../custom_types';
+import { ITaskData, ISetData, taskRef } from '../custom_types';
 import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
     set_list: ISetData = {
-        "misc": []
+        misc: {
+            tasks:[]
+        }
     }
     
     store: Storage;
@@ -25,29 +27,41 @@ export class Task_database {
         }
     }
 
-    getTaskSet = async () => {
-        return this.store.get('task_set')
+    getSet = async (setId: string) => {
+        let setList = await this.store.get('task_set') ?? this.set_list
+        return setList[setId]
     }
 
-    findTask = async (scheduleId: string) => {
-        let taskList: ITaskData[] = await this.store.get('task');
-        return taskList.find((task: ITaskData) => task.id == scheduleId)
+    getSetsTaskIds = async (setId: string) => {
+        let setList = await this.store.get('task_set') ?? this.set_list
+        return setList[setId].tasks
     }
 
-    getSets = async () => {
-        return await this.store.get('task_set')
+    completeTaskInSet = async (completeTaskId: string, setId: string) => {
+        let taskSetList: ISetData = await this.store.get('task_set') ?? []
+        const taskIndex = taskSetList[setId].tasks.findIndex((task: taskRef) => task.taskId == completeTaskId )
+        taskSetList[setId].tasks[taskIndex].completed = true
+        return await this.store.set('task_set', taskSetList)
     }
 
-    addSet = async (name: string, desc: string) => {
-
+    findTask = async (taskId: string) => {
+        let taskList:ITaskData[] = await this.store.get('task');
+        return taskList.find((task: ITaskData) => task.id == taskId)
     }
 
-    addTask = async (newTask: ITaskData, group: string) => {
+    addTask = async (newTask: ITaskData, setId: string) => {
 
-        let newSetList: ISetData = await this.store.get('task') ?? this.set_list
+        let newTaskList: ISetData = await this.store.get('task') ?? []
+        let newTaskSetList: ISetData = await this.store.get('task_set') ?? this.set_list
+
         newTask.id = v4();
-        newSetList[group].push(newTask)
-        return await this.store.set('task', newSetList)
+        newTaskList.push(newTask)
+        newTaskSetList[setId].tasks.push({ taskId: newTask.id, completed: false})
+
+        console.log('newTaskSet', newTaskSetList)
+
+        await this.store.set('task', newTaskList)
+        return await this.store.set('task_set', newTaskSetList)
 
     }
 }

@@ -20,7 +20,7 @@ export interface ISetData {
 }
 
 export interface taskRef {
-    [k: string]: any,
+    taskId: string,
     completed: boolean
 }
 

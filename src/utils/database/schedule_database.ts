@@ -19,6 +19,7 @@ export class Schedule_database {
         this.store = app_database.store
         this.createScheduleDB()
             .then(() => this.resetTaskCompletenss())
+            .then(() => this.getSchedule())
     }
 
     getTodaysName = () => {
@@ -50,8 +51,17 @@ export class Schedule_database {
         await this.store.set("schedule", newSchedule)
     }
 
-    getTasksFromSchedule = async () => {
+    getSchedule = async () => {
+        console.log(await this.store.get("schedule"))
         return await this.store.get("schedule")
+    }
+
+    completeSetSchedule = async (setId: string) => {
+        var newSchedule: IScheduleData = await this.store.get("schedule")
+        const today = this.getTodaysName()
+
+        newSchedule[today][setId].completed = true
+        await this.store.set("schedule", newSchedule)
     }
 
     updateSchedule = async (day: string, id: string, value: object) => {
@@ -60,9 +70,9 @@ export class Schedule_database {
         await this.store.set("schedule", newSchedule)
     }
 
-    addTaskToSchedule = async (set: string) => {
+    addSetToSchedule = async (set: string, daysOfWeek: []) => {
         var newSchedule: IScheduleData = await this.store.get("schedule")
-        set.daysOfWeek.forEach((day: string) => {
+        daysOfWeek.forEach((day: string) => {
             const newRecord = {
                 completed: false
             }

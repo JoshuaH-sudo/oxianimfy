@@ -20,12 +20,14 @@ export class Database_manager {
     addTaskToDB = (newTask: ITaskData, set: string) => {
         return new Promise((resolve, reject) => {
             this.task_db.addTask(newTask, set).then(() => {
-                this.schedule_db.addTaskToSchedule(set).then(() => {
+
+                this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek).then(() => {
                     resolve(true)
                 })
-            }).catch(error => {
-                reject(error)
             })
+                .catch(error => {
+                    reject(error)
+                })
         })
     }
 
@@ -39,31 +41,33 @@ export class Database_manager {
         })
     }
 
-    completeTask = async (completedTasksId: string) => {
-        let today = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date).toLowerCase()
-
-        const updatedValue = {
-            completed: true
-        }
-
-        await this.schedule_db.updateSchedule(today, completedTasksId, updatedValue)
+    completeTask = async (completedTasksId: string, setId: string) => {
+        await this.task_db.completeTaskInSet(completedTasksId, setId)
+        let currentSet = await this.task_db.getSet(setId)
+        let setNotCompleted = currentSet.tasks.find((task: taskRef) => task.completed != false)
+        if (!setNotCompleted) await this.schedule_db.completeSetSchedule(setId)
     }
 
-    getTasksFromDBForToday = async () => {
+    getSetsFromDBForToday = async () => {
+        let schedule = await this.schedule_db.getSchedule()
+        const today = this.schedule_db.getTodaysName()
+        return schedule[today]
+    }
+
+    getTasksFromSet = async (taskSet: string) => {
         try {
-            let taskIdsList = await this.schedule_db.getTasksFromSchedule()
-            const today = this.schedule_db.getTodaysName()
 
             let promises: any[] = []
-            Object.keys(taskIdsList[today]).forEach((taskKey: string) => {
-                const entry = taskIdsList[today][taskKey]
+            let taskIdList = await this.task_db.getSetsTaskIds(taskSet)
+            taskIdList.forEach((entry: taskRef) => {
+
                 if (entry.completed == false) {
                     promises.push(
-                        this.task_db.findTask(taskKey)
+                        this.task_db.findTask(entry.taskId)
                     )
                 }
             })
-            
+
             return await Promise.all(promises)
         } catch (error) {
             console.log(error)
