@@ -1,4 +1,4 @@
-import { IScheduleData, ITaskData } from '../custom_types';
+import { IScheduleData, ISetData, ITaskData } from '../custom_types';
 import { Database } from './database';
 import { Storage } from '@ionic/storage';
 
@@ -60,13 +60,13 @@ export class Schedule_database {
         await this.store.set("schedule", newSchedule)
     }
 
-    addTaskToSchedule = async (task: ITaskData) => {
+    addTaskToSchedule = async (set: string) => {
         var newSchedule: IScheduleData = await this.store.get("schedule")
-        task.daysOfWeek.forEach((day: string) => {
+        set.daysOfWeek.forEach((day: string) => {
             const newRecord = {
                 completed: false
             }
-            newSchedule[day][task.id] = newRecord
+            newSchedule[day][set] = newRecord
         });
 
         await this.store.set("schedule", newSchedule)

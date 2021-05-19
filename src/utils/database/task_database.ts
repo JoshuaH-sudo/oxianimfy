@@ -3,7 +3,6 @@ import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
-    task_list: ITaskData[] = []
     set_list: ISetData = {
         "misc": []
     }
@@ -12,13 +11,22 @@ export class Task_database {
 
     constructor(app_database: Database) {
         this.store = app_database.store
-        this.getTasks().then((result: ITaskData[]) => {
-            this.task_list = (typeof result == "object" && result != null) ? result : []
-        })
+        this.setTaskSet()
     }
 
     getTasks = async () => {
         return await this.store.get('task');
+    }
+
+    setTaskSet = async () => {
+        let keys = await this.store.keys()
+        if (keys.find(key => key == 'task_set')) {
+            await this.store.set('task_set', this.set_list)
+        }
+    }
+
+    getTaskSet = async () => {
+        return this.store.get('task_set')
     }
 
     findTask = async (scheduleId: string) => {
@@ -26,12 +34,20 @@ export class Task_database {
         return taskList.find((task: ITaskData) => task.id == scheduleId)
     }
 
-    addTask = async (newTask: ITaskData) => {
+    getSets = async () => {
+        return await this.store.get('task_set')
+    }
 
-        let newTaskList: ITaskData[] = await this.store.get('task') ?? []
+    addSet = async (name: string, desc: string) => {
+
+    }
+
+    addTask = async (newTask: ITaskData, group: string) => {
+
+        let newSetList: ISetData = await this.store.get('task') ?? this.set_list
         newTask.id = v4();
-        newTaskList.push(newTask)
-        return await this.store.set('task', newTaskList)
+        newSetList[group].push(newTask)
+        return await this.store.set('task', newSetList)
 
     }
 }

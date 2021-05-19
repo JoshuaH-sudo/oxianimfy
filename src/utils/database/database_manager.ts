@@ -17,10 +17,10 @@ export class Database_manager {
         this.app_storage = this.app_db.store
     }
 
-    addTaskToDB = (newTask: ITaskData) => {
+    addTaskToDB = (newTask: ITaskData, set: string) => {
         return new Promise((resolve, reject) => {
-            this.task_db.addTask(newTask).then(() => {
-                this.schedule_db.addTaskToSchedule(newTask).then(() => {
+            this.task_db.addTask(newTask, set).then(() => {
+                this.schedule_db.addTaskToSchedule(set).then(() => {
                     resolve(true)
                 })
             }).catch(error => {

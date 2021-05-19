@@ -11,7 +11,7 @@ import {
     EuiFlexItem,
     EuiSpacer,
     EuiFieldNumber,
-    EuiDatePicker,
+    EuiSuperSelect
 } from '@elastic/eui';
 import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/form/checkbox/checkbox_group';
 import { ITaskData } from '../utils/custom_types'
@@ -146,7 +146,7 @@ export const Task: React.FC = () => {
 
     const db_context = useContext(databaseContext);
     function createTask() {
-        db_context.addTaskToDB(newTask).catch((error: Error) => {
+        db_context.addTaskToDB(newTask, 'misc').catch((error: Error) => {
             console.log(error)
         })
     }
@@ -160,7 +160,7 @@ export const Task: React.FC = () => {
         </EuiFormRow>
     )
 
-    const updateTimer = (event: any) => {        
+    const updateTimer = (event: any) => {
         let key = event.target.name
         let value = event.target.value
 
@@ -243,7 +243,20 @@ export const Task: React.FC = () => {
                                 onChange={(id) => onDotwChange(id)}
                             />
                         </EuiFormRow>
+
+                        <EuiFormRow label="Days of the Week">
+                            <EuiSuperSelect
+                                options={[
+                                    {
+                                        value: 'misc',
+                                        inputDisplay: 'default'
+                                    }
+                                ]}
+                                prepend="Groups"
+                            />
+                        </EuiFormRow>
                     </EuiFlexItem>
+
                     <EuiFlexItem >
                         <EuiFormRow label="Timed or Counted Task">
                             <EuiCheckboxGroup
@@ -252,6 +265,8 @@ export const Task: React.FC = () => {
                                 onChange={(id) => onTaskMesureChange(id)}
                             />
                         </EuiFormRow>
+
+                        <EuiSpacer />
 
                         {(newTask['mesure'] == 'timer') ? setTimer : ''}
                         {(newTask['mesure'] == 'counter') ? setCounter : ''}
