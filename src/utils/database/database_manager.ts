@@ -31,6 +31,14 @@ export class Database_manager {
         })
     }
 
+    getSetsFromDb = async () => {
+        return await this.task_db.getSets()
+    }
+
+    addTaskGroupToDB = async (setId: string, description: string) => {
+        return await this.task_db.createSet(setId, description)
+    }
+    
     getTasksFromDB = () => {
         return new Promise((resolve, reject) => {
             this.task_db.getTasks().then((tasks: ITaskData[]) => {
@@ -43,7 +51,7 @@ export class Database_manager {
 
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
-        let currentSet = await this.task_db.getSet(setId)
+        let currentSet = await this.task_db.getSetWithId(setId)
         let setNotCompleted = currentSet.tasks.find((task: taskRef) => task.completed != false)
         if (!setNotCompleted) await this.schedule_db.completeSetSchedule(setId)
     }

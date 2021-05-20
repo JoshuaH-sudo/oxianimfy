@@ -11,10 +11,17 @@ import {
     EuiFlexItem,
     EuiSpacer,
     EuiFieldNumber,
-    EuiSuperSelect
+    EuiSuperSelect,
+    EuiModal,
+    EuiModalBody,
+    EuiModalFooter,
+    EuiModalHeader,
+    EuiModalHeaderTitle,
+    EuiButtonIcon,
+    EuiText
 } from '@elastic/eui';
 import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/form/checkbox/checkbox_group';
-import { ITaskData } from '../utils/custom_types'
+import { ITaskData, setRef } from '../utils/custom_types'
 import { databaseContext } from '../App';
 import moment from 'moment';
 
@@ -27,6 +34,12 @@ export const Task: React.FC = () => {
         unit: 0
     })
 
+    const [newTaskGroup, setNewTaskGroup] = useState<setRef>({
+        name: '',
+        desc: '',
+        tasks: []
+    })
+
     const [dotwCheckboxList, setDotwCheckboxList] = useState([
         { id: 'monday', label: 'Monday', disabled: false },
         { id: 'tuesday', label: 'Tuesday', disabled: false },
@@ -37,6 +50,7 @@ export const Task: React.FC = () => {
         { id: 'sunday', label: 'Sunday', disabled: false },
         { id: 'all', label: 'Every Day', disabled: false },
     ]);
+
     const [dotwIdMapping, setDotwIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>({});
 
     var taskMesureIdMapDefault: EuiCheckboxGroupIdToSelectedMap = {
@@ -44,6 +58,7 @@ export const Task: React.FC = () => {
         counter: false,
         none: false,
     }
+
     const [taskMesureIdMapping, setTaskMesureIdMapping] = useState<EuiCheckboxGroupIdToSelectedMap>(taskMesureIdMapDefault);
 
     const [duration, setDuration] = useState({
@@ -51,6 +66,21 @@ export const Task: React.FC = () => {
         minutes: 0,
         seconds: 0
     })
+
+    const groupDisplay = (title: string, desc: string) => {
+        return (
+            <Fragment>
+                <strong>{title}</strong>
+                <EuiText size="s" color="subdued">
+                    <p className="euiTextColor--subdued">
+                        {desc}
+                    </p>
+                </EuiText>
+            </Fragment>
+        )
+    }
+
+    const [taskGroups, setTaskGroups] = useState<any>([])
 
     const onDotwChange = (optionId: keyof object | string) => {
         //disable all other options and set them unchecked
@@ -145,6 +175,30 @@ export const Task: React.FC = () => {
     }
 
     const db_context = useContext(databaseContext);
+
+    useEffect(() => {
+        db_context.getSetsFromDb().then((sets: any) => {
+            let parseSetData = Object.keys(sets).map((setName: string) => {
+                let title = setName.charAt(0).toUpperCase() + setName.slice(1);
+                let desc = sets[setName].desc
+
+                return {
+                    value: title.toLowerCase(),  
+                    inputDisplay: title,
+                    dropdownDisplay: (
+                        groupDisplay(title, desc)
+                    )
+                }
+            })
+
+            setTaskGroups(parseSetData)
+        })
+    }, [])
+
+    function createTaskGroup() {
+        db_context.addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc)
+    }
+
     function createTask() {
         db_context.addTaskToDB(newTask, 'misc').catch((error: Error) => {
             console.log(error)
@@ -175,8 +229,6 @@ export const Task: React.FC = () => {
         updateTaskValue("unit", JSON.stringify(moment.duration(updateDuration)))
     };
 
-    useEffect(() => {
-    }, [])
 
     const setTimer = (
         <EuiForm>
@@ -208,6 +260,50 @@ export const Task: React.FC = () => {
             </EuiFormRow>
         </EuiForm>
     )
+
+    const createSetForm = (
+        <EuiForm>
+            <EuiFormRow label="Set Name">
+                <EuiFieldText
+                    name="set_name"
+                // onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                />
+            </EuiFormRow>
+            <EuiFormRow label="Set Description">
+                <EuiTextArea
+                    name="set_name"
+                // onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                />
+            </EuiFormRow>
+
+            <EuiSpacer />
+
+        </EuiForm>
+    )
+
+    const [isModalVisible, setIsModalVisible] = useState(false)
+    const closeModal = () => setIsModalVisible(false);
+    const showModal = () => setIsModalVisible(true);
+    let createSetModal
+
+    if (isModalVisible) {
+        createSetModal = (
+            <EuiModal onClose={closeModal}>
+                <EuiModalHeader>
+                    <EuiModalHeaderTitle><h1>Create A Task Set</h1></EuiModalHeaderTitle>
+                </EuiModalHeader>
+
+                <EuiModalBody>
+                    {createSetForm}
+                </EuiModalBody>
+
+                <EuiModalFooter>
+                    <EuiButton onClick={closeModal} fill>Create</EuiButton>
+                    <EuiButton onClick={closeModal} fill color='danger'>Close</EuiButton>
+                </EuiModalFooter>
+            </EuiModal>
+        )
+    }
 
     return (
         <EuiDescribedFormGroup
@@ -244,19 +340,18 @@ export const Task: React.FC = () => {
                             />
                         </EuiFormRow>
 
-                        <EuiFormRow label="Select set this task belongs to">
+                        <EuiFormRow label="Group this task">
                             <EuiSuperSelect
-                                options={[
-                                    {
-                                        value: 'misc',
-                                        inputDisplay: 'default'
-                                    }
-                                ]}
+                                options={taskGroups}
                                 valueOfSelected={'misc'}
-                                prepend="Groups"
+                                prepend="Group"
+                                append={<EuiButtonIcon onClick={showModal} iconType="plusInCircle" />}
                             />
                         </EuiFormRow>
+
                     </EuiFlexItem>
+
+                    {createSetModal}
 
                     <EuiFlexItem >
                         <EuiFormRow label="Timed or Counted Task">

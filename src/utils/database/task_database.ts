@@ -3,8 +3,9 @@ import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
-    set_list: ISetData = {
+    default_set_list: ISetData = {
         misc: {
+            desc: "The default task set",
             tasks:[]
         }
     }
@@ -13,32 +14,45 @@ export class Task_database {
 
     constructor(app_database: Database) {
         this.store = app_database.store
-        this.setTaskSet()
+        this.initTaskSets()
     }
 
     getTasks = async () => {
-        return await this.store.get('task');
+        return await this.store.get('task_set') ?? [];
     }
 
-    setTaskSet = async () => {
+    initTaskSets = async () => {
         let keys = await this.store.keys()
         if (keys.find(key => key == 'task_set')) {
-            await this.store.set('task_set', this.set_list)
+            await this.store.set('task_set', this.default_set_list)
         }
     }
 
-    getSet = async (setId: string) => {
-        let setList = await this.store.get('task_set') ?? this.set_list
+    createSet = async (setId: string, description: string) => {
+        let newSetList = await this.getSets()
+        newSetList[setId] = {
+            desc: description,
+            task:[]
+        }
+        await this.store.set('task_set', newSetList)
+    }
+
+    getSets = async () => {
+        return await this.store.get('task_set') ?? this.default_set_list
+    }
+
+    getSetWithId = async (setId: string) => {
+        let setList = await this.getSets()
         return setList[setId]
     }
 
     getSetsTaskIds = async (setId: string) => {
-        let setList = await this.store.get('task_set') ?? this.set_list
+        let setList = await this.getSets()
         return setList[setId].tasks
     }
 
     completeTaskInSet = async (completeTaskId: string, setId: string) => {
-        let taskSetList: ISetData = await this.store.get('task_set') ?? []
+        let taskSetList: ISetData = await this.getTasks()
         const taskIndex = taskSetList[setId].tasks.findIndex((task: taskRef) => task.taskId == completeTaskId )
         taskSetList[setId].tasks[taskIndex].completed = true
         return await this.store.set('task_set', taskSetList)
@@ -52,7 +66,7 @@ export class Task_database {
     addTask = async (newTask: ITaskData, setId: string) => {
 
         let newTaskList: ISetData = await this.store.get('task') ?? []
-        let newTaskSetList: ISetData = await this.store.get('task_set') ?? this.set_list
+        let newTaskSetList: ISetData = await this.getSets()
 
         newTask.id = v4();
         newTaskList.push(newTask)
