@@ -18,7 +18,7 @@ export class Schedule_database {
     constructor(app_database: Database) {
         this.store = app_database.store
         this.createScheduleDB()
-            .then(() => this.resetTaskCompletenss())
+            .then(() => this.resetTaskSetCompletenss())
             .then(() => this.getSchedule())
     }
 
@@ -33,18 +33,18 @@ export class Schedule_database {
         }
     }
 
-    resetTaskCompletenss = async () => {
+    resetTaskSetCompletenss = async () => {
         let newSchedule: IScheduleData = await this.store.get("schedule")
         const today = this.getTodaysName()
         
         Object.keys(newSchedule).forEach((day: string) => {
             if (day != today) {
 
-                Object.keys(newSchedule[day]).forEach((task: any) => {
+                Object.keys(newSchedule[day]).forEach((set: any) => {
                     const newRecord = {
                         completed: false
                     }
-                    newSchedule[day][task] = newRecord
+                    newSchedule[day][set] = newRecord
                 });
             }
         });

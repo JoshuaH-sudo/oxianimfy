@@ -24,6 +24,7 @@ import { EuiCheckboxGroupIdToSelectedMap } from '@elastic/eui/src/components/for
 import { ITaskData, setRef } from '../utils/custom_types'
 import { databaseContext } from '../App';
 import moment from 'moment';
+import { string } from 'prop-types';
 
 export const Task: React.FC = () => {
     const [newTask, setNewTask] = useState<ITaskData>({
@@ -33,6 +34,13 @@ export const Task: React.FC = () => {
         mesure: 'timer',
         unit: 0
     })
+
+    const [selectedGroup, setSelectedGroup] = useState('misc')
+    const selectGroup = (value: string) => setSelectedGroup(value)
+
+    const [isModalVisible, setIsModalVisible] = useState(false)
+    const closeModal = () => setIsModalVisible(false);
+    const showModal = () => setIsModalVisible(true);
 
     const [newTaskGroup, setNewTaskGroup] = useState<setRef>({
         name: '',
@@ -183,7 +191,7 @@ export const Task: React.FC = () => {
                 let desc = sets[setName].desc
 
                 return {
-                    value: title.toLowerCase(),  
+                    value: title.toLowerCase(),
                     inputDisplay: title,
                     dropdownDisplay: (
                         groupDisplay(title, desc)
@@ -193,14 +201,17 @@ export const Task: React.FC = () => {
 
             setTaskGroups(parseSetData)
         })
-    }, [])
+    }, [isModalVisible])
 
     function createTaskGroup() {
-        db_context.addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc)
+        db_context.addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc).then(() => {
+            selectGroup(newTaskGroup.name)
+            closeModal()
+        })
     }
 
     function createTask() {
-        db_context.addTaskToDB(newTask, 'misc').catch((error: Error) => {
+        db_context.addTaskToDB(newTask, selectedGroup).catch((error: Error) => {
             console.log(error)
         })
     }
@@ -261,18 +272,24 @@ export const Task: React.FC = () => {
         </EuiForm>
     )
 
+    const updateGroupValue = (field:string, value:string) => {
+        let updatedTaskGroup = newTaskGroup
+        updatedTaskGroup[field] = value
+        setNewTaskGroup(updatedTaskGroup)
+    }
+
     const createSetForm = (
         <EuiForm>
             <EuiFormRow label="Set Name">
                 <EuiFieldText
-                    name="set_name"
-                // onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                    name="name"
+                    onChange={(event) => updateGroupValue(event.currentTarget.name, event.currentTarget.value)}
                 />
             </EuiFormRow>
             <EuiFormRow label="Set Description">
                 <EuiTextArea
-                    name="set_name"
-                // onChange={(event) => updateTaskValue(event.currentTarget.name, event.currentTarget.value)}
+                    name="desc"
+                    onChange={(event) => updateGroupValue(event.currentTarget.name, event.currentTarget.value)}
                 />
             </EuiFormRow>
 
@@ -281,9 +298,6 @@ export const Task: React.FC = () => {
         </EuiForm>
     )
 
-    const [isModalVisible, setIsModalVisible] = useState(false)
-    const closeModal = () => setIsModalVisible(false);
-    const showModal = () => setIsModalVisible(true);
     let createSetModal
 
     if (isModalVisible) {
@@ -298,8 +312,8 @@ export const Task: React.FC = () => {
                 </EuiModalBody>
 
                 <EuiModalFooter>
-                    <EuiButton onClick={closeModal} fill>Create</EuiButton>
-                    <EuiButton onClick={closeModal} fill color='danger'>Close</EuiButton>
+                    <EuiButton onClick={createTaskGroup} fill>Create Group</EuiButton>
+                    <EuiButton onClick={closeModal} fill color='danger'>Cancel</EuiButton>
                 </EuiModalFooter>
             </EuiModal>
         )
@@ -343,8 +357,8 @@ export const Task: React.FC = () => {
                         <EuiFormRow label="Group this task">
                             <EuiSuperSelect
                                 options={taskGroups}
-                                valueOfSelected={'misc'}
-                                prepend="Group"
+                                valueOfSelected={selectedGroup}
+                                onChange={selectGroup}
                                 append={<EuiButtonIcon onClick={showModal} iconType="plusInCircle" />}
                             />
                         </EuiFormRow>
