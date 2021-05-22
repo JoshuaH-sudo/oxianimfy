@@ -23,7 +23,7 @@ export class Task_database {
     completeTaskInSet = async (completeTaskId: string, setId: string) => {
         let taskSetList: ISetData = await this.store.get('task_set') ?? [];
         const taskIndex = taskSetList[setId].tasks.findIndex((task: taskRef) => task.taskId == completeTaskId )
-        taskSetList[setId].tasks[taskIndex].completed = true
+        if (taskIndex >= 0) taskSetList[setId].tasks[taskIndex].completed = true
         return await this.store.set('task_set', taskSetList)
     }
 

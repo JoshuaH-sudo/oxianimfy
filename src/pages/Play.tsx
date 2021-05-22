@@ -42,9 +42,9 @@ const Play: React.FC<PlayInterface> = (props) => {
 
     useEffect(() => {
         app_Context.getSelectedTaskGroup()
-        .then((setId: any) => db_context.getTasksFromSet(setId))
-        .then((tasks: any) => set_tasks_list(tasks))
-        .catch((error: any) => console.log(error))
+            .then((setId: any) => db_context.getTasksFromSet(setId))
+            .then((tasks: any) => set_tasks_list(tasks))
+            .catch((error: any) => console.log(error))
     }, [])
 
     const noGame = (
@@ -64,7 +64,7 @@ const Play: React.FC<PlayInterface> = (props) => {
 const Prepare: React.FC<PrepareProps> = (props) => {
     const tasks_list: any = props.list
     const [current_task_index, set_current_task_index] = useState<number>(0);
-
+    console.log(tasks_list)
     const changeTask = (step: number) => {
         const set_num = current_task_index + step
         set_current_task_index(set_num > 0 ? set_num : current_task_index)
@@ -130,6 +130,7 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
 
                 {tasks_list[current_task_index].mesure == "counter" ? < Counter_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
                 {tasks_list[current_task_index].mesure == "timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                {tasks_list[current_task_index].mesure == "none" ? < Simple_Task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
 
                 <EuiFlexItem grow={false}>
                     <EuiButton
@@ -143,6 +144,26 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
     )
 }
 
+const Simple_Task: React.FC<TaskProps> = (props) => {
+    const task: any = props.task
+
+    const db_context = useContext(databaseContext)
+    const app_Context = useContext(appContext)
+
+    const done = () => {
+        app_Context.getSelectedTaskGroup()
+            .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+            .then(() => props.changeTask(1))
+    }
+    return (
+        <EuiFlexItem grow={false}>
+            <EuiButton onClick={done}>
+                Done
+            </EuiButton>
+        </EuiFlexItem>
+    )
+}
+
 const Timer_task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
@@ -150,16 +171,17 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     const duation = JSON.parse(task.unit as string)
     timer_length = moment.duration(duation).asMilliseconds()
     const db_context = useContext(databaseContext)
+    const app_Context = useContext(appContext)
 
     const OnTimerFinish = () => {
-        db_context.completeTask(task.id, 'misc').then(() => {
-            props.changeTask(1)
-        })
+        app_Context.getSelectedTaskGroup()
+            .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+            .then(() => props.changeTask(1))
     }
 
     return (
         <EuiFlexItem grow={false}>
-            <Countdown 
+            <Countdown
                 date={Date.now() + timer_length}
                 onComplete={OnTimerFinish}
             />
@@ -172,13 +194,14 @@ const Counter_task: React.FC<TaskProps> = (props) => {
 
     const [current_counter, set_current_counter] = useState<number>(0);
     const db_context = useContext(databaseContext)
+    const app_Context = useContext(appContext)
 
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            db_context.completeTask(task.id, 'misc').then(() => {
-                props.changeTask(1)
-            })
+            app_Context.getSelectedTaskGroup()
+                .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+                .then(() => props.changeTask(1))
         } else {
             set_current_counter(set_num)
         }

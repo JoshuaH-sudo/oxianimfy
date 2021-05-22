@@ -50,12 +50,14 @@ export class Database_manager {
 
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
+
         let currentSet = await this.task_set_db.getSetWithId(setId)
+        const today = this.schedule_db.getTodaysName()
 
         let setNotCompleted = currentSet.tasks.find((task: taskRef) => task.completed == false)
 
-        if (!setNotCompleted) await this.schedule_db.completeSetSchedule(setId)
-        return await this.task_set_db.resetTaskCompletenss(setId)
+        if (!setNotCompleted) return await this.schedule_db.completeSetSchedule(setId)
+        // return await this.task_set_db.resetTaskCompletenss(setId)
     }
 
     getSetsFromDBForToday = async () => {
@@ -90,8 +92,9 @@ export class Database_manager {
 
             let promises: any[] = []
             let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
-            taskIdList.forEach((entry: taskRef) => {
+            const today = this.schedule_db.getTodaysName()
 
+            taskIdList.forEach((entry: taskRef) => {
                 if (entry.completed == false) {
                     promises.push(
                         this.task_db.findTask(entry.taskId)
@@ -99,7 +102,8 @@ export class Database_manager {
                 }
             })
 
-            return await Promise.all(promises)
+            let taskDetailList = await Promise.all(promises)
+            return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
         } catch (error) {
             console.log(error)
         }
