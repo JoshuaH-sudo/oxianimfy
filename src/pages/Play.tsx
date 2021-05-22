@@ -13,10 +13,11 @@ import { databaseContext } from '../App';
 import { ITaskData } from '../utils/custom_types'
 import Countdown from 'react-countdown';
 import moment from 'moment';
+import { appContext } from '../App';
 
 interface PrepareProps {
     list?: React.ReactNode;
-    context: any
+    db_context: any
 }
 
 interface TaskProps {
@@ -35,20 +36,15 @@ interface PlayScreenProps {
 }
 
 const Play: React.FC<PlayInterface> = (props) => {
-    // static contextType = databaseContext;
     const [tasks_list, set_tasks_list] = useState<any[]>([])
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
+    const app_Context = useContext(appContext)
 
     useEffect(() => {
-        context.getSetsFromDBForToday().then((sets: any) => {
-            console.log(sets)
-        })
-        context.getTasksFromSet('misc')
-            .then((tasks: any) => {
-                console.log(tasks)
-                set_tasks_list(tasks)
-            })
-            .catch((error) => console.log(error))
+        app_Context.getSelectedTaskGroup()
+        .then((setId: any) => db_context.getTasksFromSet(setId))
+        .then((tasks: any) => set_tasks_list(tasks))
+        .catch((error: any) => console.log(error))
     }, [])
 
     const noGame = (
@@ -60,10 +56,9 @@ const Play: React.FC<PlayInterface> = (props) => {
 
     return (
         <div>
-            { tasks_list ? <Prepare context={context} list={tasks_list} /> : noGame}
+            { tasks_list ? <Prepare db_context={db_context} list={tasks_list} /> : noGame}
         </div>
     )
-
 }
 
 const Prepare: React.FC<PrepareProps> = (props) => {
@@ -154,10 +149,10 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     var timer_length = 0
     const duation = JSON.parse(task.unit as string)
     timer_length = moment.duration(duation).asMilliseconds()
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
 
     const OnTimerFinish = () => {
-        context.completeTask(task.id, 'misc').then(() => {
+        db_context.completeTask(task.id, 'misc').then(() => {
             props.changeTask(1)
         })
     }
@@ -176,12 +171,12 @@ const Counter_task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
     const [current_counter, set_current_counter] = useState<number>(0);
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
 
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            context.completeTask(task.id, 'misc').then(() => {
+            db_context.completeTask(task.id, 'misc').then(() => {
                 props.changeTask(1)
             })
         } else {

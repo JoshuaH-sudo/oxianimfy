@@ -27,3 +27,8 @@ export interface taskRef {
 export interface IScheduleData {
     [index: string]: any | taskRef,
 }
+
+export interface ISettings {
+    [k: string]: any,
+    selectedTaskGroup: string
+}

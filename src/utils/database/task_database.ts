@@ -32,17 +32,14 @@ export class Task_database {
         return taskList.find((task: ITaskData) => task.id == taskId)
     }
 
-    addTask = async (newTask: ITaskData, setId: string) => {
+    addTask = async (newTask: ITaskData) => {
 
         let newTaskList: ISetData = await this.store.get('task') ?? [];
-        let newTaskSetList: ISetData = await this.store.get('task_set') ?? this.default_set_list
 
         newTask.id = v4();
         newTaskList.push(newTask)
-        newTaskSetList[setId].tasks.push({ taskId: newTask.id, completed: false})
 
-        await this.store.set('task', newTaskList)
-        return await this.store.set('task_set', newTaskSetList)
+        return await this.store.set('task', newTaskList)
 
     }
 }
