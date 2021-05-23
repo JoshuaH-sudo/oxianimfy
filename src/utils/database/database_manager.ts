@@ -25,7 +25,7 @@ export class Database_manager {
 
         this.resetTaskCompletionInTaskSets()
         this.task_set_db.getSets().then((result: any) => {
-            console.log('2task_set', result)
+            console.log('task_set', result)
         })
     }
 
@@ -63,20 +63,26 @@ export class Database_manager {
 
         let schedule = await this.schedule_db.getSchedule()
 
-        console.log(config)
         let currentTime = moment()
-        let timeDifference = moment.duration(config.lastRefreshTimeStamp.diff(currentTime)) 
-        console.log(timeDifference.as('hours'))
-        
-        Object.keys(schedule).map((day: string) => {
+        let lastTimeStamp = moment(config.lastRefreshTimeStamp)
+        let timeDifference = moment.duration(lastTimeStamp.diff(currentTime)).as('days')
 
-            Object.keys(schedule[day]).map((set: string) => {
-                promises.push(
-                    this.task_set_db.resetTaskCompletenss(set.toLowerCase())
-                )
+        //if its been a day or more, refresh tasks avaliable
+        console.log('time diff', timeDifference)
+        console.log('should refresh? ', timeDifference <= -1)
+
+        if (timeDifference <= -1) {
+            Object.keys(schedule).map((day: string) => {
+
+                Object.keys(schedule[day]).map((set: string) => {
+                    promises.push(
+                        this.task_set_db.resetTaskCompletenss(set.toLowerCase())
+                    )
+                })
+
             })
-
-        })
+            this.app_manager.updateTimeStamp()
+        }
 
         return await Promise.all(promises)
     }
@@ -100,7 +106,6 @@ export class Database_manager {
 
     isSetNotDoneForToday = async (setId: string) => {
         let scheduleSets = await this.getSetsFromDBForToday()
-        console.log(scheduleSets[setId.toLowerCase()].completed != true)
         return scheduleSets[setId.toLowerCase()].completed != true
     }
 
