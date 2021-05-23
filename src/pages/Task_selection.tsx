@@ -26,43 +26,42 @@ const Task_selection: React.FC = () => {
 
   useEffect(() => {
     db_Context.getSetsDetailsFromDbForToday().then((sets: setRef[] | any) => {
-      set_task_group_list(sets)
+      sets.map(async (set: setRef) => {
+        //get task refrence from set
+        let setTaskRef = set.tasks
+
+        db_Context.getTasksFromSet(set.name).then((taskList: any) => {
+          //get task details from task refs
+          let taskToDoList: any = []
+          taskList.forEach((taskDetails: any) => {
+            let foundTask = setTaskRef.find((taskRefrence: taskRef) => taskRefrence.taskId == taskDetails.id)
+            if (foundTask != undefined) taskToDoList.push(foundTask)
+          });
+
+          //update number of tasks to do
+          let updateTaskToDo = taskToDo
+          updateTaskToDo[set.name] = {
+            toDo: taskToDoList.length
+          }
+
+          //set them
+          setTaskToDo({ ...updateTaskToDo })
+          set_task_group_list(sets)
+        })
+      })
     })
   }, [])
 
   useEffect(() => {
-    let updateTaskToDo = taskToDo
-    task_group_list.map((set: setRef) => {
 
-      let setTaskRef = set.tasks
-      console.log('setTaskRef', setTaskRef)
-
-      db_Context.getTasksFromSet(set.name).then((taskList: any) => {
-        let taskToDoList:any = []
-
-        taskList.forEach((taskDetails: any) => {
-          let foundTask = setTaskRef.find((taskRefrence: taskRef) => taskRefrence.taskId == taskDetails.id)
-          console.log('foundTask', foundTask)
-          if (foundTask != undefined) taskToDoList.push(foundTask)
-        });
-
-        console.log('taskToDoList', taskToDoList)
-
-        updateTaskToDo[set.name] = {
-          toDo: taskToDoList.length
-        }
-        setTaskToDo(updateTaskToDo)
-      })
-    })
   }, [task_group_list])
 
   const cardClicked = (selectedSet: any) => {
     app_Context.setSelectedTaskGroup(selectedSet)
   };
 
-  const isSetCompleted = (set: string) => {
+  function isSetCompleted(set: string) {
     if (taskToDo[set]) {
-      console.log('taskToDo', taskToDo[set])
       return taskToDo[set].toDo <= 0
     }
   }

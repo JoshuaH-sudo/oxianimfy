@@ -67,20 +67,16 @@ export class Database_manager {
     }
 
     getSetsDetailsFromDbForToday = async () => {
-        try {
+        let promises: any[] = []
+        let setIdList = await this.getSetsFromDBForToday()
+        Object.keys(setIdList).forEach((entry: string) => {
+            promises.push(
+                this.task_set_db.getSetWithId(entry)
+            )
+        })
 
-            let promises: any[] = []
-            let setIdList = await this.getSetsFromDBForToday()
-            Object.keys(setIdList).forEach((entry: string) => {
-                promises.push(
-                    this.task_set_db.getSetWithId(entry)
-                )
-            })
+        return await Promise.all(promises)
 
-            return await Promise.all(promises)
-        } catch (error) {
-            console.log(error)
-        }
     }
 
     getSetsDetails = async (setId: string) => {
@@ -88,24 +84,20 @@ export class Database_manager {
     }
 
     getTasksFromSet = async (taskSet: string) => {
-        try {
 
-            let promises: any[] = []
-            let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
-            const today = this.schedule_db.getTodaysName()
+        let promises: any[] = []
+        let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
+        const today = this.schedule_db.getTodaysName()
 
-            taskIdList.forEach((entry: taskRef) => {
-                if (entry.completed == false) {
-                    promises.push(
-                        this.task_db.findTask(entry.taskId)
-                    )
-                }
-            })
+        taskIdList.forEach((entry: taskRef) => {
+            if (entry.completed == false) {
+                promises.push(
+                    this.task_db.findTask(entry.taskId)
+                )
+            }
+        })
 
-            let taskDetailList = await Promise.all(promises)
-            return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
-        } catch (error) {
-            console.log(error)
-        }
+        let taskDetailList = await Promise.all(promises)
+        return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
     }
 }

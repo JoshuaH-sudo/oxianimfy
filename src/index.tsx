@@ -15,12 +15,12 @@ ReactDOM.render(
     <EuiPanel>
       <EuiButton fill href="#/">Home</EuiButton>
       <HashRouter>
-        <div>
+        <Switch>
           <Route path="/" exact component={App} />
           <Route path="/task-creation" component={Task} />
           <Route path="/task_selection" component={Task_selection} />
           <Route path="/play" component={Play} />
-        </div>
+        </Switch>
       </HashRouter>
     </EuiPanel>
   </React.StrictMode>,
