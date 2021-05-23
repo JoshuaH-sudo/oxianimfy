@@ -86,10 +86,6 @@ const Task_selection: React.FC = () => {
 
       </EuiFlexGroup>
 
-      <EuiSpacer />
-
-      <EuiButton fill href="#/">Go back</EuiButton>
-      <EuiButton fill href="#/play">Do all tasks</EuiButton>
     </EuiPanel>
   );
 };

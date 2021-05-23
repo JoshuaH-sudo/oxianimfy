@@ -7,7 +7,10 @@ import {
     EuiFlexItem,
     EuiPageContent,
     EuiPageBody,
-    EuiPage
+    EuiPage,
+    EuiHorizontalRule,
+    EuiButtonIcon,
+    EuiFlexGrid
 } from '@elastic/eui';
 import { databaseContext } from '../App';
 import { ITaskData } from '../utils/custom_types'
@@ -62,7 +65,7 @@ const Play: React.FC<PlayInterface> = (props) => {
 const Prepare: React.FC<PrepareProps> = (props) => {
     const tasks_list: any = props.list
     const [current_task_index, set_current_task_index] = useState<number>(0);
-    console.log(tasks_list)
+
     const changeTask = (step: number) => {
         const set_num = current_task_index + step
         set_current_task_index(set_num > 0 ? set_num : current_task_index)
@@ -74,21 +77,19 @@ const Prepare: React.FC<PrepareProps> = (props) => {
 
     const endGame = (
         <EuiPanel paddingSize="l">
-            <EuiText>Finised all your tasks yay</EuiText>
+            <EuiText>Finished all your tasks yay</EuiText>
             <EuiButton fill href="#/">Return</EuiButton>
         </EuiPanel>
     )
     return (
-        <EuiPage paddingSize="none">
-            <EuiPageBody paddingSize="l">
-                <EuiPageContent
-                    verticalPosition="center"
-                    horizontalPosition="center"
-                    paddingSize="none">
-                    {current_task_index < tasks_list.length ? playGame : endGame}
-                </EuiPageContent>
-            </EuiPageBody>
-        </EuiPage>
+        <EuiPageBody paddingSize="l">
+            <EuiPageContent
+                verticalPosition="center"
+                horizontalPosition="center"
+                paddingSize="none">
+                {current_task_index < tasks_list.length ? playGame : endGame}
+            </EuiPageContent>
+        </EuiPageBody>
     );
 };
 
@@ -97,48 +98,57 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
     const current_task_index: any = props.index
     const changeTask = props.changeTask;
 
-    const minStyle = {
-        minWidth: 700,
-        minHeight: 500
-    }
-
     const task_intro = (
-        <EuiText style={minStyle} grow={false}>
-            <h1>{tasks_list[current_task_index].name}</h1>
+        <EuiFlexItem>
+            <EuiText >
+                <h1>{tasks_list[current_task_index].name}</h1>
 
-            <EuiPanel style={minStyle} paddingSize="l">
+                <EuiHorizontalRule />
+
                 <p>{tasks_list[current_task_index].desc}</p>
-            </EuiPanel>
 
-        </EuiText>
+                <EuiHorizontalRule />
+
+            </EuiText>
+        </EuiFlexItem>
     )
 
     return (
-        <div>
-            { task_intro}
-            <EuiFlexGroup justifyContent="spaceEvenly">
-                <EuiFlexItem grow={false}>
-                    <EuiButton
-                        disabled={current_task_index <= 0 ? true : false}
-                        onClick={() => changeTask(-1)}
-                        fill
-                        iconType={"arrowLeft"}
-                    />
-                </EuiFlexItem>
+        <EuiPanel>
+            <EuiFlexGroup direction="column" >
 
-                {tasks_list[current_task_index].mesure == "counter" ? < Counter_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
-                {tasks_list[current_task_index].mesure == "timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
-                {tasks_list[current_task_index].mesure == "none" ? < Simple_Task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                {task_intro}
 
-                <EuiFlexItem grow={false}>
-                    <EuiButton
-                        onClick={() => changeTask(1)}
-                        fill
-                        iconType={"arrowRight"}
-                    />
-                </EuiFlexItem>
+                <EuiFlexGroup gutterSize="m" responsive={false}>
+
+                    <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                            disabled={current_task_index <= 0 ? true : false}
+                            onClick={() => changeTask(-1)}
+                            display="fill"
+                            iconType={"arrowLeft"}
+                            size="m"
+                        />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+
+                        {tasks_list[current_task_index].mesure == "counter" ? < Counter_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                        {tasks_list[current_task_index].mesure == "timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                        {tasks_list[current_task_index].mesure == "none" ? < Simple_Task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                            onClick={() => changeTask(1)}
+                            display="fill"
+                            iconType={"arrowRight"}
+                            size="m"
+                        />
+                    </EuiFlexItem>
+
+                </EuiFlexGroup>
             </EuiFlexGroup>
-        </div>
+        </EuiPanel>
     )
 }
 
@@ -153,11 +163,9 @@ const Simple_Task: React.FC<TaskProps> = (props) => {
             .then(() => props.changeTask(1))
     }
     return (
-        <EuiFlexItem grow={false}>
-            <EuiButton onClick={done}>
-                Done
-            </EuiButton>
-        </EuiFlexItem>
+        <EuiButton onClick={done}>
+            Done
+        </EuiButton>
     )
 }
 
@@ -176,12 +184,10 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     }
 
     return (
-        <EuiFlexItem grow={false}>
-            <Countdown
-                date={Date.now() + timer_length}
-                onComplete={OnTimerFinish}
-            />
-        </EuiFlexItem>
+        <Countdown
+            date={Date.now() + timer_length}
+            onComplete={OnTimerFinish}
+        />
     )
 }
 
@@ -203,13 +209,14 @@ const Counter_task: React.FC<TaskProps> = (props) => {
     }
 
     return (
-        <Fragment>
+        <EuiFlexGroup gutterSize="m" responsive={false}>
             <EuiFlexItem grow={false}>
-                <EuiButton
+                <EuiButtonIcon
                     disabled={current_counter <= 0 ? true : false}
-                    fill
+                    display="fill"
                     onClick={() => ChangeCounter(-1)}
                     iconType={"minus"}
+                    size="m"
                 />
             </EuiFlexItem>
 
@@ -218,14 +225,15 @@ const Counter_task: React.FC<TaskProps> = (props) => {
             </EuiFlexItem>
 
             <EuiFlexItem grow={false}>
-                <EuiButton
-                    fill
+                <EuiButtonIcon
                     disabled={current_counter >= task.unit ? true : false}
+                    display="fill"
                     onClick={() => ChangeCounter(1)}
                     iconType={"plus"}
+                    size="m"
                 />
             </EuiFlexItem>
-        </Fragment>
+        </EuiFlexGroup>
     )
 }
 export default Play;

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
   EuiButton,
-  EuiPanel
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem
 } from '@elastic/eui';
 
 const Page: React.FC = () => {
@@ -10,8 +12,16 @@ const Page: React.FC = () => {
 
   return (
     <EuiPanel paddingSize="l" >
-      <EuiButton fill href="#/task-creation">Create a New Task</EuiButton>
-      <EuiButton fill href="#/task_selection">Do tasks for today</EuiButton>
+      <EuiFlexGroup>
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/task-creation">Create a New Task</EuiButton>
+        </EuiFlexItem>
+        
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/task_selection">Do tasks for today</EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+
     </EuiPanel>
   );
 };
