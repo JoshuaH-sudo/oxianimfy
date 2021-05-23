@@ -14,9 +14,12 @@ export class App_manager {
 
     constructor(app_database: Database) {
         this.store = app_database.store
-        this.store.get(this.storeName).then((result: any) => {
-            console.log(this.storeName, result)
+        this.createConfig().then(() => {
+            this.store.get(this.storeName).then((result: any) => {
+                console.log(this.storeName, result)
+            })
         })
+
     }
 
     createConfig = async () => {
