@@ -1,4 +1,4 @@
-import { IScheduleData, ITaskData } from '../custom_types';
+import { IScheduleData, ISetData, ITaskData } from '../custom_types';
 import { Database } from './database';
 import { Storage } from '@ionic/storage';
 
@@ -18,7 +18,11 @@ export class Schedule_database {
     constructor(app_database: Database) {
         this.store = app_database.store
         this.createScheduleDB()
-            .then(() => this.resetTaskCompletenss())
+            .then(() => this.resetTaskSetCompletenss())
+            .then(() => this.getSchedule())
+        this.store.get('schedule').then((result: any) => {
+            console.log('schedule', result)
+        })
     }
 
     getTodaysName = () => {
@@ -32,26 +36,37 @@ export class Schedule_database {
         }
     }
 
-    resetTaskCompletenss = async () => {
+    resetTaskSetCompletenss = async () => {
         let newSchedule: IScheduleData = await this.store.get("schedule")
         const today = this.getTodaysName()
-        
+
         Object.keys(newSchedule).forEach((day: string) => {
             if (day != today) {
 
-                Object.keys(newSchedule[day]).forEach((task: any) => {
+                Object.keys(newSchedule[day]).forEach((set: any) => {
                     const newRecord = {
                         completed: false
                     }
-                    newSchedule[day][task] = newRecord
+                    newSchedule[day][set] = newRecord
                 });
             }
         });
         await this.store.set("schedule", newSchedule)
     }
 
-    getTasksFromSchedule = async () => {
+    getSchedule = async () => {
         return await this.store.get("schedule")
+    }
+
+    completeSetSchedule = async (setId: string) => {
+        var newSchedule: IScheduleData = await this.store.get("schedule")
+        const today = this.getTodaysName()
+        
+        const newRecord = {
+            completed: true
+        }
+        newSchedule[today][setId] = newRecord
+        await this.store.set("schedule", newSchedule)
     }
 
     updateSchedule = async (day: string, id: string, value: object) => {
@@ -60,13 +75,13 @@ export class Schedule_database {
         await this.store.set("schedule", newSchedule)
     }
 
-    addTaskToSchedule = async (task: ITaskData) => {
+    addSetToSchedule = async (set: string, daysOfWeek: []) => {
         var newSchedule: IScheduleData = await this.store.get("schedule")
-        task.daysOfWeek.forEach((day: string) => {
+        daysOfWeek.forEach((day: string) => {
             const newRecord = {
                 completed: false
             }
-            newSchedule[day][task.id] = newRecord
+            newSchedule[day][set] = newRecord
         });
 
         await this.store.set("schedule", newSchedule)

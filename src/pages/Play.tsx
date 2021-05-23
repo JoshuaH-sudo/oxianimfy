@@ -16,7 +16,7 @@ import moment from 'moment';
 
 interface PrepareProps {
     list?: React.ReactNode;
-    context: any
+    db_context: any
 }
 
 interface TaskProps {
@@ -35,14 +35,14 @@ interface PlayScreenProps {
 }
 
 const Play: React.FC<PlayInterface> = (props) => {
-    // static contextType = databaseContext;
     const [tasks_list, set_tasks_list] = useState<any[]>([])
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
 
     useEffect(() => {
-        context.getTasksFromDBForToday()
+        db_context.app_manager.getSelectedTaskGroup()
+            .then((setId: any) => db_context.getTasksFromSet(setId))
             .then((tasks: any) => set_tasks_list(tasks))
-            .catch((error) => console.log(error))
+            .catch((error: any) => console.log(error))
     }, [])
 
     const noGame = (
@@ -54,16 +54,15 @@ const Play: React.FC<PlayInterface> = (props) => {
 
     return (
         <div>
-            { tasks_list ? <Prepare context={context} list={tasks_list} /> : noGame}
+            { tasks_list ? <Prepare db_context={db_context} list={tasks_list} /> : noGame}
         </div>
     )
-
 }
 
 const Prepare: React.FC<PrepareProps> = (props) => {
     const tasks_list: any = props.list
     const [current_task_index, set_current_task_index] = useState<number>(0);
-
+    console.log(tasks_list)
     const changeTask = (step: number) => {
         const set_num = current_task_index + step
         set_current_task_index(set_num > 0 ? set_num : current_task_index)
@@ -129,6 +128,7 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
 
                 {tasks_list[current_task_index].mesure == "counter" ? < Counter_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
                 {tasks_list[current_task_index].mesure == "timer" ? < Timer_task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
+                {tasks_list[current_task_index].mesure == "none" ? < Simple_Task task={tasks_list[current_task_index]} changeTask={changeTask} /> : ''}
 
                 <EuiFlexItem grow={false}>
                     <EuiButton
@@ -142,23 +142,42 @@ const Play_screen: React.FC<PlayScreenProps> = (props) => {
     )
 }
 
+const Simple_Task: React.FC<TaskProps> = (props) => {
+    const task: any = props.task
+
+    const db_context = useContext(databaseContext)
+
+    const done = () => {
+        db_context.app_manager.getSelectedTaskGroup()
+            .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+            .then(() => props.changeTask(1))
+    }
+    return (
+        <EuiFlexItem grow={false}>
+            <EuiButton onClick={done}>
+                Done
+            </EuiButton>
+        </EuiFlexItem>
+    )
+}
+
 const Timer_task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
     var timer_length = 0
     const duation = JSON.parse(task.unit as string)
     timer_length = moment.duration(duation).asMilliseconds()
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
 
     const OnTimerFinish = () => {
-        context.completeTask(task.id).then(() => {
-            props.changeTask(1)
-        })
+        db_context.app_manager.getSelectedTaskGroup()
+            .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+            .then(() => props.changeTask(1))
     }
 
     return (
         <EuiFlexItem grow={false}>
-            <Countdown 
+            <Countdown
                 date={Date.now() + timer_length}
                 onComplete={OnTimerFinish}
             />
@@ -170,14 +189,14 @@ const Counter_task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
     const [current_counter, set_current_counter] = useState<number>(0);
-    const context = useContext(databaseContext)
+    const db_context = useContext(databaseContext)
 
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            context.completeTask(task.id).then(() => {
-                props.changeTask(1)
-            })
+            db_context.app_manager.getSelectedTaskGroup()
+                .then((setId: string) => db_context.completeTask(task.id, setId.toLowerCase()))
+                .then(() => props.changeTask(1))
         } else {
             set_current_counter(set_num)
         }
