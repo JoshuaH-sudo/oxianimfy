@@ -3,17 +3,13 @@ import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
 export class Task_database {
-    default_set_list: ISetData = {
-        misc: {
-            desc: "The default task set",
-            tasks:[]
-        }
-    }
-    
     store: Storage;
 
     constructor(app_database: Database) {
         this.store = app_database.store
+        this.store.get('task').then((result: any) => {
+            console.log('task', result)
+        })
     }
 
     getTasks = async () => {

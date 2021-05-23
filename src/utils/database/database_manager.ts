@@ -4,12 +4,15 @@ import { Schedule_database } from './schedule_database'
 import { Database } from './database'
 import { IScheduleData, ITaskData, setRef, taskRef } from '../custom_types';
 import { Storage } from '@ionic/storage';
+import { App_manager } from './app_manager';
+import moment from 'moment';
 
 export class Database_manager {
     app_db: Database
     task_db: Task_database
     task_set_db: Task_set_database
     schedule_db: Schedule_database
+    app_manager: App_manager
     app_storage: Storage
 
     constructor() {
@@ -17,7 +20,13 @@ export class Database_manager {
         this.task_db = new Task_database(this.app_db)
         this.task_set_db = new Task_set_database(this.app_db)
         this.schedule_db = new Schedule_database(this.app_db)
+        this.app_manager = new App_manager(this.app_db)
         this.app_storage = this.app_db.store
+
+        this.resetTaskCompletionInTaskSets()
+        this.task_set_db.getSets().then((result: any) => {
+            console.log('2task_set', result)
+        })
     }
 
     addTaskToDB = (newTask: ITaskData, set: string) => {
@@ -48,22 +57,51 @@ export class Database_manager {
         })
     }
 
+    resetTaskCompletionInTaskSets = async () => {
+        let config = await this.app_manager.getConfig()
+        let promises: any[] = []
+
+        let schedule = await this.schedule_db.getSchedule()
+
+        console.log(config)
+        let currentTime = moment()
+        let timeDifference = moment.duration(config.lastRefreshTimeStamp.diff(currentTime)) 
+        console.log(timeDifference.as('hours'))
+        
+        Object.keys(schedule).map((day: string) => {
+
+            Object.keys(schedule[day]).map((set: string) => {
+                promises.push(
+                    this.task_set_db.resetTaskCompletenss(set.toLowerCase())
+                )
+            })
+
+        })
+
+        return await Promise.all(promises)
+    }
+
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
-
         let currentSet = await this.task_set_db.getSetWithId(setId)
-        const today = this.schedule_db.getTodaysName()
+        let currentTasks = await this.getUncompletedTasks(currentSet.tasks, setId)
 
-        let setNotCompleted = currentSet.tasks.find((task: taskRef) => task.completed == false)
+        if (currentTasks.length <= 0) {
 
-        if (!setNotCompleted) return await this.schedule_db.completeSetSchedule(setId)
-        // return await this.task_set_db.resetTaskCompletenss(setId)
+            return await this.schedule_db.completeSetSchedule(setId)
+        }
     }
 
     getSetsFromDBForToday = async () => {
         let schedule = await this.schedule_db.getSchedule()
         const today = this.schedule_db.getTodaysName()
         return schedule[today]
+    }
+
+    isSetNotDoneForToday = async (setId: string) => {
+        let scheduleSets = await this.getSetsFromDBForToday()
+        console.log(scheduleSets[setId.toLowerCase()].completed != true)
+        return scheduleSets[setId.toLowerCase()].completed != true
     }
 
     getSetsDetailsFromDbForToday = async () => {
@@ -76,7 +114,6 @@ export class Database_manager {
         })
 
         return await Promise.all(promises)
-
     }
 
     getSetsDetails = async (setId: string) => {
@@ -99,5 +136,19 @@ export class Database_manager {
 
         let taskDetailList = await Promise.all(promises)
         return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
+    }
+
+
+    getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
+        let taskList = await this.getTasksFromSet(set)
+
+        //get task details from task refs
+        let taskToDoList: any = []
+        taskList.forEach((taskDetails: any) => {
+            let foundTask = setTaskRefs.find((taskRefrence: taskRef) => taskRefrence.taskId == taskDetails.id && taskRefrence.completed == false)
+            if (foundTask != undefined) taskToDoList.push(foundTask)
+        });
+
+        return taskToDoList
     }
 }

@@ -18,7 +18,7 @@ export class Task_set_database {
     constructor(app_database: Database) {
         this.store = app_database.store
         this.store.get('task_set').then((result: any) => {
-            console.log(result)
+            console.log('task_set', result)
         })
     }
 
@@ -45,7 +45,10 @@ export class Task_set_database {
 
     addTaskToSet = async (setId: string, taskId: string) => {
         let newTaskSetList: ISetData = await this.store.get('task_set') ?? this.default_set_list
+        console.log('adding task to set', newTaskSetList)
         newTaskSetList[setId].tasks.push({ taskId: taskId, completed: false})
+        console.log('adding task to 2', newTaskSetList)
+
         return await this.store.set('task_set', newTaskSetList)
     }
 

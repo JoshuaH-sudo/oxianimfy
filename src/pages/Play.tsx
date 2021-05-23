@@ -13,7 +13,6 @@ import { databaseContext } from '../App';
 import { ITaskData } from '../utils/custom_types'
 import Countdown from 'react-countdown';
 import moment from 'moment';
-import { appContext } from '../App';
 
 interface PrepareProps {
     list?: React.ReactNode;
@@ -38,10 +37,9 @@ interface PlayScreenProps {
 const Play: React.FC<PlayInterface> = (props) => {
     const [tasks_list, set_tasks_list] = useState<any[]>([])
     const db_context = useContext(databaseContext)
-    const app_Context = useContext(appContext)
 
     useEffect(() => {
-        app_Context.getSelectedTaskGroup()
+        db_context.app_manager.getSelectedTaskGroup()
             .then((setId: any) => db_context.getTasksFromSet(setId))
             .then((tasks: any) => set_tasks_list(tasks))
             .catch((error: any) => console.log(error))
@@ -148,10 +146,9 @@ const Simple_Task: React.FC<TaskProps> = (props) => {
     const task: any = props.task
 
     const db_context = useContext(databaseContext)
-    const app_Context = useContext(appContext)
 
     const done = () => {
-        app_Context.getSelectedTaskGroup()
+        db_context.app_manager.getSelectedTaskGroup()
             .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
             .then(() => props.changeTask(1))
     }
@@ -171,10 +168,9 @@ const Timer_task: React.FC<TaskProps> = (props) => {
     const duation = JSON.parse(task.unit as string)
     timer_length = moment.duration(duation).asMilliseconds()
     const db_context = useContext(databaseContext)
-    const app_Context = useContext(appContext)
 
     const OnTimerFinish = () => {
-        app_Context.getSelectedTaskGroup()
+        db_context.app_manager.getSelectedTaskGroup()
             .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
             .then(() => props.changeTask(1))
     }
@@ -194,13 +190,12 @@ const Counter_task: React.FC<TaskProps> = (props) => {
 
     const [current_counter, set_current_counter] = useState<number>(0);
     const db_context = useContext(databaseContext)
-    const app_Context = useContext(appContext)
 
     const ChangeCounter = (step: number) => {
         const set_num = current_counter + step
         if (set_num >= task.unit) {
-            app_Context.getSelectedTaskGroup()
-                .then((setId: string) => db_context.completeTask(task.id, setId.toLocaleLowerCase()))
+            db_context.app_manager.getSelectedTaskGroup()
+                .then((setId: string) => db_context.completeTask(task.id, setId.toLowerCase()))
                 .then(() => props.changeTask(1))
         } else {
             set_current_counter(set_num)
