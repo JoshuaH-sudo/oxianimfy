@@ -5,7 +5,8 @@ import {
     EuiFlexGroup,
     EuiFlexGrid,
     EuiFlexItem,
-    EuiCard
+    EuiCard,
+    EuiText
 } from '@elastic/eui';
 import { databaseContext } from '../App';
 import { ITaskData, setRef, taskRef } from '../utils/custom_types';
@@ -33,25 +34,33 @@ const Edit_tasks: React.FC = () => {
         })
     }, [])
 
-    const tabBar = (
-        <div
-            style={{
-                backgroundColor: 'coral',
-                width: '100%',
-                height: '50px'
-            }}
-        />
-    )
+    const tabBar = (title: string) => {
+
+        return (
+            <div
+                style={{
+                    backgroundColor: 'coral',
+                    color: 'black',
+                    width: '100%',
+                    height: '5vh',
+                    textAlign: 'center',
+                }}
+            >
+                <EuiText textAlign='center' size='m'>
+                    <p style={{fontWeight: 'bold'}}>{title}</p>
+                </EuiText>
+            </div>
+        )
+    }
 
     const taskCard = (task: ITaskData) => {
         return (
-            <EuiFlexItem key={task.id}>
+            <EuiFlexItem key={task.id} grow={1}>
                 <EuiCard
                     textAlign="left"
-                    image={tabBar}
-                    style={{ height: '33vh' }}
-                    title={task.name}
-                    description={task.desc}
+                    image={tabBar(task.name)}
+                    title={task.desc.length > 20 ? task.desc.substring(0, 20) + '...' : task.desc}
+                    description={''}
                     onClick={() => { }}
                 />
             </EuiFlexItem>
@@ -60,7 +69,7 @@ const Edit_tasks: React.FC = () => {
 
     return (
         <EuiPanel paddingSize="l" >
-            <EuiFlexGrid columns={3} gutterSize="l">
+            <EuiFlexGrid columns={3} responsive={false}>
 
                 {task_list[current_filter_set].map((task: ITaskData) => {
                     return taskCard(task)
