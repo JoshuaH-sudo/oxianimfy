@@ -43,7 +43,7 @@ const Play: React.FC<PlayInterface> = (props) => {
 
     useEffect(() => {
         db_context.app_manager.getSelectedTaskGroup()
-            .then((setId: any) => db_context.getTasksFromSet(setId))
+            .then((setId: any) => db_context.getTasksFromSetForToday(setId))
             .then((tasks: any) => set_tasks_list(tasks))
             .catch((error: any) => console.log(error))
     }, [])

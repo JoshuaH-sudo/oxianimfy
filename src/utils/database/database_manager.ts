@@ -81,7 +81,9 @@ export class Database_manager {
                 })
 
             })
-            this.app_manager.updateTimeStamp()
+            promises.push(
+                this.app_manager.updateTimeStamp()
+            )
         }
 
         return await Promise.all(promises)
@@ -125,7 +127,21 @@ export class Database_manager {
         return await this.task_set_db.getSetWithId(setId)
     }
 
-    getTasksFromSet = async (taskSet: string) => {
+    getAllTaskDetails = async (taskSet: string) => {
+        let promises: any[] = []
+        let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
+
+        taskIdList.forEach((entry: taskRef) => {
+            promises.push(
+                this.task_db.findTask(entry.taskId)
+            )
+        })
+
+        return await Promise.all(promises)
+
+    }
+
+    getTasksFromSetForToday = async (taskSet: string) => {
 
         let promises: any[] = []
         let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
@@ -145,7 +161,7 @@ export class Database_manager {
 
 
     getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
-        let taskList = await this.getTasksFromSet(set)
+        let taskList = await this.getTasksFromSetForToday(set)
 
         //get task details from task refs
         let taskToDoList: any = []

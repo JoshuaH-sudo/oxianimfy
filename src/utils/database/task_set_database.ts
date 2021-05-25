@@ -25,7 +25,7 @@ export class Task_set_database {
     resetTaskCompletenss = async (setId: string) => {
         let newSetList = await this.store.get('task_set') ?? this.default_set_list
 
-        newSetList[setId].tasks.map((taskId: taskRef) => {
+        newSetList[setId].tasks.forEach((taskId: taskRef) => {
             taskId.completed = false
         });
 

@@ -36,6 +36,7 @@ export class App_manager {
     updateTimeStamp = async () => {
         let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
         updatedSettings.lastRefreshTimeStamp = moment().startOf('day').toString()
+        return await this.store.set(this.storeName, updatedSettings)
     }
 
     setSelectedTaskGroup = async (taskSetId: string) => {

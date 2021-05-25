@@ -20,6 +20,10 @@ const Page: React.FC = () => {
         <EuiFlexItem grow={false}>
           <EuiButton fill href="#/task_selection">Do tasks for today</EuiButton>
         </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/edit-tasks">Edit tasks</EuiButton>
+        </EuiFlexItem>
       </EuiFlexGroup>
 
     </EuiPanel>
