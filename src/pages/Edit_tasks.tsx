@@ -6,7 +6,7 @@ import {
     EuiFlexGrid,
     EuiFlexItem,
     EuiCard,
-    EuiText
+    EuiText,
 } from '@elastic/eui';
 import { databaseContext } from '../App';
 import { ITaskData, setRef, taskRef } from '../utils/custom_types';
@@ -47,10 +47,14 @@ const Edit_tasks: React.FC = () => {
                 }}
             >
                 <EuiText textAlign='center' size='m'>
-                    <p style={{fontWeight: 'bold'}}>{title}</p>
+                    <p style={{ fontWeight: 'bold' }}>{title}</p>
                 </EuiText>
             </div>
         )
+    }
+
+    const editPrompt = () => {
+        
     }
 
     const taskCard = (task: ITaskData) => {
@@ -59,7 +63,7 @@ const Edit_tasks: React.FC = () => {
                 <EuiCard
                     textAlign="left"
                     image={tabBar(task.name)}
-                    title={task.desc.length > 20 ? task.desc.substring(0, 20) + '...' : task.desc}
+                    title={task.desc}
                     description={''}
                     onClick={() => { }}
                 />
@@ -68,7 +72,7 @@ const Edit_tasks: React.FC = () => {
     }
 
     return (
-        <EuiPanel paddingSize="l" >
+        <EuiPanel>
             <EuiFlexGrid columns={3} responsive={false}>
 
                 {task_list[current_filter_set].map((task: ITaskData) => {
