@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import Play from './pages/Play';
 import Task from './pages/Task_creation';
-import Edit_tasks from './pages/Edit_tasks';
+import Edit_task_menu from './pages/Edit_task_menu';
 import { HashRouter, Route, Switch } from "react-router-dom";
 import Task_selection from './pages/Task_selection';
 import {
@@ -21,7 +21,7 @@ ReactDOM.render(
           <Route path="/task-creation" component={Task} />
           <Route path="/task_selection" component={Task_selection} />
           <Route path="/play" component={Play} />
-          <Route path="/edit-tasks" component={Edit_tasks} />
+          <Route path="/edit-tasks" component={Edit_task_menu} />
         </Switch>
       </HashRouter>
     </EuiPanel>

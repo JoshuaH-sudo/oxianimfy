@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import {
   EuiButton,
   EuiPanel,
   EuiFlexGroup,
   EuiFlexItem
 } from '@elastic/eui';
+import { databaseContext } from '../App';
 
 const Page: React.FC = () => {
-
-  const name = "start"
+  const db_context = useContext(databaseContext)
 
   return (
     <EuiPanel paddingSize="l" >
@@ -23,6 +23,10 @@ const Page: React.FC = () => {
 
         <EuiFlexItem grow={false}>
           <EuiButton fill href="#/edit-tasks">Edit tasks</EuiButton>
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton fill onClick={() => {db_context.app_storage.clear()}}>Clear data</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
 

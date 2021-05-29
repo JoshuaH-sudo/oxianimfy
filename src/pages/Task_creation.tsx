@@ -19,7 +19,7 @@ import {
 } from '@elastic/eui';
 import { ITaskData, setRef } from '../utils/custom_types'
 import { databaseContext } from '../App';
-import { DotwProp, MesureProp, TitleDescProp } from '../components/task_creation_props';
+import { DotwProp, GroupSelectProp, MesureProp, TitleDescProp } from '../components/task_creation_props';
 
 export const Task: React.FC = () => {
     const [newTask, setNewTask] = useState<ITaskData>({
@@ -43,21 +43,6 @@ export const Task: React.FC = () => {
         tasks: []
     })
 
-    const groupDisplay = (title: string, desc: string) => {
-        return (
-            <Fragment>
-                <strong>{title}</strong>
-                <EuiText size="s" color="subdued">
-                    <p className="euiTextColor--subdued">
-                        {desc}
-                    </p>
-                </EuiText>
-            </Fragment>
-        )
-    }
-
-    const [taskGroups, setTaskGroups] = useState<any>([])
-
     const updateTaskValue = (key: string, value: string | any) => {
         const updatedTask = newTask
         updatedTask[key] = value
@@ -65,25 +50,6 @@ export const Task: React.FC = () => {
     }
 
     const db_context = useContext(databaseContext);
-
-    useEffect(() => {
-        db_context.getSetsFromDb().then((sets: any) => {
-            let parseSetData = Object.keys(sets).map((setName: string) => {
-                let title = setName.charAt(0).toUpperCase() + setName.slice(1);
-                let desc = sets[setName].desc
-
-                return {
-                    value: title.toLowerCase(),
-                    inputDisplay: title,
-                    dropdownDisplay: (
-                        groupDisplay(title, desc)
-                    )
-                }
-            })
-
-            setTaskGroups(parseSetData)
-        })
-    }, [isModalVisible])
 
     function createTaskGroup() {
         db_context.addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc).then(() => {
@@ -107,7 +73,7 @@ export const Task: React.FC = () => {
     let createSetModal
 
     if (isModalVisible) {
-        createSetModal = (
+        createSetModal  = (
             <EuiModal onClose={closeModal}>
                 <EuiModalHeader>
                     <EuiModalHeaderTitle><h1>Create A Task Set</h1></EuiModalHeaderTitle>
@@ -147,14 +113,7 @@ export const Task: React.FC = () => {
                         <EuiFlexItem >
                             <DotwProp updateTaskValue={updateTaskValue} />
 
-                            <EuiFormRow label="Group this task">
-                                <EuiSuperSelect
-                                    options={taskGroups}
-                                    valueOfSelected={selectedGroup}
-                                    onChange={selectGroup}
-                                    append={<EuiButtonIcon onClick={showModal} iconType="plusInCircle" />}
-                                />
-                            </EuiFormRow>
+                            <GroupSelectProp selectedGroup={selectedGroup} selectGroup={selectGroup} showModal={showModal} isModalVisible={isModalVisible}/>
 
                         </EuiFlexItem>
 
