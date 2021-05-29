@@ -26,7 +26,7 @@ const Page: React.FC = () => {
         </EuiFlexItem>
 
         <EuiFlexItem grow={false}>
-          <EuiButton fill onClick={() => {db_context.app_storage.clear()}}>Clear data</EuiButton>
+          <EuiButton fill href="/" onClick={() => {db_context.app_storage.clear()}}>Clear data</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
 

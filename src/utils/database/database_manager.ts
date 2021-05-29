@@ -33,7 +33,20 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_db.addTask(newTask)
                 .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
-                .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek))
+                .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id))
+                .then(() => resolve(true))
+                .catch(error => reject(error))
+        })
+    }
+
+    updateTaskInDB = (updatedTask: ITaskData, updatedGroup: string, oldGroup: string) => {
+        return new Promise((resolve, reject) => {
+            this.task_db.editTask(updatedTask)
+                .then(() =>  { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
+                //remove the task from the schedule entirely
+                .then(() => this.schedule_db.removeTaskInSchedule(updatedGroup, updatedTask.id))
+                //re add the task back in on each day its ment to be in
+                .then(() => this.schedule_db.addSetToSchedule(updatedGroup, updatedTask.daysOfWeek, updatedTask.id))
                 .then(() => resolve(true))
                 .catch(error => reject(error))
         })
@@ -138,7 +151,6 @@ export class Database_manager {
         })
 
         return await Promise.all(promises)
-
     }
 
     getTasksFromSetForToday = async (taskSet: string) => {

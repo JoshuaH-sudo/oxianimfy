@@ -38,4 +38,17 @@ export class Task_database {
         return await this.store.set('task', newTaskList)
 
     }
+
+    editTask = async (updateTask: ITaskData) => {
+        let newTaskList: ISetData = await this.store.get('task') ?? [];
+
+        console.log('up',updateTask)
+        console.log('list', newTaskList)
+        let index = newTaskList.findIndex((task: ITaskData) => task.id == updateTask.id)
+        console.log(index)
+        if (index != -1) newTaskList[index] = updateTask
+        
+        return await this.store.set('task', newTaskList)
+
+    }
 }

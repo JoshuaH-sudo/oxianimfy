@@ -73,7 +73,7 @@ export const Task: React.FC = () => {
     let createSetModal
 
     if (isModalVisible) {
-        createSetModal  = (
+        createSetModal = (
             <EuiModal onClose={closeModal}>
                 <EuiModalHeader>
                     <EuiModalHeaderTitle><h1>Create A Task Set</h1></EuiModalHeaderTitle>
@@ -112,9 +112,9 @@ export const Task: React.FC = () => {
                     <EuiFlexGroup >
                         <EuiFlexItem >
                             <DotwProp updateTaskValue={updateTaskValue} />
-
-                            <GroupSelectProp selectedGroup={selectedGroup} selectGroup={selectGroup} showModal={showModal} isModalVisible={isModalVisible}/>
-
+                            <EuiFormRow label="Group this task">
+                                <GroupSelectProp selectedGroup={selectedGroup} selectGroup={selectGroup} showModal={showModal} isModalVisible={isModalVisible} />
+                            </EuiFormRow>
                         </EuiFlexItem>
 
                         {createSetModal}
