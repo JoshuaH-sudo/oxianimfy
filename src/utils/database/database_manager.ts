@@ -43,9 +43,9 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_db.editTask(updatedTask)
                 .then(() =>  { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
-                //remove the task from the schedule entirely
-                .then(() => this.schedule_db.removeTaskInSchedule(updatedGroup, updatedTask.id))
-                //re add the task back in on each day its ment to be in
+                //remove the task from the schedule entirely from previous group
+                .then(() => this.schedule_db.removeTaskInSchedule(oldGroup, updatedTask.id))
+                //re add the task back in on each day its ment to be in with the newest group
                 .then(() => this.schedule_db.addSetToSchedule(updatedGroup, updatedTask.daysOfWeek, updatedTask.id))
                 .then(() => resolve(true))
                 .catch(error => reject(error))
