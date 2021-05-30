@@ -39,10 +39,34 @@ export class Database_manager {
         })
     }
 
+    removeTask = (task: ITaskData) => {
+        return new Promise((resolve, reject) => {
+            this.task_db.deleteTask(task)
+        })
+    }
+
+    updateTaskSetInDB = (set: setRef) => {
+        return new Promise((resolve, reject) => {
+            this.task_set_db.getSetWithKey(set.key)
+                .then((oldSet: setRef) => {
+                    if (oldSet) {
+                        this.task_set_db.updatedSet(oldSet.name.toLowerCase(), set)
+                            .then(() => {
+                                this.schedule_db.replaceSetInSchedule(oldSet.name.toLowerCase(), set.name.toLowerCase())
+                                    .then(() => resolve(true))
+                            })
+                    } else {
+                        reject()
+                    }
+                })
+                .catch(error => reject(error))
+        })
+    }
+
     updateTaskInDB = (updatedTask: ITaskData, updatedGroup: string, oldGroup: string) => {
         return new Promise((resolve, reject) => {
             this.task_db.editTask(updatedTask)
-                .then(() =>  { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
+                .then(() => { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
                 //remove the task from the schedule entirely from previous group
                 .then(() => this.schedule_db.removeTaskInSchedule(oldGroup, updatedTask.id))
                 //re add the task back in on each day its ment to be in with the newest group

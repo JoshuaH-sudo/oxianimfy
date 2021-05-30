@@ -99,7 +99,7 @@ export class Schedule_database {
             if (retrivedSchedule[day][setId]) exsistingTasks = retrivedSchedule[day][setId].tasks
             exsistingTasks = exsistingTasks.filter((exsistingId: string) => exsistingId != taskId)
             
-            if (exsistingTasks != []) {
+            if (exsistingTasks.length > 0) {
                 const newRecord = {
                     completed: false,
                     tasks: exsistingTasks
@@ -108,7 +108,19 @@ export class Schedule_database {
                 retrivedSchedule[day][setId] = newRecord
             } else {
                 delete retrivedSchedule[day][setId]
-                console.log('yeet', retrivedSchedule[day][setId])
+            }
+        });
+
+        return await this.store.set("schedule", retrivedSchedule)
+    }
+
+    replaceSetInSchedule = async (oldSetId: string, newSetId: string) => {
+         var retrivedSchedule: IScheduleData = await this.store.get("schedule")
+
+        Object.keys(retrivedSchedule).forEach((day: string) => {
+            if (retrivedSchedule[day][oldSetId]) {
+                retrivedSchedule[day][newSetId] = retrivedSchedule[day][oldSetId]
+                delete retrivedSchedule[day][oldSetId]
             }
         });
 
@@ -121,7 +133,6 @@ export class Schedule_database {
         daysOfWeek.forEach((day: string) => {
             let exsistingTasks = [] 
             if (newSchedule[day][set]) exsistingTasks = newSchedule[day][set].tasks
-            console.log(newSchedule[day][set])
             exsistingTasks.push(taskId)
             
             const newRecord = {

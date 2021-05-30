@@ -39,11 +39,16 @@ export class Task_database {
 
     }
 
+    deleteTask = async (deleteTask: ITaskData) => {
+        let taskList: ITaskData[] = await this.store.get('task') ?? [];
+        taskList = taskList.filter((task: ITaskData) => task.id != deleteTask.id)
+
+        return await this.store.set('task', taskList)
+    }
+
     editTask = async (updateTask: ITaskData) => {
         let newTaskList: ISetData = await this.store.get('task') ?? [];
 
-        console.log('up',updateTask)
-        console.log('list', newTaskList)
         let index = newTaskList.findIndex((task: ITaskData) => task.id == updateTask.id)
         console.log(index)
         if (index != -1) newTaskList[index] = updateTask

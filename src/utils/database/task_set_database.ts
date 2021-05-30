@@ -1,4 +1,4 @@
-import { ITaskData, ISetData, taskRef } from '../custom_types';
+import { ITaskData, ISetData, taskRef, setRef } from '../custom_types';
 import { Database } from './database';
 import { v4 } from 'uuid'
 import { Storage } from '@ionic/storage';
@@ -59,6 +59,12 @@ export class Task_set_database {
         return setList[setId.toLowerCase()]
     }
 
+    getSetWithKey = async (setKey: string) => {
+        let setList = await this.store.get('task_set') ?? this.default_set_list
+        let foundSetId = Object.keys(setList).find((setId: string) => setList[setId].key == setKey)
+        if (foundSetId) return setList[foundSetId]
+    }
+
     getSetsTaskIds = async (setId: string) => {
         let setList = await this.store.get('task_set') ?? this.default_set_list
         return setList[setId.toLowerCase()].tasks
@@ -72,5 +78,18 @@ export class Task_set_database {
         console.log(newTaskSetList)
 
         await this.store.set('task_set', newTaskSetList)
+    }
+
+    updatedSet = async (oldSetId: string, newSet: setRef) => {
+        let newSetList = await this.store.get('task_set') ?? this.default_set_list
+        delete newSetList[oldSetId]
+        newSetList[newSet.name.toLowerCase()] = {
+            key: newSet.key,
+            name: newSet.name,
+            desc: newSet.desc,
+            tasks: newSet.tasks
+        }
+
+        await this.store.set('task_set', newSetList)
     }
 }
