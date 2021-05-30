@@ -41,7 +41,21 @@ export class Database_manager {
 
     removeTask = (task: ITaskData) => {
         return new Promise((resolve, reject) => {
-            this.task_db.deleteTask(task)
+            this.task_db.deleteTask(task).then(() => {
+                this.task_set_db.findSetsBelongingToTask(task.id).then((foundSetIds) => {
+
+                    let promises: any = []
+                    foundSetIds.forEach((setId: string) => {
+                        promises.push(
+                            this.schedule_db.removeTaskInSchedule(setId, task.id)
+                                .then(() => this.task_set_db.removeTaskFromSet(setId, task.id))
+                        )
+                    })
+                    
+                    Promise.all(promises).then(() => resolve(true))
+                })
+            })
+                .catch(error => reject(error))
         })
     }
 

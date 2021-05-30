@@ -70,12 +70,27 @@ export class Task_set_database {
         return setList[setId.toLowerCase()].tasks
     }
 
+    findSetsBelongingToTask = async (taskId: string) => {
+        let setList = await this.store.get('task_set') ?? this.default_set_list
+        let foundSets: string[] = []
+        Object.keys(setList).forEach((setId: string) => {
+            if (setList[setId].tasks.indexOf(taskId) ) foundSets.push(setId)
+        })
+        return foundSets
+    }
+
+    removeTaskFromSet = async (setId: string, taskId: string) => {
+        let newTaskSetList = await this.store.get('task_set') ?? this.default_set_list
+        newTaskSetList[setId].tasks = newTaskSetList[setId].tasks.filter((taskRef: taskRef) => taskRef.taskId != taskId)
+
+        await this.store.set('task_set', newTaskSetList)
+    }
+
     updatedSetTasks = async (oldSetId:string, newSetId: string, taskId: string) => {
         let newTaskSetList = await this.store.get('task_set') ?? this.default_set_list
 
         newTaskSetList[oldSetId].tasks = newTaskSetList[oldSetId].tasks.filter((taskRef: taskRef) => taskRef.taskId != taskId)
         newTaskSetList[newSetId].tasks.push({ taskId: taskId, completed: false})
-        console.log(newTaskSetList)
 
         await this.store.set('task_set', newTaskSetList)
     }
