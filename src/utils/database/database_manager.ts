@@ -41,7 +41,7 @@ export class Database_manager {
 
     removeTask = (task: ITaskData) => {
         return new Promise((resolve, reject) => {
-            this.task_db.deleteTask(task).then(() => {
+            this.task_db.deleteTask(task.id).then(() => {
                 this.task_set_db.findSetsBelongingToTask(task.id).then((foundSetIds) => {
 
                     let promises: any = []
@@ -51,9 +51,30 @@ export class Database_manager {
                                 .then(() => this.task_set_db.removeTaskFromSet(setId, task.id))
                         )
                     })
-                    
+
                     Promise.all(promises).then(() => resolve(true))
                 })
+            })
+                .catch(error => reject(error))
+        })
+    }
+
+    removeSet = (set: setRef) => {
+        return new Promise((resolve, reject) => {
+            this.task_set_db.getSetsTaskIds(set.name).then((taskIds: any) => {
+                let promises: any = []
+                taskIds.forEach((taskRef: taskRef) => {
+                    promises.push(
+                        this.task_db.deleteTask(taskRef.taskId)
+                    )
+                })
+
+                Promise.all(promises).then(() => {
+                    this.task_set_db.deleteSet(set.name)
+                        .then(() => this.schedule_db.deleteSetInSchedule(set.id))
+                })
+                    .then(() => resolve(true))
+
             })
                 .catch(error => reject(error))
         })

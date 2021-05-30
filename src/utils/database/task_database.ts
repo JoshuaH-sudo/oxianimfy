@@ -39,9 +39,9 @@ export class Task_database {
 
     }
 
-    deleteTask = async (deleteTask: ITaskData) => {
+    deleteTask = async (deleteTaskId: string) => {
         let taskList: ITaskData[] = await this.store.get('task') ?? [];
-        taskList = taskList.filter((task: ITaskData) => task.id != deleteTask.id)
+        taskList = taskList.filter((task: ITaskData) => task.id != deleteTaskId)
 
         return await this.store.set('task', taskList)
     }

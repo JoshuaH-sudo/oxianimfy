@@ -107,4 +107,12 @@ export class Task_set_database {
 
         await this.store.set('task_set', newSetList)
     }
+
+    deleteSet = async (setName: string) => {
+        let newSetList = await this.store.get('task_set') ?? this.default_set_list
+        delete newSetList[setName]
+
+        await this.store.set('task_set', newSetList)
+
+    }
 }

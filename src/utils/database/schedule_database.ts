@@ -114,6 +114,18 @@ export class Schedule_database {
         return await this.store.set("schedule", retrivedSchedule)
     }
 
+    deleteSetInSchedule = async (setName: string) => {
+        var retrivedSchedule: IScheduleData = await this.store.get("schedule")
+        
+        Object.keys(retrivedSchedule).forEach((day: string) => {
+            if (retrivedSchedule[day][setName]) {
+                delete retrivedSchedule[day][setName]
+            }
+        });
+        
+        return await this.store.set("schedule", retrivedSchedule)
+    }
+
     replaceSetInSchedule = async (oldSetId: string, newSetId: string) => {
          var retrivedSchedule: IScheduleData = await this.store.get("schedule")
 
