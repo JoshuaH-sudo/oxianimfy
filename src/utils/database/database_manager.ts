@@ -72,8 +72,8 @@ export class Database_manager {
                 Promise.all(promises).then(() => {
                     this.task_set_db.deleteSet(set.name)
                         .then(() => this.schedule_db.deleteSetInSchedule(set.id))
+                        .then(() => resolve(true))
                 })
-                    .then(() => resolve(true))
 
             })
                 .catch(error => reject(error))
