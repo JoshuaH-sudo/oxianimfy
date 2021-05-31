@@ -74,7 +74,7 @@ export class Task_set_database {
         let setList = await this.store.get('task_set') ?? this.default_set_list
         let foundSets: string[] = []
         Object.keys(setList).forEach((setId: string) => {
-            if (setList[setId].tasks.indexOf(taskId) ) foundSets.push(setId)
+            if (setList[setId].tasks.find((taskRef: taskRef) => taskRef.taskId == taskId)) foundSets.push(setId)
         })
         return foundSets
     }

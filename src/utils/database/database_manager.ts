@@ -63,18 +63,20 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_set_db.getSetsTaskIds(set.name).then((taskIds: any) => {
                 let promises: any = []
-                taskIds.forEach((taskRef: taskRef) => {
-                    promises.push(
-                        this.task_db.deleteTask(taskRef.taskId)
-                    )
-                })
 
-                Promise.all(promises).then(() => {
+                promises.push(
+                    this.task_db.deleteMultiTask(taskIds)
+                )
+
+                promises.push(
                     this.task_set_db.deleteSet(set.name)
-                        .then(() => this.schedule_db.deleteSetInSchedule(set.id))
-                        .then(() => resolve(true))
-                })
+                )
 
+                promises.push(
+                    this.schedule_db.deleteSetInSchedule(set.name)
+                )
+
+                Promise.all(promises).then(() => resolve(true))
             })
                 .catch(error => reject(error))
         })

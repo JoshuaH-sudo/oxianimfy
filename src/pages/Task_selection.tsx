@@ -20,6 +20,7 @@ const Task_selection: React.FC = () => {
 
   useEffect(() => {
     db_Context.getSetsDetailsFromDbForToday().then((sets: setRef[] | any) => {
+      console.log('sets', sets)
       sets.map(async (set: setRef) => {
         //get task refrence from set
         let setTaskRef = set.tasks
