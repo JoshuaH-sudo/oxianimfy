@@ -33,7 +33,81 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_db.addTask(newTask)
                 .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
-                .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek))
+                .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id))
+                .then(() => resolve(true))
+                .catch(error => reject(error))
+        })
+    }
+
+    removeTask = (task: ITaskData) => {
+        return new Promise((resolve, reject) => {
+            this.task_db.deleteTask(task.id).then(() => {
+                this.task_set_db.findSetsBelongingToTask(task.id).then((foundSetIds) => {
+
+                    let promises: any = []
+                    foundSetIds.forEach((setId: string) => {
+                        promises.push(
+                            this.schedule_db.removeTaskInSchedule(setId, task.id)
+                                .then(() => this.task_set_db.removeTaskFromSet(setId, task.id))
+                        )
+                    })
+
+                    Promise.all(promises).then(() => resolve(true))
+                })
+            })
+                .catch(error => reject(error))
+        })
+    }
+
+    removeSet = (set: setRef) => {
+        return new Promise((resolve, reject) => {
+            this.task_set_db.getSetsTaskIds(set.name).then((taskIds: any) => {
+                let promises: any = []
+
+                promises.push(
+                    this.task_db.deleteMultiTask(taskIds)
+                )
+
+                promises.push(
+                    this.task_set_db.deleteSet(set.name)
+                )
+
+                promises.push(
+                    this.schedule_db.deleteSetInSchedule(set.name)
+                )
+
+                Promise.all(promises).then(() => resolve(true))
+            })
+                .catch(error => reject(error))
+        })
+    }
+
+    updateTaskSetInDB = (set: setRef) => {
+        return new Promise((resolve, reject) => {
+            this.task_set_db.getSetWithKey(set.key)
+                .then((oldSet: setRef) => {
+                    if (oldSet) {
+                        this.task_set_db.updatedSet(oldSet.name.toLowerCase(), set)
+                            .then(() => {
+                                this.schedule_db.replaceSetInSchedule(oldSet.name.toLowerCase(), set.name.toLowerCase())
+                                    .then(() => resolve(true))
+                            })
+                    } else {
+                        reject()
+                    }
+                })
+                .catch(error => reject(error))
+        })
+    }
+
+    updateTaskInDB = (updatedTask: ITaskData, updatedGroup: string, oldGroup: string) => {
+        return new Promise((resolve, reject) => {
+            this.task_db.editTask(updatedTask)
+                .then(() => { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
+                //remove the task from the schedule entirely from previous group
+                .then(() => this.schedule_db.removeTaskInSchedule(oldGroup, updatedTask.id))
+                //re add the task back in on each day its ment to be in with the newest group
+                .then(() => this.schedule_db.addSetToSchedule(updatedGroup, updatedTask.daysOfWeek, updatedTask.id))
                 .then(() => resolve(true))
                 .catch(error => reject(error))
         })
@@ -81,7 +155,9 @@ export class Database_manager {
                 })
 
             })
-            this.app_manager.updateTimeStamp()
+            promises.push(
+                this.app_manager.updateTimeStamp()
+            )
         }
 
         return await Promise.all(promises)
@@ -89,13 +165,7 @@ export class Database_manager {
 
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
-        let currentSet = await this.task_set_db.getSetWithId(setId)
-        let currentTasks = await this.getUncompletedTasks(currentSet.tasks, setId)
-
-        if (currentTasks.length <= 0) {
-
-            return await this.schedule_db.completeSetSchedule(setId)
-        }
+        return await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
     }
 
     getSetsFromDBForToday = async () => {
@@ -125,7 +195,20 @@ export class Database_manager {
         return await this.task_set_db.getSetWithId(setId)
     }
 
-    getTasksFromSet = async (taskSet: string) => {
+    getAllTaskDetails = async (taskSet: string) => {
+        let promises: any[] = []
+        let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
+
+        taskIdList.forEach((entry: taskRef) => {
+            promises.push(
+                this.task_db.findTask(entry.taskId)
+            )
+        })
+
+        return await Promise.all(promises)
+    }
+
+    getTasksFromSetForToday = async (taskSet: string) => {
 
         let promises: any[] = []
         let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
@@ -145,7 +228,7 @@ export class Database_manager {
 
 
     getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
-        let taskList = await this.getTasksFromSet(set)
+        let taskList = await this.getTasksFromSetForToday(set)
 
         //get task details from task refs
         let taskToDoList: any = []

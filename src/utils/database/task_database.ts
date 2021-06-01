@@ -15,16 +15,16 @@ export class Task_database {
     getTasks = async () => {
         return await this.store.get('task') ?? [];
     }
-    
+
     completeTaskInSet = async (completeTaskId: string, setId: string) => {
         let taskSetList: ISetData = await this.store.get('task_set') ?? [];
-        const taskIndex = taskSetList[setId].tasks.findIndex((task: taskRef) => task.taskId == completeTaskId )
+        const taskIndex = taskSetList[setId].tasks.findIndex((task: taskRef) => task.taskId == completeTaskId)
         if (taskIndex >= 0) taskSetList[setId].tasks[taskIndex].completed = true
         return await this.store.set('task_set', taskSetList)
     }
 
     findTask = async (taskId: string) => {
-        let taskList:ITaskData[] = await this.store.get('task') ?? [];
+        let taskList: ITaskData[] = await this.store.get('task') ?? [];
         return taskList.find((task: ITaskData) => task.id == taskId)
     }
 
@@ -34,6 +34,34 @@ export class Task_database {
 
         newTask.id = v4();
         newTaskList.push(newTask)
+
+        return await this.store.set('task', newTaskList)
+
+    }
+
+    deleteMultiTask = async (deleteTaskIdList: any) => {
+        let taskList: ITaskData[] = await this.store.get('task') ?? [];
+
+        deleteTaskIdList.forEach((taskref: taskRef) => {
+            taskList = taskList.filter((task: ITaskData) => task.id != taskref.taskId)
+        });
+
+        return await this.store.set('task', taskList)
+    }
+
+    deleteTask = async (deleteTaskId: string) => {
+        let taskList: ITaskData[] = await this.store.get('task') ?? [];
+
+        taskList = taskList.filter((task: ITaskData) => task.id != deleteTaskId)
+
+        return await this.store.set('task', taskList)
+    }
+
+    editTask = async (updateTask: ITaskData) => {
+        let newTaskList: ISetData = await this.store.get('task') ?? [];
+
+        let index = newTaskList.findIndex((task: ITaskData) => task.id == updateTask.id)
+        if (index != -1) newTaskList[index] = updateTask
 
         return await this.store.set('task', newTaskList)
 

@@ -19,6 +19,10 @@ export interface ISetData {
     [index: string]: any | setRef,
 }
 
+export interface ITaskSetData {
+    [index: string]: any | ITaskData,
+}
+
 export interface taskRef {
     taskId: string,
     completed: boolean
