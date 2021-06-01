@@ -70,6 +70,16 @@ export class Schedule_database {
         })
     }
 
+    completeTaskInSetSchedule = async (completedTaskId: string, setId:string) => {
+        var newSchedule: IScheduleData = await this.store.get("schedule")
+        const today = this.getTodaysName()
+        newSchedule[today][setId].tasks[completedTaskId].completed = true
+
+        //check off set if all tasks are done
+        if (newSchedule[today][setId].tasks.find((taskRef: taskRef) => taskRef.completed == false)) await this.completeSetSchedule(setId)
+        return await this.store.set("schedule", newSchedule)
+    }
+
     completeSetSchedule = async (setId: string) => {
         var newSchedule: IScheduleData = await this.store.get("schedule")
         const today = this.getTodaysName()
@@ -95,13 +105,17 @@ export class Schedule_database {
         var retrivedSchedule: IScheduleData = await this.store.get("schedule")
 
         Object.keys(retrivedSchedule).forEach((day: string) => {
-            let exsistingTasks = [] 
-            if (retrivedSchedule[day][setId]) exsistingTasks = retrivedSchedule[day][setId].tasks
-            exsistingTasks = exsistingTasks.filter((exsistingId: string) => exsistingId != taskId)
+            let exsistingTasks:any = [] 
+            if (retrivedSchedule[day][setId]) {
+                delete retrivedSchedule[day][setId].tasks[taskId]
+                exsistingTasks = {...retrivedSchedule[day][setId].tasks}
+            }
             
-            if (exsistingTasks.length > 0) {
+            //see if set is now complete
+            let isSetCompleted = Object.keys(exsistingTasks).find((taskRef: any) => exsistingTasks[taskRef].completed == false) ?  false : true
+            if (Object.keys(exsistingTasks).length > 0) {
                 const newRecord = {
-                    completed: false,
+                    completed: isSetCompleted,
                     tasks: exsistingTasks
                 }
     
@@ -145,7 +159,7 @@ export class Schedule_database {
         daysOfWeek.forEach((day: string) => {
             let exsistingTasks = [] 
             if (newSchedule[day][set]) exsistingTasks = newSchedule[day][set].tasks
-            exsistingTasks.push(taskId)
+            exsistingTasks[taskId] = { completed: false } 
             
             const newRecord = {
                 completed: false,

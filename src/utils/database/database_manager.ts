@@ -165,13 +165,7 @@ export class Database_manager {
 
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
-        let currentSet = await this.task_set_db.getSetWithId(setId)
-        let currentTasks = await this.getUncompletedTasks(currentSet.tasks, setId)
-
-        if (currentTasks.length <= 0) {
-
-            return await this.schedule_db.completeSetSchedule(setId)
-        }
+        return await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
     }
 
     getSetsFromDBForToday = async () => {

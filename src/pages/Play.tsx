@@ -202,6 +202,7 @@ const Counter_task: React.FC<TaskProps> = (props) => {
         if (set_num >= task.unit) {
             db_context.app_manager.getSelectedTaskGroup()
                 .then((setId: string) => db_context.completeTask(task.id, setId.toLowerCase()))
+                .then(() => set_current_counter(0))
                 .then(() => props.changeTask(1))
         } else {
             set_current_counter(set_num)
