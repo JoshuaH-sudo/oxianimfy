@@ -49,4 +49,17 @@ export class App_manager {
         let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
         return updatedSettings.selectedTaskGroup
     }
+
+    //test code
+    subtractDay = async () => {
+        let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
+        updatedSettings.lastRefreshTimeStamp = moment().startOf('day').subtract('days', 1).toString()
+        return await this.store.set(this.storeName, updatedSettings)
+    }
+
+    addDay = async () => {
+        let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
+        updatedSettings.lastRefreshTimeStamp = moment().startOf('day').add('days', 1).toString()
+        return await this.store.set(this.storeName, updatedSettings)
+    }
 }

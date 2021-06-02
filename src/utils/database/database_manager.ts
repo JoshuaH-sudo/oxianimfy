@@ -5,6 +5,8 @@ import { Database } from './database'
 import { IScheduleData, ITaskData, setRef, taskRef } from '../custom_types';
 import { Storage } from '@ionic/storage';
 import { App_manager } from './app_manager';
+import { Stats_database } from './stats_database';
+
 import moment from 'moment';
 
 export class Database_manager {
@@ -12,15 +14,19 @@ export class Database_manager {
     task_db: Task_database
     task_set_db: Task_set_database
     schedule_db: Schedule_database
+    stats_db: Stats_database
     app_manager: App_manager
     app_storage: Storage
 
     constructor() {
         this.app_db = new Database()
+
         this.task_db = new Task_database(this.app_db)
         this.task_set_db = new Task_set_database(this.app_db)
         this.schedule_db = new Schedule_database(this.app_db)
+        this.stats_db = new Stats_database(this.app_db)
         this.app_manager = new App_manager(this.app_db)
+
         this.app_storage = this.app_db.store
 
         this.resetTaskCompletionInTaskSets()
@@ -33,6 +39,12 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_db.addTask(newTask)
                 .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
+                .then(async () => {
+                    if (await this.isSetDoneForToday(set)) {
+                        console.log('lol', this.isSetDoneForToday(set))
+                        this.stats_db.decreseSetStreak(set)
+                    }
+                })
                 .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id))
                 .then(() => resolve(true))
                 .catch(error => reject(error))
@@ -165,7 +177,13 @@ export class Database_manager {
 
     completeTask = async (completedTasksId: string, setId: string) => {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
-        return await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
+        await this.stats_db.incrementTaskStreak(completedTasksId)
+        await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
+        if (await this.isSetDoneForToday(setId)) {
+            return this.stats_db.incrementSetStreak(setId)
+        } else {
+            return Promise.resolve()
+        }
     }
 
     getSetsFromDBForToday = async () => {
@@ -176,7 +194,20 @@ export class Database_manager {
 
     isSetNotDoneForToday = async (setId: string) => {
         let scheduleSets = await this.getSetsFromDBForToday()
-        return scheduleSets[setId.toLowerCase()].completed != true
+        if (scheduleSets[setId.toLowerCase()]) {
+            return scheduleSets[setId.toLowerCase()].completed != true
+        } else {
+            return true
+        }
+    }
+
+    isSetDoneForToday = async (setId: string) => {
+        let scheduleSets = await this.getSetsFromDBForToday()
+        if (scheduleSets[setId.toLowerCase()]) {
+            return scheduleSets[setId.toLowerCase()].completed == true
+        } else {
+            return false
+        }
     }
 
     getSetsDetailsFromDbForToday = async () => {
@@ -225,7 +256,6 @@ export class Database_manager {
         let taskDetailList = await Promise.all(promises)
         return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
     }
-
 
     getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
         let taskList = await this.getTasksFromSetForToday(set)

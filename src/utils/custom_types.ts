@@ -28,6 +28,11 @@ export interface taskRef {
     completed: boolean
 }
 
+export interface streakData {
+    id: string,
+    streak: number
+}
+
 export interface IScheduleData {
     [index: string]: any | taskRef,
 }
