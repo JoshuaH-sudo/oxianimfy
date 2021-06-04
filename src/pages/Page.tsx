@@ -25,6 +25,11 @@ const Page: React.FC = () => {
           <EuiButton fill href="#/edit-tasks">Edit tasks</EuiButton>
         </EuiFlexItem>
 
+        
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/stats">View Stats</EuiButton>
+        </EuiFlexItem>
+
         <EuiFlexItem grow={false}>
           <EuiButton fill href="/" onClick={() => { db_context.app_storage.clear() }}>Clear data</EuiButton>
         </EuiFlexItem>

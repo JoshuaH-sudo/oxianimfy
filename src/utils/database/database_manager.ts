@@ -39,12 +39,6 @@ export class Database_manager {
         return new Promise((resolve, reject) => {
             this.task_db.addTask(newTask)
                 .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
-                .then(async () => {
-                    if (await this.isSetDoneForToday(set)) {
-                        console.log('lol', this.isSetDoneForToday(set))
-                        this.stats_db.decreseSetStreak(set)
-                    }
-                })
                 .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id))
                 .then(() => resolve(true))
                 .catch(error => reject(error))
@@ -64,7 +58,8 @@ export class Database_manager {
                         )
                     })
 
-                    Promise.all(promises).then(() => resolve(true))
+                    Promise.all(promises)
+                        .then(() => resolve(true))
                 })
             })
                 .catch(error => reject(error))
@@ -133,20 +128,12 @@ export class Database_manager {
         return await this.task_set_db.createSet(setId, description)
     }
 
-    getTasksFromDB = () => {
-        return new Promise((resolve, reject) => {
-            this.task_db.getTasks().then((tasks: ITaskData[]) => {
-                resolve(tasks)
-            }).catch(error => {
-                reject(error)
-            })
-        })
+    getTasksFromDB = async (): Promise<ITaskData[]> => {
+        return this.task_db.getTasks()
     }
 
     resetTaskCompletionInTaskSets = async () => {
         let config = await this.app_manager.getConfig()
-        let promises: any[] = []
-
         let schedule = await this.schedule_db.getSchedule()
 
         let currentTime = moment()
@@ -156,16 +143,22 @@ export class Database_manager {
         //if its been a day or more, refresh tasks avaliable
         console.log('time diff', timeDifference)
         console.log('should refresh? ', timeDifference <= -1)
-
+        let promises: any[] = []
         if (timeDifference <= -1) {
             Object.keys(schedule).map((day: string) => {
 
                 Object.keys(schedule[day]).map((set: string) => {
-                    promises.push(
-                        this.task_set_db.resetTaskCompletenss(set.toLowerCase())
-                    )
+                    if (schedule[day][set].completed) {
+                        promises.push(
+                            this.stats_db.incrementSetStreak(set)
+                                .then(() => this.task_set_db.resetTaskCompletenss(set.toLowerCase()))
+                        )
+                    } else {
+                        promises.push(
+                            this.task_set_db.resetTaskCompletenss(set.toLowerCase())
+                        )
+                    }
                 })
-
             })
             promises.push(
                 this.app_manager.updateTimeStamp()
@@ -179,11 +172,6 @@ export class Database_manager {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
         await this.stats_db.incrementTaskStreak(completedTasksId)
         await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
-        if (await this.isSetDoneForToday(setId)) {
-            return this.stats_db.incrementSetStreak(setId)
-        } else {
-            return Promise.resolve()
-        }
     }
 
     getSetsFromDBForToday = async () => {

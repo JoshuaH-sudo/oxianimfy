@@ -4,8 +4,9 @@ import App from './App';
 import Play from './pages/Play';
 import Task from './pages/Task_creation';
 import Edit_task_menu from './pages/Edit_task_menu';
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { Stats } from './pages/stats';
 import Task_selection from './pages/Task_selection';
+import { HashRouter, Route, Switch } from "react-router-dom";
 import {
   EuiPanel,
   EuiButton
@@ -22,6 +23,7 @@ ReactDOM.render(
           <Route path="/task_selection" component={Task_selection} />
           <Route path="/play" component={Play} />
           <Route path="/edit-tasks" component={Edit_task_menu} />
+          <Route path="/stats" component={Stats} />
         </Switch>
       </HashRouter>
     </EuiPanel>

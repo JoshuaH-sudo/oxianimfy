@@ -40,7 +40,7 @@ export class Schedule_database {
         let newSchedule: IScheduleData = await this.store.get("schedule")
         const today = this.getTodaysName()
 
-        Object.keys(newSchedule).forEach((day: string) => {
+        if (newSchedule) Object.keys(newSchedule).forEach((day: string) => {
             if (day != today) {
 
                 Object.keys(newSchedule[day]).forEach((set: any) => {

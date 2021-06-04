@@ -1,5 +1,6 @@
 import '@ionic/react/css/core.css';
 import '@elastic/eui/dist/eui_theme_dark.css';
+import '@elastic/charts/dist/theme_dark.css';
 import React from 'react';
 import Page from './pages/Page';
 import { Database_manager } from './utils/database/database_manager'
