@@ -39,7 +39,7 @@ const Page: React.FC = () => {
         <EuiFlexGroup>
 
           <EuiFlexItem grow={false}>
-            <EuiButton fill href="/" onClick={() => { db_context.app_manager.subtractDay() }}>go back 1 day</EuiButton>
+            <EuiButton fill href="/" onClick={() => { db_context.app_manager.subtractDay(3) }}>go back 1 day</EuiButton>
           </EuiFlexItem>
 
           <EuiFlexItem grow={false}>

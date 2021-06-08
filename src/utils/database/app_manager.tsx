@@ -51,15 +51,15 @@ export class App_manager {
     }
 
     //test code
-    subtractDay = async () => {
+    subtractDay = async (numOfDays: number = 1) => {
         let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
-        updatedSettings.lastRefreshTimeStamp = moment().startOf('day').subtract('days', 1).toString()
+        updatedSettings.lastRefreshTimeStamp = moment(updatedSettings.lastRefreshTimeStamp).startOf('day').subtract('days', numOfDays).toString()
         return await this.store.set(this.storeName, updatedSettings)
     }
 
     addDay = async () => {
         let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
-        updatedSettings.lastRefreshTimeStamp = moment().startOf('day').add('days', 1).toString()
+        updatedSettings.lastRefreshTimeStamp = moment(updatedSettings.lastRefreshTimeStamp).startOf('day').add('days', 1).toString()
         return await this.store.set(this.storeName, updatedSettings)
     }
 }

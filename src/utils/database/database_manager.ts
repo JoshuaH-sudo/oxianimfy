@@ -132,6 +132,14 @@ export class Database_manager {
         return this.task_db.getTasks()
     }
 
+    betweenLastTimeToToday = (lastTimeStamp: moment.Moment, day: string) => {
+        //sunday is considered the first day of the week 
+        let startOfWeek = moment().format('dddd') == 'Sunday' ? moment().startOf('week').subtract(1, 'week') : moment().startOf('week')
+
+        //check the days that are inbetween the last time stamp and today
+        return lastTimeStamp.isBefore(startOfWeek.day(day), 'day') && startOfWeek.day(day).isBefore(moment(), 'day')
+    }
+
     resetTaskCompletionInTaskSets = async () => {
         let config = await this.app_manager.getConfig()
         let schedule = await this.schedule_db.getSchedule()
@@ -139,11 +147,13 @@ export class Database_manager {
         let currentTime = moment()
         let lastTimeStamp = moment(config.lastRefreshTimeStamp)
         let timeDifference = moment.duration(lastTimeStamp.diff(currentTime)).as('days')
-
+        console.log('last day', lastTimeStamp.format('dddd'))
         //if its been a day or more, refresh tasks avaliable
-        console.log('time diff', timeDifference)
         console.log('should refresh? ', timeDifference <= -1)
         let promises: any[] = []
+
+        console.log('last timeStamp', lastTimeStamp)
+
         if (timeDifference <= -1) {
             Object.keys(schedule).map((day: string) => {
 
@@ -151,6 +161,11 @@ export class Database_manager {
                     if (schedule[day][set].completed) {
                         promises.push(
                             this.stats_db.incrementSetStreak(set)
+                                .then(() => this.task_set_db.resetTaskCompletenss(set.toLowerCase()))
+                        )
+                    } else if (!schedule[day][set].completed && this.betweenLastTimeToToday(lastTimeStamp, day)) {
+                        promises.push(
+                            this.stats_db.resetSetStreak(set)
                                 .then(() => this.task_set_db.resetTaskCompletenss(set.toLowerCase()))
                         )
                     } else {
@@ -172,6 +187,7 @@ export class Database_manager {
         await this.task_db.completeTaskInSet(completedTasksId, setId)
         await this.stats_db.incrementTaskStreak(completedTasksId)
         await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
+        // if ( await this.isSetDoneForToday(setId)) return this.stats_db.incrementSetStreak(setId)
     }
 
     getSetsFromDBForToday = async () => {

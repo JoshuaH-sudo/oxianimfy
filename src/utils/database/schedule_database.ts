@@ -5,13 +5,13 @@ import { Storage } from '@ionic/storage';
 
 export class Schedule_database {
     schedule: IScheduleData = {
+        "sunday": [],
         "monday": [],
         "tuesday": [],
         "wednesday": [],
         "thursday": [],
         "friday": [],
         "saturday": [],
-        "sunday": []
     }
     store: Storage;
 
