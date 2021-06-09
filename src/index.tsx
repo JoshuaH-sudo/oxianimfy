@@ -4,7 +4,7 @@ import App from './App';
 import Play from './pages/Play';
 import Task from './pages/Task_creation';
 import Edit_task_menu from './pages/Edit_task_menu';
-import { Stats } from './pages/stats';
+import { Stats } from './pages/Stats_display';
 import Task_selection from './pages/Task_selection';
 import { HashRouter, Route, Switch } from "react-router-dom";
 import {

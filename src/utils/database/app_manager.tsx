@@ -57,9 +57,9 @@ export class App_manager {
         return await this.store.set(this.storeName, updatedSettings)
     }
 
-    addDay = async () => {
+    addDay = async (numOfDays: number = 1) => {
         let updatedSettings: ISettings = await this.store.get(this.storeName) ?? this.settings;
-        updatedSettings.lastRefreshTimeStamp = moment(updatedSettings.lastRefreshTimeStamp).startOf('day').add('days', 1).toString()
+        updatedSettings.lastRefreshTimeStamp = moment(updatedSettings.lastRefreshTimeStamp).startOf('day').add('days', numOfDays).toString()
         return await this.store.set(this.storeName, updatedSettings)
     }
 }
