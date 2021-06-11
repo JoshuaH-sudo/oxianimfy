@@ -9,6 +9,30 @@ const Page: React.FC = () => {
     <Fragment>
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/task-creation">
+            Create a New Task
+          </EuiButton>
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/task_selection">
+            Do tasks for today
+          </EuiButton>
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/edit-tasks">
+            Edit tasks
+          </EuiButton>
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/stats">
+            View Stats
+          </EuiButton>
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
           <EuiButton
             fill
             href="/"

@@ -56,6 +56,10 @@ export const Task: React.FC = () => {
 
   const db_context = useContext(databaseContext);
 
+  useEffect(() => {
+    updateTaskValue("unit", "0");
+  }, [newTask.mesure]);
+
   function createTaskGroup() {
     db_context
       .addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc)
@@ -77,6 +81,8 @@ export const Task: React.FC = () => {
     setNewTaskGroup(updatedTaskGroup);
   };
 
+  const groupIsValid = newTaskGroup.name !== "" && newTaskGroup.desc !== "";
+
   let createSetModal;
 
   if (isModalVisible) {
@@ -95,7 +101,7 @@ export const Task: React.FC = () => {
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButton onClick={createTaskGroup} fill>
+          <EuiButton isDisabled={!groupIsValid} onClick={createTaskGroup} fill>
             Create Group
           </EuiButton>
           <EuiButton onClick={closeModal} fill color="danger">
@@ -105,6 +111,12 @@ export const Task: React.FC = () => {
       </EuiModal>
     );
   }
+
+  const formIsValid =
+    newTask.name !== "" &&
+    newTask.daysOfWeek.length > 0 &&
+    newTask.unit !== "0" &&
+    newTask.unit !== "P0D"
 
   return (
     <EuiPanel paddingSize="l">
@@ -120,6 +132,7 @@ export const Task: React.FC = () => {
           <EuiFlexGroup>
             <EuiFlexItem>
               <DotwProp updateTaskValue={updateTaskValue} />
+
               <EuiFormRow label="Group this task">
                 <GroupSelectProp
                   selectedGroup={selectedGroup}
@@ -143,7 +156,11 @@ export const Task: React.FC = () => {
           <EuiSpacer />
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiButton fill onClick={() => createTask()}>
+              <EuiButton
+                isDisabled={!formIsValid}
+                fill
+                onClick={() => createTask()}
+              >
                 Create
               </EuiButton>
             </EuiFlexItem>
