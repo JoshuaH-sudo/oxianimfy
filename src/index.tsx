@@ -1,21 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import Play from './pages/Play';
-import Task from './pages/Task_creation';
-import Edit_task_menu from './pages/Edit_task_menu';
-import { Stats } from './pages/Stats_display';
-import Task_selection from './pages/Task_selection';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import Play from "./pages/Play";
+import Task from "./pages/Task_creation";
+import Edit_task_menu from "./pages/Edit_task_menu";
+import { Stats } from "./pages/Stats_display";
+import Task_selection from "./pages/Task_selection";
 import { HashRouter, Route, Switch } from "react-router-dom";
-import {
-  EuiPanel,
-  EuiButton
-} from '@elastic/eui';
+import { EuiPanel, EuiButton } from "@elastic/eui";
 
 ReactDOM.render(
   <React.StrictMode>
     <EuiPanel>
-      <EuiButton fill href="#/">Home</EuiButton>
+      <EuiButton fill href="#/">
+        Home
+      </EuiButton>
       <HashRouter>
         <Switch>
           <Route path="/" exact component={App} />
@@ -28,6 +27,5 @@ ReactDOM.render(
       </HashRouter>
     </EuiPanel>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
-
