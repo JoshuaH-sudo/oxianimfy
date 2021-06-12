@@ -1,78 +1,36 @@
-import React, { Fragment, useContext } from "react";
-import { EuiButton, EuiPanel, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
-import { databaseContext } from "../App";
+import React, { useContext } from 'react';
+import {
+  EuiButton,
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem
+} from '@elastic/eui';
+import { databaseContext } from '../App';
 
 const Page: React.FC = () => {
-  const db_context = useContext(databaseContext);
+  const db_context = useContext(databaseContext)
 
   return (
-    <Fragment>
+    <EuiPanel paddingSize="l" >
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
-          <EuiButton fill href="#/task-creation">
-            Create a New Task
-          </EuiButton>
+          <EuiButton fill href="#/task-creation">Create a New Task</EuiButton>
+        </EuiFlexItem>
+        
+        <EuiFlexItem grow={false}>
+          <EuiButton fill href="#/task_selection">Do tasks for today</EuiButton>
         </EuiFlexItem>
 
         <EuiFlexItem grow={false}>
-          <EuiButton fill href="#/task_selection">
-            Do tasks for today
-          </EuiButton>
+          <EuiButton fill href="#/edit-tasks">Edit tasks</EuiButton>
         </EuiFlexItem>
 
         <EuiFlexItem grow={false}>
-          <EuiButton fill href="#/edit-tasks">
-            Edit tasks
-          </EuiButton>
-        </EuiFlexItem>
-
-        <EuiFlexItem grow={false}>
-          <EuiButton fill href="#/stats">
-            View Stats
-          </EuiButton>
-        </EuiFlexItem>
-
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            fill
-            href="/"
-            onClick={() => {
-              db_context.app_storage.clear();
-            }}
-          >
-            Clear data
-          </EuiButton>
+          <EuiButton fill href="/" onClick={() => {db_context.app_storage.clear()}}>Clear data</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiPanel paddingSize="l">
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              fill
-              href="/"
-              onClick={() => {
-                db_context.app_manager.subtractDay(3);
-              }}
-            >
-              go back 1 day
-            </EuiButton>
-          </EuiFlexItem>
-
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              fill
-              href="/"
-              onClick={() => {
-                db_context.app_manager.addDay();
-              }}
-            >
-              go foward 1 day
-            </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPanel>
-    </Fragment>
+    </EuiPanel>
   );
 };
 
