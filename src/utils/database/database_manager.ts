@@ -97,28 +97,16 @@ export class Database_manager {
     });
   };
 
-  updateTaskSetInDB = (set: setRef) => {
-    return new Promise((resolve, reject) => {
-      this.task_set_db
-        .getSetWithKey(set.key)
-        .then((oldSet: setRef) => {
-          if (oldSet) {
-            this.task_set_db
-              .updatedSet(oldSet.name.toLowerCase(), set)
-              .then(() => {
-                this.schedule_db
-                  .replaceSetInSchedule(
-                    oldSet.name.toLowerCase(),
-                    set.name.toLowerCase()
-                  )
-                  .then(() => resolve(true));
-              });
-          } else {
-            reject();
-          }
-        })
-        .catch((error) => reject(error));
-    });
+  updateTaskSetInDB = async (set: setRef) => {
+    const oldSet = await this.task_set_db.getSetWithKey(set.key);
+    if (oldSet) {
+      await this.task_set_db.updatedSet(oldSet.name.toLowerCase(), set);
+      await this.schedule_db.replaceSetInSchedule(
+        oldSet.name.toLowerCase(),
+        set.name.toLowerCase()
+      );
+      return await this.stats_db.changeName(oldSet.name, set.name)
+    }
   };
 
   updateTaskInDB = (
