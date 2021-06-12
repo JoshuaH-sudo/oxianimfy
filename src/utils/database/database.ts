@@ -1,17 +1,17 @@
-import { Storage } from '@ionic/storage';
+import { Storage } from "@ionic/storage";
 export class Database {
-    task_list: any[] = []
-    store:Storage = new Storage();
+  task_list: any[] = [];
+  store: Storage = new Storage();
 
-    constructor() {
-        this.createStorage()
-    }
+  constructor() {
+    this.createStorage();
+  }
 
-    async deleteStorage() {
-        await this.store.clear();
-    }
+  async deleteStorage() {
+    await this.store.clear();
+  }
 
-    async createStorage() {
-        await this.store.create()
-    }
+  async createStorage() {
+    await this.store.create();
+  }
 }

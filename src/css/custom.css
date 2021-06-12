@@ -1,0 +1,9 @@
+.euiTitle--small {
+    width: 100%;
+}
+
+.euiCard__titleButton {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: inherit;
+}

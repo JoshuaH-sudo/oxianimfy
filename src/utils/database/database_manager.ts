@@ -1,242 +1,295 @@
-import { Task_database } from './task_database'
-import { Task_set_database } from './task_set_database'
-import { Schedule_database } from './schedule_database'
-import { Database } from './database'
-import { IScheduleData, ITaskData, setRef, taskRef } from '../custom_types';
-import { Storage } from '@ionic/storage';
-import { App_manager } from './app_manager';
-import moment from 'moment';
+import { Task_database } from "./task_database";
+import { Task_set_database } from "./task_set_database";
+import { Schedule_database } from "./schedule_database";
+import { Database } from "./database";
+import { IScheduleData, ITaskData, setRef, taskRef } from "../custom_types";
+import { Storage } from "@ionic/storage";
+import { App_manager } from "./app_manager";
+import { Stats_database } from "./stats_database";
+
+import moment from "moment";
 
 export class Database_manager {
-    app_db: Database
-    task_db: Task_database
-    task_set_db: Task_set_database
-    schedule_db: Schedule_database
-    app_manager: App_manager
-    app_storage: Storage
+  app_db: Database;
+  task_db: Task_database;
+  task_set_db: Task_set_database;
+  schedule_db: Schedule_database;
+  stats_db: Stats_database;
+  app_manager: App_manager;
+  app_storage: Storage;
 
-    constructor() {
-        this.app_db = new Database()
-        this.task_db = new Task_database(this.app_db)
-        this.task_set_db = new Task_set_database(this.app_db)
-        this.schedule_db = new Schedule_database(this.app_db)
-        this.app_manager = new App_manager(this.app_db)
-        this.app_storage = this.app_db.store
+  constructor() {
+    this.app_db = new Database();
 
-        this.resetTaskCompletionInTaskSets()
-        this.task_set_db.getSets().then((result: any) => {
-            console.log('task_set', result)
-        })
-    }
+    this.task_db = new Task_database(this.app_db);
+    this.task_set_db = new Task_set_database(this.app_db);
+    this.schedule_db = new Schedule_database(this.app_db);
+    this.stats_db = new Stats_database(this.app_db);
+    this.app_manager = new App_manager(this.app_db);
 
-    addTaskToDB = (newTask: ITaskData, set: string) => {
-        return new Promise((resolve, reject) => {
-            this.task_db.addTask(newTask)
-                .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
-                .then(() => this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id))
-                .then(() => resolve(true))
-                .catch(error => reject(error))
-        })
-    }
+    this.app_storage = this.app_db.store;
 
-    removeTask = (task: ITaskData) => {
-        return new Promise((resolve, reject) => {
-            this.task_db.deleteTask(task.id).then(() => {
-                this.task_set_db.findSetsBelongingToTask(task.id).then((foundSetIds) => {
+    this.resetTaskCompletionInTaskSets().then(() => {
+      this.stats_db.getStatsDB().then((result: any) => {
+        console.log("streak reset", result);
+      });
+      this.task_set_db.getSets().then((result: any) => {
+        console.log("task_set", result);
+      });
+    });
+  }
 
-                    let promises: any = []
-                    foundSetIds.forEach((setId: string) => {
-                        promises.push(
-                            this.schedule_db.removeTaskInSchedule(setId, task.id)
-                                .then(() => this.task_set_db.removeTaskFromSet(setId, task.id))
-                        )
-                    })
+  addTaskToDB = (newTask: ITaskData, set: string) => {
+    return new Promise((resolve, reject) => {
+      this.task_db
+        .addTask(newTask)
+        .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
+        .then(() =>
+          this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id)
+        )
+        .then(() => resolve(true))
+        .catch((error) => reject(error));
+    });
+  };
 
-                    Promise.all(promises).then(() => resolve(true))
-                })
-            })
-                .catch(error => reject(error))
-        })
-    }
-
-    removeSet = (set: setRef) => {
-        return new Promise((resolve, reject) => {
-            this.task_set_db.getSetsTaskIds(set.name).then((taskIds: any) => {
-                let promises: any = []
-
+  removeTask = (task: ITaskData) => {
+    return new Promise((resolve, reject) => {
+      this.task_db
+        .deleteTask(task.id)
+        .then(() => {
+          this.task_set_db
+            .findSetsBelongingToTask(task.id)
+            .then((foundSetIds) => {
+              let promises: any = [];
+              foundSetIds.forEach((setId: string) => {
                 promises.push(
-                    this.task_db.deleteMultiTask(taskIds)
-                )
-
-                promises.push(
-                    this.task_set_db.deleteSet(set.name)
-                )
-
-                promises.push(
-                    this.schedule_db.deleteSetInSchedule(set.name)
-                )
-
-                Promise.all(promises).then(() => resolve(true))
-            })
-                .catch(error => reject(error))
-        })
-    }
-
-    updateTaskSetInDB = (set: setRef) => {
-        return new Promise((resolve, reject) => {
-            this.task_set_db.getSetWithKey(set.key)
-                .then((oldSet: setRef) => {
-                    if (oldSet) {
-                        this.task_set_db.updatedSet(oldSet.name.toLowerCase(), set)
-                            .then(() => {
-                                this.schedule_db.replaceSetInSchedule(oldSet.name.toLowerCase(), set.name.toLowerCase())
-                                    .then(() => resolve(true))
-                            })
-                    } else {
-                        reject()
-                    }
-                })
-                .catch(error => reject(error))
-        })
-    }
-
-    updateTaskInDB = (updatedTask: ITaskData, updatedGroup: string, oldGroup: string) => {
-        return new Promise((resolve, reject) => {
-            this.task_db.editTask(updatedTask)
-                .then(() => { if (updatedGroup != oldGroup) this.task_set_db.updatedSetTasks(oldGroup, updatedGroup, updatedTask.id) })
-                //remove the task from the schedule entirely from previous group
-                .then(() => this.schedule_db.removeTaskInSchedule(oldGroup, updatedTask.id))
-                //re add the task back in on each day its ment to be in with the newest group
-                .then(() => this.schedule_db.addSetToSchedule(updatedGroup, updatedTask.daysOfWeek, updatedTask.id))
-                .then(() => resolve(true))
-                .catch(error => reject(error))
-        })
-    }
-
-    getSetsFromDb = async () => {
-        return await this.task_set_db.getSets()
-    }
-
-    addTaskGroupToDB = async (setId: string, description: string) => {
-        return await this.task_set_db.createSet(setId, description)
-    }
-
-    getTasksFromDB = () => {
-        return new Promise((resolve, reject) => {
-            this.task_db.getTasks().then((tasks: ITaskData[]) => {
-                resolve(tasks)
-            }).catch(error => {
-                reject(error)
-            })
-        })
-    }
-
-    resetTaskCompletionInTaskSets = async () => {
-        let config = await this.app_manager.getConfig()
-        let promises: any[] = []
-
-        let schedule = await this.schedule_db.getSchedule()
-
-        let currentTime = moment()
-        let lastTimeStamp = moment(config.lastRefreshTimeStamp)
-        let timeDifference = moment.duration(lastTimeStamp.diff(currentTime)).as('days')
-
-        //if its been a day or more, refresh tasks avaliable
-        console.log('time diff', timeDifference)
-        console.log('should refresh? ', timeDifference <= -1)
-
-        if (timeDifference <= -1) {
-            Object.keys(schedule).map((day: string) => {
-
-                Object.keys(schedule[day]).map((set: string) => {
-                    promises.push(
-                        this.task_set_db.resetTaskCompletenss(set.toLowerCase())
+                  this.schedule_db
+                    .removeTaskInSchedule(setId, task.id)
+                    .then(() =>
+                      this.task_set_db.removeTaskFromSet(setId, task.id)
                     )
-                })
+                );
+              });
 
-            })
-            promises.push(
-                this.app_manager.updateTimeStamp()
-            )
-        }
-
-        return await Promise.all(promises)
-    }
-
-    completeTask = async (completedTasksId: string, setId: string) => {
-        await this.task_db.completeTaskInSet(completedTasksId, setId)
-        return await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId)
-    }
-
-    getSetsFromDBForToday = async () => {
-        let schedule = await this.schedule_db.getSchedule()
-        const today = this.schedule_db.getTodaysName()
-        return schedule[today]
-    }
-
-    isSetNotDoneForToday = async (setId: string) => {
-        let scheduleSets = await this.getSetsFromDBForToday()
-        return scheduleSets[setId.toLowerCase()].completed != true
-    }
-
-    getSetsDetailsFromDbForToday = async () => {
-        let promises: any[] = []
-        let setIdList = await this.getSetsFromDBForToday()
-        Object.keys(setIdList).forEach((entry: string) => {
-            promises.push(
-                this.task_set_db.getSetWithId(entry)
-            )
+              Promise.all(promises).then(() => resolve(true));
+            });
         })
+        .catch((error) => reject(error));
+    });
+  };
 
-        return await Promise.all(promises)
-    }
+  removeSet = (set: setRef) => {
+    return new Promise((resolve, reject) => {
+      this.task_set_db
+        .getSetsTaskIds(set.name)
+        .then((taskIds: any) => {
+          let promises: any = [];
 
-    getSetsDetails = async (setId: string) => {
-        return await this.task_set_db.getSetWithId(setId)
-    }
+          promises.push(this.task_db.deleteMultiTask(taskIds));
 
-    getAllTaskDetails = async (taskSet: string) => {
-        let promises: any[] = []
-        let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
+          promises.push(this.task_set_db.deleteSet(set.name));
 
-        taskIdList.forEach((entry: taskRef) => {
-            promises.push(
-                this.task_db.findTask(entry.taskId)
-            )
+          promises.push(this.schedule_db.deleteSetInSchedule(set.name));
+
+          Promise.all(promises).then(() => resolve(true));
         })
+        .catch((error) => reject(error));
+    });
+  };
 
-        return await Promise.all(promises)
+  updateTaskSetInDB = async (set: setRef) => {
+    const oldSet = await this.task_set_db.getSetWithKey(set.key);
+    if (oldSet) {
+      await this.task_set_db.updatedSet(oldSet.name.toLowerCase(), set);
+      await this.schedule_db.replaceSetInSchedule(
+        oldSet.name.toLowerCase(),
+        set.name.toLowerCase()
+      );
+      return await this.stats_db.changeName(oldSet.name, set.name)
     }
+  };
 
-    getTasksFromSetForToday = async (taskSet: string) => {
-
-        let promises: any[] = []
-        let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet)
-        const today = this.schedule_db.getTodaysName()
-
-        taskIdList.forEach((entry: taskRef) => {
-            if (entry.completed == false) {
-                promises.push(
-                    this.task_db.findTask(entry.taskId)
-                )
-            }
+  updateTaskInDB = (
+    updatedTask: ITaskData,
+    updatedGroup: string,
+    oldGroup: string
+  ) => {
+    return new Promise((resolve, reject) => {
+      this.task_db
+        .editTask(updatedTask)
+        .then(() => {
+          if (updatedGroup != oldGroup)
+            this.task_set_db.updatedSetTasks(
+              oldGroup,
+              updatedGroup,
+              updatedTask.id
+            );
         })
+        //remove the task from the schedule entirely from previous group
+        .then(() =>
+          this.schedule_db.removeTaskInSchedule(oldGroup, updatedTask.id)
+        )
+        //re add the task back in on each day its ment to be in with the newest group
+        .then(() =>
+          this.schedule_db.addSetToSchedule(
+            updatedGroup,
+            updatedTask.daysOfWeek,
+            updatedTask.id
+          )
+        )
+        .then(() => resolve(true))
+        .catch((error) => reject(error));
+    });
+  };
 
-        let taskDetailList = await Promise.all(promises)
-        return taskDetailList.filter((task: ITaskData) => task.daysOfWeek.indexOf(today) > -1)
-    }
+  getSetsFromDb = async () => {
+    return await this.task_set_db.getSets();
+  };
 
+  addTaskGroupToDB = async (setId: string, description: string) => {
+    return await this.task_set_db.createSet(setId, description);
+  };
 
-    getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
-        let taskList = await this.getTasksFromSetForToday(set)
+  getTasksFromDB = async (): Promise<ITaskData[]> => {
+    return this.task_db.getTasks();
+  };
 
-        //get task details from task refs
-        let taskToDoList: any = []
-        taskList.forEach((taskDetails: any) => {
-            let foundTask = setTaskRefs.find((taskRefrence: taskRef) => taskRefrence.taskId == taskDetails.id && taskRefrence.completed == false)
-            if (foundTask != undefined) taskToDoList.push(foundTask)
+  betweenLastTimeToToday = (lastTimeStamp: moment.Moment, day: string) => {
+    //sunday is considered the first day of the week
+    let startOfWeek =
+      moment().format("dddd") == "Sunday"
+        ? moment().startOf("week").subtract(1, "week")
+        : moment().startOf("week");
+
+    //check the days that are inbetween the last time stamp and today
+    return (
+      lastTimeStamp.isBefore(startOfWeek.day(day), "day") &&
+      startOfWeek.day(day).isBefore(moment(), "day")
+    );
+  };
+
+  resetTaskCompletionInTaskSets = async () => {
+    let config = await this.app_manager.getConfig();
+    let schedule = await this.schedule_db.getSchedule();
+
+    let currentTime = moment();
+    let lastTimeStamp = moment(config.lastRefreshTimeStamp);
+    let timeDifference = moment
+      .duration(lastTimeStamp.diff(currentTime))
+      .as("days");
+    console.log("last day", lastTimeStamp.format("dddd"));
+    //if its been a day or more, refresh tasks avaliable
+    console.log("should refresh? ", timeDifference <= -1);
+    let promises: any[] = [];
+
+    console.log("last timeStamp", lastTimeStamp);
+
+    if (timeDifference <= -1) {
+      Object.keys(schedule).map((day: string) => {
+        Object.keys(schedule[day]).map((set: string) => {
+          if (
+            !schedule[day][set].completed &&
+            this.betweenLastTimeToToday(lastTimeStamp, day)
+          ) {
+            promises.push(this.stats_db.resetSetStreak(set));
+          }
+          promises.push(this.task_set_db.resetTaskCompletenss(set));
         });
-
-        return taskToDoList
+      });
+      promises.push(this.app_manager.updateTimeStamp());
     }
+
+    return await Promise.all(promises);
+  };
+
+  completeTask = async (completedTasksId: string, setId: string) => {
+    await this.task_db.completeTaskInSet(completedTasksId, setId);
+    await this.stats_db.incrementTaskStreak(completedTasksId);
+    await this.schedule_db.completeTaskInSetSchedule(completedTasksId, setId);
+    if (await this.isSetDoneForToday(setId))
+      return this.stats_db.incrementSetStreak(setId);
+  };
+
+  getSetsFromDBForToday = async () => {
+    let schedule = await this.schedule_db.getSchedule();
+    const today = this.schedule_db.getTodaysName();
+    return schedule[today];
+  };
+
+  isSetNotDoneForToday = async (setId: string) => {
+    let scheduleSets = await this.getSetsFromDBForToday();
+    if (scheduleSets[setId.toLowerCase()]) {
+      return scheduleSets[setId.toLowerCase()].completed != true;
+    } else {
+      return true;
+    }
+  };
+
+  isSetDoneForToday = async (setId: string) => {
+    let scheduleSets = await this.getSetsFromDBForToday();
+    if (scheduleSets[setId.toLowerCase()]) {
+      return scheduleSets[setId.toLowerCase()].completed == true;
+    } else {
+      return false;
+    }
+  };
+
+  getSetsDetailsFromDbForToday = async () => {
+    let promises: any[] = [];
+    let setIdList = await this.getSetsFromDBForToday();
+    Object.keys(setIdList).forEach((entry: string) => {
+      promises.push(this.task_set_db.getSetWithId(entry));
+    });
+
+    return await Promise.all(promises);
+  };
+
+  getSetsDetails = async (setId: string) => {
+    return await this.task_set_db.getSetWithId(setId);
+  };
+
+  getAllTaskDetails = async (taskSet: string) => {
+    let promises: any[] = [];
+    let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet);
+
+    taskIdList.forEach((entry: taskRef) => {
+      promises.push(this.task_db.findTask(entry.taskId));
+    });
+
+    return await Promise.all(promises);
+  };
+
+  getTasksFromSetForToday = async (taskSet: string) => {
+    let promises: any[] = [];
+    let taskIdList = await this.task_set_db.getSetsTaskIds(taskSet);
+    const today = this.schedule_db.getTodaysName();
+
+    taskIdList.forEach((entry: taskRef) => {
+      if (entry.completed == false) {
+        promises.push(this.task_db.findTask(entry.taskId));
+      }
+    });
+
+    let taskDetailList = await Promise.all(promises);
+    return taskDetailList.filter(
+      (task: ITaskData) => task.daysOfWeek.indexOf(today) > -1
+    );
+  };
+
+  getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {
+    let taskList = await this.getTasksFromSetForToday(set);
+
+    //get task details from task refs
+    let taskToDoList: any = [];
+    taskList.forEach((taskDetails: any) => {
+      let foundTask = setTaskRefs.find(
+        (taskRefrence: taskRef) =>
+          taskRefrence.taskId == taskDetails.id &&
+          taskRefrence.completed == false
+      );
+      if (foundTask != undefined) taskToDoList.push(foundTask);
+    });
+
+    return taskToDoList;
+  };
 }
