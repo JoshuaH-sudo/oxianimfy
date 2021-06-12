@@ -7,20 +7,13 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
-  EuiSuperSelect,
-  EuiModal,
-  EuiModalBody,
-  EuiModalFooter,
-  EuiModalHeader,
-  EuiModalHeaderTitle,
-  EuiButtonIcon,
-  EuiText,
   EuiPanel,
 } from "@elastic/eui";
 import { ITaskData, setRef } from "../utils/custom_types";
 import { databaseContext } from "../App";
 import {
   DotwProp,
+  GroupModal,
   GroupSelectProp,
   MesureProp,
   TitleDescProp,
@@ -81,35 +74,11 @@ export const Task: React.FC = () => {
     setNewTaskGroup(updatedTaskGroup);
   };
 
-  const groupIsValid = newTaskGroup.name !== "" && newTaskGroup.desc !== "";
 
   let createSetModal;
 
   if (isModalVisible) {
-    createSetModal = (
-      <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <h1>Create A Task Set</h1>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-
-        <EuiModalBody>
-          <EuiForm>
-            <TitleDescProp updateTaskValue={updateGroupValue} />
-          </EuiForm>
-        </EuiModalBody>
-
-        <EuiModalFooter>
-          <EuiButton isDisabled={!groupIsValid} onClick={createTaskGroup} fill>
-            Create Group
-          </EuiButton>
-          <EuiButton onClick={closeModal} fill color="danger">
-            Cancel
-          </EuiButton>
-        </EuiModalFooter>
-      </EuiModal>
-    );
+    createSetModal = (<GroupModal updateGroupValue={updateGroupValue} closeModal={closeModal} createTaskGroup={createTaskGroup}/>);
   }
 
   const formIsValid =
