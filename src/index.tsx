@@ -9,7 +9,7 @@ import Task_selection from "./pages/Task_selection";
 
 import { HashRouter, Route, Switch } from "react-router-dom";
 import { EuiPanel, EuiButton } from "@elastic/eui";
-import { Nav_bar } from "./components/Nav_bar";
+import { Control_bar, Nav_bar } from "./components/navigation";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -26,6 +26,7 @@ ReactDOM.render(
         </Switch>
       </HashRouter>
     </EuiPanel>
+    <Control_bar />
   </React.StrictMode>,
   document.getElementById("root")
 );
