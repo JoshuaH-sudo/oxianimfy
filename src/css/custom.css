@@ -7,3 +7,8 @@
     overflow: hidden;
     width: inherit;
 }
+
+.control_bar_item {
+    margin-left: auto;
+    margin-right: auto;
+}
