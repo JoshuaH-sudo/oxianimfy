@@ -93,8 +93,10 @@ export class Stats_database {
 
   resetSetStreak = async (setId: string) => {
     let statsDB = await this.store.get(this.storeName);
+    console.log('set exsistis?', statsDB.sets[setId])
 
     if (statsDB.sets[setId]) {
+      console.log('reseting set', setId)
       delete statsDB.sets[setId];
       return await this.store.set(this.storeName, statsDB);
     } else {

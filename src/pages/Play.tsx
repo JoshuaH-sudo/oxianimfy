@@ -19,9 +19,21 @@ import {
   EuiFlexGrid,
 } from "@elastic/eui";
 import { databaseContext } from "../App";
-import { ITaskData } from "../utils/custom_types";
+import { ITaskData, taskRef } from "../utils/custom_types";
 import Countdown from "react-countdown";
 import moment from "moment";
+
+import SwiperCore, { Navigation, Pagination, Scrollbar, A11y } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/swiper.scss";
+import "swiper/components/navigation/navigation.scss";
+import "swiper/components/pagination/pagination.scss";
+import "swiper/components/scrollbar/scrollbar.scss";
+import { pageUrls } from "../utils/constants";
+
+// install Swiper modules
+SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
 
 interface PrepareProps {
   list?: React.ReactNode;
@@ -38,8 +50,7 @@ interface PlayInterface {
 }
 
 interface PlayScreenProps {
-  list: any[];
-  index: number;
+  task: any;
   changeTask: Function;
 }
 
@@ -56,12 +67,12 @@ const Play: React.FC<PlayInterface> = (props) => {
   }, []);
 
   const noGame = (
-    <EuiPanel paddingSize="l">
+    <Fragment>
       <EuiText>No tasks for today hurray</EuiText>
       <EuiButton fill href="#/">
         Return
       </EuiButton>
-    </EuiPanel>
+    </Fragment>
   );
 
   return (
@@ -76,21 +87,11 @@ const Play: React.FC<PlayInterface> = (props) => {
 };
 
 const Prepare: React.FC<PrepareProps> = (props) => {
-  const tasks_list: any = props.list;
-  const [current_task_index, set_current_task_index] = useState<number>(0);
+  let tasks_list: any = props.list;
 
-  const changeTask = (step: number) => {
-    const set_num = current_task_index + step;
-    set_current_task_index(set_num > 0 ? set_num : current_task_index);
+  const changeTask = (taskIdToRemove: string) => {
+    tasks_list = tasks_list.filter((task: any) => task.id !== taskIdToRemove);
   };
-
-  const playGame = (
-    <Play_screen
-      list={tasks_list}
-      index={current_task_index}
-      changeTask={changeTask}
-    />
-  );
 
   const endGame = (
     <EuiPanel paddingSize="l">
@@ -100,6 +101,30 @@ const Prepare: React.FC<PrepareProps> = (props) => {
       </EuiButton>
     </EuiPanel>
   );
+
+  const tasks = tasks_list.map((taskInfo: any) => {
+    console.log("yeet", taskInfo);
+    return (
+      <SwiperSlide>
+        <Task_card task={taskInfo} changeTask={changeTask} />
+      </SwiperSlide>
+    );
+  });
+
+  const game_setup = (
+    <Swiper
+      slidesPerView={1}
+      spaceBetween={50}
+      // loop={tasks_list.length > 1}
+      navigation
+      pagination={{ clickable: true, dynamicBullets: true }}
+      onSlideChange={() => console.log("slide change")}
+      onSwiper={(swiper) => console.log(swiper)}
+    >
+      {tasks}
+    </Swiper>
+  );
+
   return (
     <EuiPageBody paddingSize="l">
       <EuiPageContent
@@ -107,81 +132,53 @@ const Prepare: React.FC<PrepareProps> = (props) => {
         horizontalPosition="center"
         paddingSize="none"
       >
-        {current_task_index < tasks_list.length ? playGame : endGame}
+        {tasks_list.length > 0 ? game_setup : endGame}
       </EuiPageContent>
     </EuiPageBody>
   );
 };
 
-const Play_screen: React.FC<PlayScreenProps> = (props) => {
-  const tasks_list: any = props.list;
-  const current_task_index: any = props.index;
+const Task_card: React.FC<PlayScreenProps> = (props) => {
+  const task = props.task;
   const changeTask = props.changeTask;
 
   const task_intro = (
-    <EuiFlexItem>
-      <EuiText>
-        <h1>{tasks_list[current_task_index].name}</h1>
-
-        <EuiHorizontalRule />
-
-        <p>{tasks_list[current_task_index].desc}</p>
-
-        <EuiHorizontalRule />
+    <Fragment>
+      <EuiText className="center_text">
+        <h1>{task.name}</h1>
       </EuiText>
-    </EuiFlexItem>
+
+      <EuiHorizontalRule />
+
+      <EuiText className="center_text">
+        <p>{task.desc}</p>
+      </EuiText>
+
+      <EuiHorizontalRule />
+    </Fragment>
   );
 
   return (
     <EuiPanel>
-      <EuiFlexGroup direction="column">
-        {task_intro}
-
-        <EuiFlexGroup gutterSize="m" responsive={false}>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              disabled={current_task_index <= 0 ? true : false}
-              onClick={() => changeTask(-1)}
-              display="fill"
-              iconType={"arrowLeft"}
-              size="m"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {tasks_list[current_task_index].mesure == "counter" ? (
-              <Counter_task
-                task={tasks_list[current_task_index]}
-                changeTask={changeTask}
-              />
-            ) : (
-              ""
-            )}
-            {tasks_list[current_task_index].mesure == "timer" ? (
-              <Timer_task
-                task={tasks_list[current_task_index]}
-                changeTask={changeTask}
-              />
-            ) : (
-              ""
-            )}
-            {tasks_list[current_task_index].mesure == "none" ? (
-              <Simple_Task
-                task={tasks_list[current_task_index]}
-                changeTask={changeTask}
-              />
-            ) : (
-              ""
-            )}
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              onClick={() => changeTask(1)}
-              display="fill"
-              iconType={"arrowRight"}
-              size="m"
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
+      <EuiFlexGroup direction="column" justifyContent="center">
+        <EuiFlexItem>{task_intro}</EuiFlexItem>
+        <EuiFlexItem>
+          {task.mesure == "counter" ? (
+            <Counter_task task={task} changeTask={changeTask} />
+          ) : (
+            ""
+          )}
+          {task.mesure == "timer" ? (
+            <Timer_task task={task} changeTask={changeTask} />
+          ) : (
+            ""
+          )}
+          {task.mesure == "none" ? (
+            <Simple_Task task={task} changeTask={changeTask} />
+          ) : (
+            ""
+          )}
+        </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPanel>
   );
@@ -240,14 +237,14 @@ const Counter_task: React.FC<TaskProps> = (props) => {
           db_context.completeTask(task.id, setId.toLowerCase())
         )
         .then(() => set_current_counter(0))
-        .then(() => props.changeTask(1));
+        .then(() => props.changeTask(task.id));
     } else {
       set_current_counter(set_num);
     }
   };
 
   return (
-    <EuiFlexGroup gutterSize="m" responsive={false}>
+    <EuiFlexGroup gutterSize="m" justifyContent="center" responsive={false}>
       <EuiFlexItem grow={false}>
         <EuiButtonIcon
           disabled={current_counter <= 0 ? true : false}

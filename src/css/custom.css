@@ -8,7 +8,27 @@
     width: inherit;
 }
 
+.center_text {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .control_bar_item {
     margin-left: auto;
     margin-right: auto;
+}
+
+.set_select_card {
+    height: 40vh;
+    max-height: 600px;
+}
+
+.set_select_card_desc {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 60vw;
+}
+
+.swiper-slide {
+    height: 45vh;
 }
