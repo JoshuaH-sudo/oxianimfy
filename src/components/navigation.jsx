@@ -7,7 +7,7 @@ import {
   EuiHeaderSectionItem,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText
+  EuiText,
 } from "@elastic/eui";
 
 import { pageUrls } from "../utils/constants";
@@ -77,40 +77,47 @@ export const Nav_bar = () => {
 };
 export const Control_bar = () => {
   return (
-    <div
-      style={{
-        position: "fixed",
-        left: 0,
-        bottom: 0,
-        width: "100%",
-        backgroundColor: "black",
-      }}
+    <EuiFlexGroup
+      id="control_bar_nav"
+      gutterSize="none"
+      justifyContent="spaceEvenly"
+      responsive={false}
     >
-      <EuiFlexGroup
-        gutterSize="none"
-        justifyContent="spaceEvenly"
-        responsive={false}
-      >
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon iconType="home" href={pageUrls.home} className='control_bar_item'/>
-          <EuiText>Home</EuiText>
-        </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButtonIcon
+          iconType="home"
+          href={pageUrls.home}
+          className="control_bar_item"
+        />
+        <EuiText>Home</EuiText>
+      </EuiFlexItem>
 
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon iconType="plus" href={pageUrls.task_create} className='control_bar_item'/>
-          <EuiText>Add Tasks</EuiText>
-        </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButtonIcon
+          iconType="plus"
+          href={pageUrls.task_create}
+          className="control_bar_item"
+        />
+        <EuiText>Add Tasks</EuiText>
+      </EuiFlexItem>
 
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon iconType="pencil" href={pageUrls.task_edit} className='control_bar_item'/>
-          <EuiText>Edit Tasks</EuiText>
-        </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButtonIcon
+          iconType="pencil"
+          href={pageUrls.task_edit}
+          className="control_bar_item"
+        />
+        <EuiText>Edit Tasks</EuiText>
+      </EuiFlexItem>
 
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon iconType="stats" href={pageUrls.stats} className='control_bar_item'/>
-          <EuiText>stats</EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </div>
+      <EuiFlexItem grow={false}>
+        <EuiButtonIcon
+          iconType="stats"
+          href={pageUrls.stats}
+          className="control_bar_item"
+        />
+        <EuiText>stats</EuiText>
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };

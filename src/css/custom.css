@@ -1,3 +1,21 @@
+body {
+    height: 100%
+}
+#root {
+    height: inherit;
+    display: flex;
+    flex-direction: column;
+}
+
+#main_content {
+    height: 100%;
+}
+
+#control_bar_nav {
+    width: 100%;
+    background-color: black;
+}
+
 .euiTitle--small {
     width: 100%;
 }

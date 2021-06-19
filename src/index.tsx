@@ -14,7 +14,7 @@ import { Control_bar, Nav_bar } from "./components/navigation";
 ReactDOM.render(
   <React.StrictMode>
     <Nav_bar />
-    <EuiPanel>
+    <EuiPanel id='main_content'>
       <HashRouter>
         <Switch>
           <Route path="/" exact component={App} />

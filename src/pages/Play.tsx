@@ -115,10 +115,10 @@ const Prepare: React.FC<PrepareProps> = (props) => {
     <Swiper
       slidesPerView={1}
       spaceBetween={50}
-      // loop={tasks_list.length > 1}
+      loop={tasks_list.length > 1}
       navigation
       pagination={{ clickable: true, dynamicBullets: true }}
-      onSlideChange={() => console.log("slide change")}
+      onSlideChange={() => console.log("slide changse")}
       onSwiper={(swiper) => console.log(swiper)}
     >
       {tasks}
@@ -126,15 +126,9 @@ const Prepare: React.FC<PrepareProps> = (props) => {
   );
 
   return (
-    <EuiPageBody paddingSize="l">
-      <EuiPageContent
-        verticalPosition="center"
-        horizontalPosition="center"
-        paddingSize="none"
-      >
-        {tasks_list.length > 0 ? game_setup : endGame}
-      </EuiPageContent>
-    </EuiPageBody>
+    <EuiPanel>
+      {tasks_list.length > 0 ? game_setup : endGame}
+    </EuiPanel>
   );
 };
 
