@@ -2,22 +2,38 @@ body {
     height: 100%
 }
 #root {
-    height: inherit;
+    height: calc(100% - 50px);
     display: flex;
     flex-direction: column;
 }
 
-#main_content {
-    height: 100%;
-}
-
 #control_bar_nav {
+    height: 50px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
     background-color: black;
 }
 
+#play_tasks {
+    flex-basis: 0% !important;
+}
+
+#end_game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#header_nav {
+    width: 100%;
+}
+
 .euiTitle--small {
     width: 100%;
+    height: 100
 }
 
 .euiCard__titleButton {
@@ -47,6 +63,6 @@ body {
     max-width: 60vw;
 }
 
-.swiper-slide {
+#set_selection > .swiper-wrapper {
     height: 45vh;
 }

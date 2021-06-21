@@ -4,6 +4,7 @@ import React, {
   useEffect,
   Fragment,
   Component,
+  useRef,
 } from "react";
 import {
   EuiButton,
@@ -36,7 +37,8 @@ import { pageUrls } from "../utils/constants";
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
 
 interface PrepareProps {
-  list?: React.ReactNode;
+  list?: any;
+  changeTask: Function;
   db_context: any;
 }
 
@@ -55,81 +57,89 @@ interface PlayScreenProps {
 }
 
 const Play: React.FC<PlayInterface> = (props) => {
-  const [tasks_list, set_tasks_list] = useState<any[]>([]);
+  const [tasks_todo, set_tasks_todo] = useState<any[]>([]);
   const db_context = useContext(databaseContext);
+
+  const changeTask = (taskIdToRemove: string) => {
+    let new_tasks_todo = tasks_todo;
+    new_tasks_todo = new_tasks_todo.filter(
+      (task: any) => task.id !== taskIdToRemove
+    );
+    set_tasks_todo(new_tasks_todo);
+  };
 
   useEffect(() => {
     db_context.app_manager
       .getSelectedTaskGroup()
       .then((setId: any) => db_context.getTasksFromSetForToday(setId))
-      .then((tasks: any) => set_tasks_list(tasks))
+      .then((tasks: any) => set_tasks_todo(tasks))
       .catch((error: any) => console.log(error));
   }, []);
 
   const noGame = (
-    <Fragment>
+    <EuiPanel style={{ margin: "auto" }}>
       <EuiText>No tasks for today hurray</EuiText>
-      <EuiButton fill href="#/">
-        Return
-      </EuiButton>
-    </Fragment>
-  );
-
-  return (
-    <div>
-      {tasks_list ? (
-        <Prepare db_context={db_context} list={tasks_list} />
-      ) : (
-        noGame
-      )}
-    </div>
-  );
-};
-
-const Prepare: React.FC<PrepareProps> = (props) => {
-  let tasks_list: any = props.list;
-
-  const changeTask = (taskIdToRemove: string) => {
-    tasks_list = tasks_list.filter((task: any) => task.id !== taskIdToRemove);
-  };
-
-  const endGame = (
-    <EuiPanel paddingSize="l">
-      <EuiText>Finished all your tasks yay</EuiText>
       <EuiButton fill href="#/">
         Return
       </EuiButton>
     </EuiPanel>
   );
 
-  const tasks = tasks_list.map((taskInfo: any) => {
-    console.log("yeet", taskInfo);
+  return (
+    <Fragment>
+      {tasks_todo ? (
+        <Prepare
+          db_context={db_context}
+          list={tasks_todo}
+          changeTask={changeTask}
+        />
+      ) : (
+        noGame
+      )}
+    </Fragment>
+  );
+};
+
+const Prepare: React.FC<PrepareProps> = (props) => {
+  const endGame = (
+    <div id="end_game">
+      <EuiPanel style={{ textAlign: "center" }}>
+        <EuiText>Finished all your tasks yay</EuiText>
+        <EuiButton fill href="#/">
+          Return
+        </EuiButton>
+      </EuiPanel>
+    </div>
+  );
+
+  const tasks = props.list.map((taskInfo: any) => {
     return (
       <SwiperSlide>
-        <Task_card task={taskInfo} changeTask={changeTask} />
+        <EuiPanel style={{ height: "inherit" }}>
+          <Task_card task={taskInfo} changeTask={props.changeTask} />
+        </EuiPanel>
       </SwiperSlide>
     );
   });
 
   const game_setup = (
     <Swiper
+      style={{ height: "100%" }}
       slidesPerView={1}
       spaceBetween={50}
-      loop={tasks_list.length > 1}
+      loop={props.list.length > 1}
       navigation
       pagination={{ clickable: true, dynamicBullets: true }}
-      onSlideChange={() => console.log("slide changse")}
+      onSlideChange={() => props.changeTask("")}
       onSwiper={(swiper) => console.log(swiper)}
     >
       {tasks}
     </Swiper>
   );
 
-  return (
-    <EuiPanel>
-      {tasks_list.length > 0 ? game_setup : endGame}
-    </EuiPanel>
-  );
+  console.log(props.list);
+
+  return <Fragment>{props.list.length > 0 ? game_setup : endGame}</Fragment>;
 };
 
 const Task_card: React.FC<PlayScreenProps> = (props) => {
@@ -153,10 +163,14 @@ const Task_card: React.FC<PlayScreenProps> = (props) => {
   );
 
   return (
-    <EuiPanel>
-      <EuiFlexGroup direction="column" justifyContent="center">
-        <EuiFlexItem>{task_intro}</EuiFlexItem>
-        <EuiFlexItem>
+    <Fragment>
+      <EuiFlexGroup
+        direction="column"
+        justifyContent="center"
+        style={{ flexWrap: "nowrap", height: "100%" }}
+      >
+        <EuiFlexItem style={{ height: "100%" }}>{task_intro}</EuiFlexItem>
+        <EuiFlexItem id="play_tasks">
           {task.mesure == "counter" ? (
             <Counter_task task={task} changeTask={changeTask} />
           ) : (
@@ -174,7 +188,7 @@ const Task_card: React.FC<PlayScreenProps> = (props) => {
           )}
         </EuiFlexItem>
       </EuiFlexGroup>
-    </EuiPanel>
+    </Fragment>
   );
 };
 
@@ -196,8 +210,8 @@ const Simple_Task: React.FC<TaskProps> = (props) => {
 
 const Timer_task: React.FC<TaskProps> = (props) => {
   const task: any = props.task;
-
   var timer_length = 0;
+
   const duation = JSON.parse(task.unit as string);
   timer_length = moment.duration(duation).asMilliseconds();
   const db_context = useContext(databaseContext);
@@ -208,11 +222,13 @@ const Timer_task: React.FC<TaskProps> = (props) => {
       .then((setId: string) =>
         db_context.completeTask(task.id, setId.toLocaleLowerCase())
       )
-      .then(() => props.changeTask(1));
+      .then(() => props.changeTask(task.id));
   };
 
   return (
-    <Countdown date={Date.now() + timer_length} onComplete={OnTimerFinish} />
+    <div style={{ margin: "auto" }}>
+      <Countdown date={Date.now() + timer_length} onComplete={OnTimerFinish} />
+    </div>
   );
 };
 
@@ -238,7 +254,11 @@ const Counter_task: React.FC<TaskProps> = (props) => {
   };
 
   return (
-    <EuiFlexGroup gutterSize="m" justifyContent="center" responsive={false}>
+    <EuiFlexGroup
+      gutterSize="m"
+      justifyContent="spaceAround"
+      responsive={false}
+    >
       <EuiFlexItem grow={false}>
         <EuiButtonIcon
           disabled={current_counter <= 0 ? true : false}
