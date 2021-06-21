@@ -103,12 +103,12 @@ const Play: React.FC<PlayInterface> = (props) => {
 const Prepare: React.FC<PrepareProps> = (props) => {
   const endGame = (
     <div id="end_game">
-      <EuiPanel style={{ textAlign: "center" }}>
-        <EuiText>Finished all your tasks yay</EuiText>
-        <EuiButton fill href="#/">
-          Return
-        </EuiButton>
-      </EuiPanel>
+    <EuiPanel style={{  textAlign: 'center'}}>
+      <EuiText>Finished all your tasks yay</EuiText>
+      <EuiButton fill href="#/">
+        Return
+      </EuiButton>
+    </EuiPanel>
     </div>
   );
 
@@ -130,10 +130,14 @@ const Prepare: React.FC<PrepareProps> = (props) => {
       loop={props.list.length > 1}
       navigation
       pagination={{ clickable: true, dynamicBullets: true }}
+      onSlideChange={() => props.changeTask("")}
+      onSwiper={(swiper) => console.log(swiper)}
     >
       {tasks}
     </Swiper>
   );
+
+  console.log(props.list);
 
   return <Fragment>{props.list.length > 0 ? game_setup : endGame}</Fragment>;
 };
