@@ -135,8 +135,6 @@ const Task_selection: React.FC = () => {
         loop={task_group_list.length > 1}
         navigation
         pagination={{ clickable: true, dynamicBullets: true }}
-        onSlideChange={() => console.log("slide change")}
-        onSwiper={(swiper) => console.log(swiper)}
       >
         {task_group_list.length > 0
           ? task_group_list.map((set) => {
