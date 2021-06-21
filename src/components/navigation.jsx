@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   EuiButtonIcon,
   EuiPopover,
@@ -75,7 +75,10 @@ export const Nav_bar = () => {
 
   return <EuiHeader id="header_nav" sections={sections} />;
 };
-export const Control_bar = () => {
+export const Control_bar = (props) => {
+  const [current_hash, set_hash] = useState(pageUrls.home);
+  window.addEventListener("hashchange", () => set_hash(window.location.hash)); 
+
   return (
     <EuiFlexGroup
       id="control_bar_nav"
@@ -83,37 +86,51 @@ export const Control_bar = () => {
       justifyContent="spaceEvenly"
       responsive={false}
     >
-      <EuiFlexItem grow={false}>
+      <EuiFlexItem >
         <EuiButtonIcon
           iconType="home"
           href={pageUrls.home}
+          display={current_hash === pageUrls.home ? "fill" : ""}
           className="control_bar_item"
         />
         <EuiText>Home</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem grow={false}>
+      <EuiFlexItem >
+        <EuiButtonIcon
+          iconType="play"
+          href={pageUrls.play_screen}
+          display={current_hash === pageUrls.play_screen ? "fill" : ""}
+          className="control_bar_item"
+        />
+        <EuiText>Play</EuiText>
+      </EuiFlexItem>
+
+      <EuiFlexItem >
         <EuiButtonIcon
           iconType="plus"
           href={pageUrls.task_create}
+          display={current_hash === pageUrls.task_create ? "fill" : ""}
           className="control_bar_item"
         />
-        <EuiText>Add Tasks</EuiText>
+        <EuiText>Add</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem grow={false}>
+      <EuiFlexItem >
         <EuiButtonIcon
           iconType="pencil"
           href={pageUrls.task_edit}
+          display={current_hash === pageUrls.task_edit ? "fill" : ""}
           className="control_bar_item"
         />
-        <EuiText>Edit Tasks</EuiText>
+        <EuiText>Edit</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem grow={false}>
+      <EuiFlexItem >
         <EuiButtonIcon
           iconType="stats"
           href={pageUrls.stats}
+          display={current_hash === pageUrls.stats ? "fill" : ""}
           className="control_bar_item"
         />
         <EuiText>stats</EuiText>

@@ -2,17 +2,19 @@ body {
     height: 100%
 }
 #root {
-    height: calc(100% - 50px);
+    height: calc(100% - 60px);
     display: flex;
     flex-direction: column;
 }
 
 #control_bar_nav {
-    height: 50px;
+    height: 60px;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
+    z-index: 99;
+    text-align: center;
     background-color: black;
 }
 
@@ -48,8 +50,7 @@ body {
 }
 
 .control_bar_item {
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
 }
 
 .set_select_card {

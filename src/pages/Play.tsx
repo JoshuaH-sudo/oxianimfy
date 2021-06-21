@@ -130,14 +130,10 @@ const Prepare: React.FC<PrepareProps> = (props) => {
       loop={props.list.length > 1}
       navigation
       pagination={{ clickable: true, dynamicBullets: true }}
-      onSlideChange={() => props.changeTask("")}
-      onSwiper={(swiper) => console.log(swiper)}
     >
       {tasks}
     </Swiper>
   );
-
-  console.log(props.list);
 
   return <Fragment>{props.list.length > 0 ? game_setup : endGame}</Fragment>;
 };
