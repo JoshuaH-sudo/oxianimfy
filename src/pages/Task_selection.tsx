@@ -77,7 +77,7 @@ const Task_selection: React.FC = () => {
 
   const displaySetCards = (set: any) => {
     return (
-      <SwiperSlide>
+      <SwiperSlide id="set_cards">
         <EuiCard
           icon={
             <EuiIcon

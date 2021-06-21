@@ -73,7 +73,7 @@ export const Nav_bar = () => {
     },
   ];
 
-  return <EuiHeader sections={sections} />;
+  return <EuiHeader id="header_nav" sections={sections} />;
 };
 export const Control_bar = () => {
   return (
