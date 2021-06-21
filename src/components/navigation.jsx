@@ -99,8 +99,8 @@ export const Control_bar = (props) => {
       <EuiFlexItem >
         <EuiButtonIcon
           iconType="play"
-          href={pageUrls.play_screen}
-          display={current_hash === pageUrls.play_screen ? "fill" : ""}
+          href={pageUrls.task_select}
+          display={current_hash === pageUrls.task_select ? "fill" : ""}
           className="control_bar_item"
         />
         <EuiText>Play</EuiText>

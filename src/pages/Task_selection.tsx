@@ -77,7 +77,7 @@ const Task_selection: React.FC = () => {
 
   const displaySetCards = (set: any) => {
     return (
-      <SwiperSlide id="set_cards">
+      <SwiperSlide id={set.name}>
         <EuiCard
           icon={
             <EuiIcon
@@ -135,6 +135,7 @@ const Task_selection: React.FC = () => {
         loop={task_group_list.length > 1}
         navigation
         pagination={{ clickable: true, dynamicBullets: true }}
+        onSlideChange={(swiper) => db_Context.app_manager.setSelectedTaskGroup(swiper.slides[swiper.activeIndex].id)}
       >
         {task_group_list.length > 0
           ? task_group_list.map((set) => {
