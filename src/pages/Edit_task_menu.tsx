@@ -1,9 +1,5 @@
 /* eslint-disable react/jsx-pascal-case */
-import React, {
-  useState,
-  useContext,
-  useEffect,
-} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   EuiButton,
   EuiPanel,
@@ -30,7 +26,10 @@ import {
   GroupDisplayProp,
   GroupEditProp,
 } from "../components/task_creation_props";
-import { Edit_task } from "../components/Edit_task_menu_props";
+import {
+  Confirm_deletion_prompt,
+  Edit_task,
+} from "../components/Edit_task_menu_props";
 
 const Edit_task_menu: React.FC = () => {
   const db_context = useContext(databaseContext);
@@ -44,6 +43,8 @@ const Edit_task_menu: React.FC = () => {
   const [taskToEdit, setTaskToEdit] = useState<ITaskData>();
   const [groupToEdit, setGroupToEdit] = useState<setRef>();
   const [submitChange, setSubmitChange] = useState(false);
+
+  const [show_confirm, set_show_confirm] = useState<any>({});
 
   const refresh = () => {
     db_context.getSetsFromDb().then((setGroups: any) => {
@@ -135,8 +136,19 @@ const Edit_task_menu: React.FC = () => {
           iconType="trash"
           aria-label="More"
           onClick={() => {
-            if (task) db_context.removeTask(task).then(() => refresh());
-            else if (set) db_context.removeSet(set).then(() => refresh());
+            if (set)
+              set_show_confirm({
+                show: true,
+                desc: "Are you sure you want to delete " + set.name + "?",
+                confirm: () => {
+                  db_context.removeSet(set).then(() => {
+                    set_show_confirm({ show: false });
+                    refresh();
+                  });
+                },
+                cancel: () => set_show_confirm({ show: false }),
+              });
+            else if (task) db_context.removeTask(task).then(() => refresh());
           }}
         />
       </EuiFlexItem>
@@ -146,7 +158,7 @@ const Edit_task_menu: React.FC = () => {
   const taskCard = (task: ITaskData) => {
     if (task)
       return (
-        <EuiFlexItem key={task.id} grow={1} id='edit_task_card'>
+        <EuiFlexItem key={task.id} grow={1} id="edit_task_card">
           <EuiCard
             textAlign="left"
             image={tabBar(task.name)}
@@ -195,7 +207,7 @@ const Edit_task_menu: React.FC = () => {
     {
       id: "2",
       label: "2",
-    }
+    },
   ];
 
   const [columnNumIdSelected, setColumnNumIdSelected] =
@@ -258,7 +270,7 @@ const Edit_task_menu: React.FC = () => {
       <EuiModal onClose={closeModal}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>
-            <h1>yeet</h1>
+            <h1>Edit</h1>
           </EuiModalHeaderTitle>
         </EuiModalHeader>
 
@@ -345,6 +357,17 @@ const Edit_task_menu: React.FC = () => {
       </EuiPanel>
 
       {modal}
+
+      {show_confirm.show ? (
+        <Confirm_deletion_prompt
+          title={"Warning!"}
+          desc={show_confirm.desc}
+          confirm={show_confirm.confirm}
+          cancel={show_confirm.cancel}
+        />
+      ) : (
+        ""
+      )}
 
       {isGroupEditModalVisible ? (
         <GroupEditProp closeModal={closeGroupEditModal} editSet={groupToEdit} />

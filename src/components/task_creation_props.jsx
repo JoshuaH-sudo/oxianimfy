@@ -353,7 +353,6 @@ export const GroupModal = (props) => {
 
     db_context.getSetsFromDb().then((sets) => {
       let parseSetList = Object.keys(sets)
-      console.log('yeet', sets)
       set_group_list(parseSetList)
     })
 
