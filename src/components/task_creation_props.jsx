@@ -183,12 +183,6 @@ export const TimerProp = (props) => {
 export const CounterProp = (props) => {
   const [counter, setCounter] = useState("0");
 
-  useEffect(() => {
-    if (props.editTask) {
-      if (parseInt(props.editTask.unit)) setCounter(props.editTask.unit);
-    }
-  }, []);
-
   const updateCounter = (event) => {
     let value = event.target.value;
 
@@ -196,6 +190,12 @@ export const CounterProp = (props) => {
       value !== "" ? setCounter(parseInt(value, 10)) : setCounter("0");
     }
   };
+
+  useEffect(() => {
+    if (props.editTask) {
+      if (!isNaN(parseInt(props.editTask.unit, 10))) setCounter(props.editTask.unit)
+    }
+  }, [])
 
   useEffect(() => {
     props.updateTaskValue("unit", counter);
@@ -212,9 +212,9 @@ export const CounterProp = (props) => {
 };
 export const MesureProp = (props) => {
   var taskMesureIdMapDefault = {
-    timer: true,
-    counter: false,
-    none: false,
+    timer: props.mesure === "timer" || props.mesure === '' ? true : false,
+    counter: props.mesure === "counter" ? true : false,
+    none: props.mesure === "none"  ? true : false,
   };
 
   var taskMesureOptions = [
@@ -260,10 +260,6 @@ export const MesureProp = (props) => {
     if (optionId == "none") props.updateTaskValue("unit", "none");
     setTaskMesureIdMapping(newTaskMesureIdMap);
   };
-
-  useEffect(() => {
-    onTaskMesureChange(props.mesure);
-  }, []);
 
   useEffect(() => {
     props.updateTaskValue(

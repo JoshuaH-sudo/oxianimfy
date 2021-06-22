@@ -3,8 +3,6 @@ import React, {
   useState,
   useContext,
   useEffect,
-  Fragment,
-  Component,
 } from "react";
 import {
   EuiButton,
@@ -16,29 +14,23 @@ import {
   EuiText,
   EuiSpacer,
   EuiButtonGroup,
-  EuiTitle,
   EuiFieldSearch,
-  EuiForm,
-  EuiFormRow,
-  EuiDescribedFormGroup,
-  EuiSuperSelect,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiButtonIcon,
-  EuiSelect,
 } from "@elastic/eui";
 import { databaseContext } from "../App";
-import { ITaskData, setRef, taskRef } from "../utils/custom_types";
+import { ITaskData, setRef } from "../utils/custom_types";
 import "../css/custom.css";
 import { FlexGridColumns } from "@elastic/eui/src/components/flex/flex_grid";
 import {
   GroupDisplayProp,
   GroupEditProp,
 } from "../components/task_creation_props";
-import Edit_task from "../components/Edit_task";
+import { Edit_task } from "../components/Edit_task_menu_props";
 
 const Edit_task_menu: React.FC = () => {
   const db_context = useContext(databaseContext);
@@ -361,6 +353,7 @@ const Edit_task_menu: React.FC = () => {
       </EuiPanel>
 
       {modal}
+
       {isGroupEditModalVisible ? (
         <GroupEditProp closeModal={closeGroupEditModal} editSet={groupToEdit} />
       ) : (
