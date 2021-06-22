@@ -341,12 +341,22 @@ export const TitleDescProp = (props) => {
 export const GroupModal = (props) => {
   const [name, setTitle] = useState(props.name ?? "");
   const [desc, setDesc] = useState(props.desc ?? "");
+  
+  const [group_list, set_group_list] = useState([])
+  const db_context = useContext(databaseContext);
 
   useEffect(() => {
     if (props.editTask) {
       setTitle(props.editTask.name);
       setDesc(props.editTask.desc);
     }
+
+    db_context.getSetsFromDb().then((sets) => {
+      let parseSetList = Object.keys(sets)
+      console.log('yeet', sets)
+      set_group_list(parseSetList)
+    })
+
   }, []);
 
   useEffect(() => {
@@ -354,7 +364,7 @@ export const GroupModal = (props) => {
     props.updateGroupValue("desc", desc);
   }, [name, desc]);
 
-  const groupIsValid = name !== "";
+  const groupIsValid = name !== "" && group_list.find((setName) => setName === name.toLowerCase()) === undefined;
 
   return (
     <EuiModal closeModal={props.closeModal}>
@@ -368,6 +378,8 @@ export const GroupModal = (props) => {
         <EuiForm>
           <EuiFormRow
             label="Task name"
+            isInvalid={group_list.find((setName) => setName === name.toLowerCase())}
+            error={'That Name is in use, please choose another'}
             helpText={name === "" ? "Please give this set a name." : ""}
           >
             <EuiFieldText
