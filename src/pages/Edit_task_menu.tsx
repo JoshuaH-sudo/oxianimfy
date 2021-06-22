@@ -146,7 +146,7 @@ const Edit_task_menu: React.FC = () => {
   const taskCard = (task: ITaskData) => {
     if (task)
       return (
-        <EuiFlexItem key={task.id} grow={1} style={{ overflow: "hidden" }}>
+        <EuiFlexItem key={task.id} grow={1} id='edit_task_card'>
           <EuiCard
             textAlign="left"
             image={tabBar(task.name)}
@@ -195,15 +195,7 @@ const Edit_task_menu: React.FC = () => {
     {
       id: "2",
       label: "2",
-    },
-    {
-      id: "3",
-      label: "3",
-    },
-    {
-      id: "4",
-      label: "4",
-    },
+    }
   ];
 
   const [columnNumIdSelected, setColumnNumIdSelected] =

@@ -75,10 +75,9 @@ export const Nav_bar = () => {
 
   return <EuiHeader id="header_nav" sections={sections} />;
 };
-export const Control_bar = (props) => {
-  const [current_hash, set_hash] = useState(pageUrls.home);
+export const Control_bar = () => {
+  const [current_hash, set_hash] = useState(window.location.hash);
   window.addEventListener("hashchange", () => set_hash(window.location.hash)); 
-
   return (
     <EuiFlexGroup
       id="control_bar_nav"

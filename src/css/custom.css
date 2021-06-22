@@ -1,6 +1,7 @@
 body {
     height: 100%
 }
+
 #root {
     height: calc(100% - 60px);
     display: flex;
@@ -44,6 +45,13 @@ body {
     width: inherit;
 }
 
+#edit_task_card {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: inherit;
+    display: block;
+}
+
 .center_text {
     margin-left: auto;
     margin-right: auto;
@@ -64,6 +72,6 @@ body {
     max-width: 60vw;
 }
 
-#set_selection > .swiper-wrapper {
+#set_selection>.swiper-wrapper {
     height: 45vh;
 }
