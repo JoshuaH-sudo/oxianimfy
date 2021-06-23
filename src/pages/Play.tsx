@@ -137,8 +137,6 @@ const Prepare: React.FC<PrepareProps> = (props) => {
     </Swiper>
   );
 
-  console.log(props.list);
-
   return <Fragment>{props.list.length > 0 ? game_setup : endGame}</Fragment>;
 };
 

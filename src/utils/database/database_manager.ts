@@ -161,13 +161,10 @@ export class Database_manager {
         ? moment().startOf("week").subtract(1, "week")
         : moment().startOf("week");
 
-        console.log('start of week', startOfWeek)
-        console.log('start of week day', startOfWeek.day(day))
-        console.log('lastTime before day', lastTimeStamp.isBefore(startOfWeek.day(day), "day"))
-        console.log('day before today', startOfWeek.day(day).isBefore(moment(), "day"))
-    //check the days that are inbetween the last time stamp and today
+       console.log('is the day in question the last time stamp', lastTimeStamp.isSame(startOfWeek.day(day), "day"))
+    //check the days that are inbetween the last time stamp and today includeing the last time stamp
     return (
-      lastTimeStamp.isBefore(startOfWeek.day(day), "day") &&
+      lastTimeStamp.isBefore(startOfWeek.day(day), "day") || lastTimeStamp.isSame(startOfWeek.day(day), "day")  &&
       startOfWeek.day(day).isBefore(moment(), "day")
     );
   };
@@ -178,7 +175,6 @@ export class Database_manager {
 
     let currentTime = moment();
     let lastTimeStamp = moment(config.lastRefreshTimeStamp);
-    // let lastTimeStamp = moment().subtract(3, 'days');
     let timeDifference = moment
       .duration(lastTimeStamp.diff(currentTime))
       .as("days");
@@ -204,7 +200,7 @@ export class Database_manager {
       promises.push(this.app_manager.updateTimeStamp());
     }
 
-    return await Promise.all(promises);
+    return await Promise.all(promises)
   };
 
   completeTask = async (completedTasksId: string, setId: string) => {
