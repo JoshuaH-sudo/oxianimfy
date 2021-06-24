@@ -161,13 +161,9 @@ export class Database_manager {
         ? moment().startOf("week").subtract(1, "week")
         : moment().startOf("week");
 
-        console.log('start of week', startOfWeek)
-        console.log('start of week day', startOfWeek.day(day))
-        console.log('lastTime before day', lastTimeStamp.isBefore(startOfWeek.day(day), "day"))
-        console.log('day before today', startOfWeek.day(day).isBefore(moment(), "day"))
     //check the days that are inbetween the last time stamp and today
     return (
-      lastTimeStamp.isBefore(startOfWeek.day(day), "day") &&
+      lastTimeStamp.isBefore(startOfWeek.day(day), "day") || lastTimeStamp.isSame(startOfWeek.day(day), "day")  &&
       startOfWeek.day(day).isBefore(moment(), "day")
     );
   };

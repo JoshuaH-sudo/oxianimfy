@@ -17,6 +17,7 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiButtonIcon,
+  EuiHighlight,
 } from "@elastic/eui";
 import { databaseContext } from "../App";
 import { ITaskData, setRef } from "../utils/custom_types";
@@ -85,6 +86,12 @@ const Edit_task_menu: React.FC = () => {
     SetGroupEditModalVisible(true);
   };
 
+  const highlightFilter = (text: string) => (
+    <EuiHighlight search={searchValue} highlightAll={true}>
+      {text}
+    </EuiHighlight>
+  );
+
   const tabBar = (title: string) => (
     <div
       style={{
@@ -105,7 +112,7 @@ const Edit_task_menu: React.FC = () => {
             textOverflow: "ellipsis",
           }}
         >
-          {title}
+          {highlightFilter(title)}
         </p>
       </EuiText>
     </div>
@@ -155,6 +162,18 @@ const Edit_task_menu: React.FC = () => {
     </EuiFlexGroup>
   );
 
+  const noCardDisplay = () => (
+    <EuiFlexItem key={"no-card"} grow={1}>
+      <EuiCard
+        textAlign="left"
+        image={tabBar("No Cards")}
+        title={"There are no items to display, try diffrent filter settings"}
+        description={""}
+        onClick={() => {}}
+      />
+    </EuiFlexItem>
+  );
+
   const taskCard = (task: ITaskData) => {
     if (task)
       return (
@@ -162,7 +181,7 @@ const Edit_task_menu: React.FC = () => {
           <EuiCard
             textAlign="left"
             image={tabBar(task.name)}
-            title={task.desc}
+            title={highlightFilter(task.desc)}
             description={cardActions(task)}
           />
         </EuiFlexItem>
@@ -170,12 +189,15 @@ const Edit_task_menu: React.FC = () => {
   };
 
   const displayTaskCards = () =>
-    task_list[current_filter_set]
+    task_list[current_filter_set] && task_list[current_filter_set].length > 0
       ? task_list[current_filter_set].map((task: ITaskData) => {
-          if (applyFilter(task)) return taskCard(task);
+          if (applyFilter(task)) {
+            return taskCard(task);
+          } else {
+            return noCardDisplay();
+          }
         })
-      : "";
-
+      : noCardDisplay();
   useEffect(() => {
     refresh();
   }, [isGroupEditModalVisible]);
@@ -193,12 +215,11 @@ const Edit_task_menu: React.FC = () => {
   );
 
   const displayTaskGroups = () =>
-    task_groups_list
+    task_groups_list && Object.keys(task_groups_list).length > 1
       ? Object.keys(task_groups_list).map((setId: string) => {
           if (setId != "misc") return taskSetCard(task_groups_list[setId]);
         })
-      : "";
-
+      : noCardDisplay();
   const columnNum = [
     {
       id: "1",
@@ -223,7 +244,7 @@ const Edit_task_menu: React.FC = () => {
       label: "Tasks",
     },
     {
-      id: "set",
+      id: "sets",
       label: "Task Groups",
     },
   ];
@@ -301,7 +322,16 @@ const Edit_task_menu: React.FC = () => {
   }
 
   const selectGroup = (value: string) => set_current_filter_set(value);
-
+  const displayCards = () => {
+    switch (itemTypeSelected) {
+      case "tasks":
+        return displayTaskCards();
+        break;
+      case "sets":
+        return displayTaskGroups();
+        break;
+    }
+  };
   return (
     <EuiPanel>
       <EuiFlexGroup alignItems="center">
@@ -350,9 +380,7 @@ const Edit_task_menu: React.FC = () => {
 
       <EuiPanel>
         <EuiFlexGrid columns={columnNumIdSelected} responsive={false}>
-          {itemTypeSelected == "tasks"
-            ? displayTaskCards()
-            : displayTaskGroups()}
+          {displayCards()}
         </EuiFlexGrid>
       </EuiPanel>
 

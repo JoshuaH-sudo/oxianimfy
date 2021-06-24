@@ -20,6 +20,9 @@
 .vscode
 .idea
 
+*.swo
+*.swp
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -28,4 +31,4 @@ yarn-error.log*
 .eslintcache
 
 notes.txt
-workspace.code-workspace
+*.code-workspace
