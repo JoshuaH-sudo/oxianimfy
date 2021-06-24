@@ -92,26 +92,16 @@ const Edit_task_menu: React.FC = () => {
     </EuiHighlight>
   );
 
-  const tabBar = (title: string) => (
+				const tabBar = (title: string, barColor: string = 'coral', textColor: string = 'black') => (
     <div
+			id='card_bar'
       style={{
-        backgroundColor: "coral",
-        color: "black",
-        width: "100%",
-        height: "5vh",
-        textAlign: "center",
+				backgroundColor: barColor,
+        color: textColor,
       }}
     >
       <EuiText textAlign="center" size="m">
-        <p
-          style={{
-            paddingLeft: "10px",
-            paddingRight: "10px",
-            fontWeight: "bold",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
+				<p id='card_title'> 
           {highlightFilter(title)}
         </p>
       </EuiText>
@@ -166,7 +156,7 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={"no-card"} grow={1}>
       <EuiCard
         textAlign="left"
-        image={tabBar("No Cards")}
+				image={tabBar("No Cards", 'black', 'white')}
         title={"There are no items to display, try diffrent filter settings"}
         description={""}
         onClick={() => {}}

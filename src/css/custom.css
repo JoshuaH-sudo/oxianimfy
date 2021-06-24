@@ -1,77 +1,97 @@
 body {
-    height: 100%
+  height: 100%;
 }
 
 #root {
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: column;
+  height: calc(100% - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+#main_content { 
+	margin: 0
 }
 
 #control_bar_nav {
-    height: 60px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 99;
-    text-align: center;
-    background-color: black;
+  height: 60px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 99;
+  text-align: center;
+  background-color: black;
 }
 
 #play_tasks {
-    flex-basis: 0% !important;
+  flex-basis: 0% !important;
 }
 
 #end_game {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 #header_nav {
-    width: 100%;
+  width: 100%;
 }
 
 .euiTitle--small {
-    width: 100%;
-    height: 100
+  width: 100%;
+  height: 100;
 }
 
 .euiCard__titleButton {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: inherit;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: inherit;
 }
 
 #edit_task_card {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: inherit;
-    display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: inherit;
+  display: block;
+}
+
+#card_title {
+  padding: 10px;
+  fontweight: bold;
+  overflow: hidden;
+  textoverflow: ellipsis;
+  font-size: larger;
+}
+
+#card_bar {
+  width: 100%;
+  height: 5vh;
+  min-height: 50px;
+  text-align: center;
+  margin: auto;
 }
 
 .center_text {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .control_bar_item {
-    margin: auto;
+  margin: auto;
 }
 
 .set_select_card {
-    height: 40vh;
-    max-height: 600px;
+  height: 40vh;
+  max-height: 600px;
 }
 
 .set_select_card_desc {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 60vw;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 60vw;
 }
 
-#set_selection>.swiper-wrapper {
-    height: 45vh;
+#set_selection > .swiper-wrapper {
+  height: 45vh;
 }
