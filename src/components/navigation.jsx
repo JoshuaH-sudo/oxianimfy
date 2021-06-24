@@ -77,7 +77,7 @@ export const Nav_bar = () => {
 };
 export const Control_bar = () => {
   const [current_hash, set_hash] = useState(window.location.hash);
-  window.addEventListener("hashchange", () => set_hash(window.location.hash)); 
+  window.addEventListener("hashchange", () => set_hash(window.location.hash));
   return (
     <EuiFlexGroup
       id="control_bar_nav"
@@ -85,7 +85,7 @@ export const Control_bar = () => {
       justifyContent="spaceEvenly"
       responsive={false}
     >
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiButtonIcon
           iconType="home"
           href={pageUrls.home}
@@ -95,7 +95,7 @@ export const Control_bar = () => {
         <EuiText>Home</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiButtonIcon
           iconType="play"
           href={pageUrls.task_select}
@@ -105,7 +105,7 @@ export const Control_bar = () => {
         <EuiText>Play</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiButtonIcon
           iconType="plus"
           href={pageUrls.task_create}
@@ -115,7 +115,7 @@ export const Control_bar = () => {
         <EuiText>Add</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiButtonIcon
           iconType="pencil"
           href={pageUrls.task_edit}
@@ -125,7 +125,7 @@ export const Control_bar = () => {
         <EuiText>Edit</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiButtonIcon
           iconType="stats"
           href={pageUrls.stats}

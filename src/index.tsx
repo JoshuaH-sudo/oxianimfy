@@ -18,10 +18,10 @@ ReactDOM.render(
     <EuiFlexGroup
       direction="column"
       justifyContent="spaceEvenly"
-      id='main_content'
+      id="main_content"
       responsive={false}
     >
-      <EuiFlexItem >
+      <EuiFlexItem>
         <EuiPanel>
           <HashRouter>
             <Switch>
@@ -35,10 +35,8 @@ ReactDOM.render(
           </HashRouter>
         </EuiPanel>
       </EuiFlexItem>
-
     </EuiFlexGroup>
     <Control_bar />
-
   </React.StrictMode>,
   document.getElementById("root")
 );

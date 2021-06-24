@@ -1,13 +1,14 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "oxianimify",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "build",
-  "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 0
-    }
-  },
-  "cordova": {}
+	"appId": "io.ionic.starter",
+	"appName": "oxianimify",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "build",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0
+		}
+	},
+	"cordova": {},
+	"linuxAndroidStudioPath": "/snap/android-studio/82/android-studio/bin/studio.sh"
 }

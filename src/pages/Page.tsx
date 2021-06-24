@@ -1,5 +1,11 @@
 import React, { Fragment, useContext } from "react";
-import { EuiButton, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiText } from "@elastic/eui";
+import {
+  EuiButton,
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
+} from "@elastic/eui";
 import { databaseContext } from "../App";
 import Task_selection from "./Task_selection";
 
@@ -9,7 +15,7 @@ const Page: React.FC = () => {
   return (
     <Fragment>
       <EuiText>Tasks To Do Today</EuiText>
-        <Task_selection />
+      <Task_selection />
       <EuiPanel paddingSize="l">
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>

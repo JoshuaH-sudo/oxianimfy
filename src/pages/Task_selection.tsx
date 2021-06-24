@@ -38,7 +38,7 @@ const Task_selection: React.FC = () => {
   const updateSetsSelection = (set: any) => {
     //update number of tasks to do
     let updatedSetList = task_group_list;
-    updatedSetList.push(set)
+    updatedSetList.push(set);
     set_task_group_list(updatedSetList);
   };
 
@@ -55,7 +55,7 @@ const Task_selection: React.FC = () => {
             .then((taskList: any) => {
               updateTaskToDo(taskList.length, set.name);
               //set them
-              updateSetsSelection(set)
+              updateSetsSelection(set);
               set_task_group_list(sets);
             });
         } else {
@@ -135,7 +135,11 @@ const Task_selection: React.FC = () => {
         loop={task_group_list.length > 1}
         navigation
         pagination={{ clickable: true, dynamicBullets: true }}
-        onSlideChange={(swiper) => db_Context.app_manager.setSelectedTaskGroup(swiper.slides[swiper.activeIndex].id)}
+        onSlideChange={(swiper) =>
+          db_Context.app_manager.setSelectedTaskGroup(
+            swiper.slides[swiper.activeIndex].id
+          )
+        }
       >
         {task_group_list.length > 0
           ? task_group_list.map((set) => {

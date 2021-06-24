@@ -30,6 +30,7 @@ import {
 import {
   Confirm_deletion_prompt,
   Edit_task,
+  Filter_flyout,
 } from "../components/Edit_task_menu_props";
 
 const Edit_task_menu: React.FC = () => {
@@ -92,18 +93,20 @@ const Edit_task_menu: React.FC = () => {
     </EuiHighlight>
   );
 
-				const tabBar = (title: string, barColor: string = 'coral', textColor: string = 'black') => (
+  const tabBar = (
+    title: string,
+    barColor: string = "coral",
+    textColor: string = "black"
+  ) => (
     <div
-			id='card_bar'
+      id="card_bar"
       style={{
-				backgroundColor: barColor,
+        backgroundColor: barColor,
         color: textColor,
       }}
     >
       <EuiText textAlign="center" size="m">
-				<p id='card_title'> 
-          {highlightFilter(title)}
-        </p>
+        <p id="card_title">{highlightFilter(title)}</p>
       </EuiText>
     </div>
   );
@@ -156,7 +159,7 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={"no-card"} grow={1}>
       <EuiCard
         textAlign="left"
-				image={tabBar("No Cards", 'black', 'white')}
+        image={tabBar("No Cards", "black", "white")}
         title={"There are no items to display, try diffrent filter settings"}
         description={""}
         onClick={() => {}}
@@ -210,46 +213,6 @@ const Edit_task_menu: React.FC = () => {
           if (setId != "misc") return taskSetCard(task_groups_list[setId]);
         })
       : noCardDisplay();
-  const columnNum = [
-    {
-      id: "1",
-      label: "1",
-    },
-    {
-      id: "2",
-      label: "2",
-    },
-  ];
-
-  const [columnNumIdSelected, setColumnNumIdSelected] =
-    useState<FlexGridColumns>(2);
-
-  const columnNumChange = (optionId: any) => {
-    setColumnNumIdSelected(optionId);
-  };
-
-  const itemTypeOptions = [
-    {
-      id: "tasks",
-      label: "Tasks",
-    },
-    {
-      id: "sets",
-      label: "Task Groups",
-    },
-  ];
-
-  const [itemTypeSelected, setItemTypeSelected] = useState<string>("tasks");
-
-  const onItemTypeChange = (optionId: any) => {
-    setItemTypeSelected(optionId);
-  };
-
-  const [searchValue, setSearchValue] = useState("");
-  const onSearchChange = (e: any) => {
-    setSearchValue(e.target.value);
-  };
-
   const applyFilter = (task: ITaskData) => {
     return searchValue != ""
       ? task.desc.indexOf(searchValue) != -1 ||
@@ -321,7 +284,14 @@ const Edit_task_menu: React.FC = () => {
         return displayTaskGroups();
         break;
     }
-  };
+	};
+
+  const [searchValue, setSearchValue] = useState("");
+  const onSearchChange = (e: any) => {
+    setSearchValue(e.target.value);
+	};
+
+  const [itemTypeSelected, setItemTypeSelected] = useState<string>("tasks");
   return (
     <EuiPanel>
       <EuiFlexGroup alignItems="center">
@@ -334,45 +304,12 @@ const Edit_task_menu: React.FC = () => {
           />
         </EuiFlexItem>
 
-        <EuiFlexItem>
-          <EuiButtonGroup
-            legend="Column level choices"
-            options={columnNum}
-            idSelected={columnNumIdSelected.toString()}
-            onChange={columnNumChange}
-            isFullWidth
-          />
-        </EuiFlexItem>
-
-        {itemTypeSelected == "tasks" ? (
-          <EuiFlexItem>
-            <GroupDisplayProp
-              selectedGroup={current_filter_set}
-              selectGroup={selectGroup}
-              change={task_groups_list}
-            />
-          </EuiFlexItem>
-        ) : (
-          ""
-        )}
-        <EuiFlexItem>
-          <EuiButtonGroup
-            legend="Item type"
-            options={itemTypeOptions}
-            idSelected={itemTypeSelected.toString()}
-            onChange={onItemTypeChange}
-            isFullWidth
-          />
-        </EuiFlexItem>
+        <Filter_flyout
+          itemType={itemTypeSelected}
+          setItemType={setItemTypeSelected}
+					current_filter_set={current_filter_set}
+        />
       </EuiFlexGroup>
-
-      <EuiSpacer />
-
-      <EuiPanel>
-        <EuiFlexGrid columns={columnNumIdSelected} responsive={false}>
-          {displayCards()}
-        </EuiFlexGrid>
-      </EuiPanel>
 
       {modal}
 

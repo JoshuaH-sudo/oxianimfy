@@ -105,7 +105,7 @@ export class Database_manager {
         oldSet.name.toLowerCase(),
         set.name.toLowerCase()
       );
-      return await this.stats_db.changeName(oldSet.name, set.name)
+      return await this.stats_db.changeName(oldSet.name, set.name);
     }
   };
 
@@ -163,8 +163,9 @@ export class Database_manager {
 
     //check the days that are inbetween the last time stamp and today
     return (
-      lastTimeStamp.isBefore(startOfWeek.day(day), "day") || lastTimeStamp.isSame(startOfWeek.day(day), "day")  &&
-      startOfWeek.day(day).isBefore(moment(), "day")
+      lastTimeStamp.isBefore(startOfWeek.day(day), "day") ||
+      (lastTimeStamp.isSame(startOfWeek.day(day), "day") &&
+        startOfWeek.day(day).isBefore(moment(), "day"))
     );
   };
 

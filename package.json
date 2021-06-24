@@ -5,7 +5,7 @@
   "dependencies": {
     "@capacitor-community/electron": "^1.4.2",
     "@capacitor/android": "^2.4.7",
-    "@capacitor/core": "2.4.7",
+    "@capacitor/core": "^2.4.7",
     "@elastic/charts": "29.2.0",
     "@elastic/datemath": "^5.0.3",
     "@elastic/eui": "^32.1.0",
@@ -75,7 +75,7 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "2.4.7",
+    "@capacitor/cli": "^2.4.7",
     "@types/uuid": "^8.3.0",
     "react-scripts": "4.0.2"
   },

@@ -12,13 +12,16 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiConfirmModal,
+  EuiButtonGroup,
 } from "@elastic/eui";
+import { FlexGridColumns } from "@elastic/eui/src/components/flex/flex_grid";
 import { databaseContext } from "../App";
 import { ITaskData, setRef } from "../utils/custom_types";
 import "../css/custom.css";
 import {
   DotwProp,
   GroupSelectProp,
+  GroupDisplayProp,
   MesureProp,
   TitleDescProp,
 } from "./task_creation_props";
@@ -160,7 +163,77 @@ export const Confirm_deletion_prompt: React.FC<Confirm_prop> = (props) => {
       confirmButtonText={"Ok"}
       buttonColor="danger"
     >
-        {props.desc}
+      {props.desc}
     </EuiConfirmModal>
+  );
+};
+
+export const Filter_flyout: React.FC<any> = (props) => {
+  const itemTypeOptions = [
+    {
+      id: "tasks",
+      label: "Tasks",
+    },
+    {
+      id: "sets",
+      label: "Task Groups",
+    },
+  ];
+
+  const onItemTypeChange = (optionId: any) => {
+    props.setItemType(optionId);
+  };
+
+  const columnNum = [
+    {
+      id: "1",
+      label: "1",
+    },
+    {
+      id: "2",
+      label: "2",
+    },
+  ];
+
+  const [columnNumIdSelected, setColumnNumIdSelected] =
+    useState<FlexGridColumns>(2);
+
+  const columnNumChange = (optionId: any) => {
+    setColumnNumIdSelected(optionId);
+  };
+
+  return (
+    <EuiFlexGroup>
+      <EuiFlexItem>
+        <EuiButtonGroup
+          legend="Column level choices"
+          options={columnNum}
+          idSelected={columnNumIdSelected.toString()}
+          onChange={columnNumChange}
+          isFullWidth
+        />
+      </EuiFlexItem>
+
+      {props.itemType == "tasks" ? (
+        <EuiFlexItem>
+          <GroupDisplayProp
+            selectedGroup={props.current_filter_set}
+            selectGroup={selectGroup}
+            change={task_groups_list}
+          />
+        </EuiFlexItem>
+      ) : (
+        ""
+      )}
+      <EuiFlexItem>
+        <EuiButtonGroup
+          legend="Item type"
+          options={itemTypeOptions}
+          idSelected={props.itemType}
+          onChange={onItemTypeChange}
+          isFullWidth
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };

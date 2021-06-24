@@ -74,18 +74,23 @@ export const Task: React.FC = () => {
     setNewTaskGroup(updatedTaskGroup);
   };
 
-
   let createSetModal;
 
   if (isModalVisible) {
-    createSetModal = (<GroupModal updateGroupValue={updateGroupValue} closeModal={closeModal} createTaskGroup={createTaskGroup}/>);
+    createSetModal = (
+      <GroupModal
+        updateGroupValue={updateGroupValue}
+        closeModal={closeModal}
+        createTaskGroup={createTaskGroup}
+      />
+    );
   }
 
   const formIsValid =
     newTask.name !== "" &&
     newTask.daysOfWeek.length > 0 &&
     newTask.unit !== "0" &&
-    newTask.unit !== "P0D"
+    newTask.unit !== "P0D";
 
   return (
     <EuiPanel paddingSize="l">

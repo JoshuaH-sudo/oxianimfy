@@ -103,12 +103,12 @@ const Play: React.FC<PlayInterface> = (props) => {
 const Prepare: React.FC<PrepareProps> = (props) => {
   const endGame = (
     <div id="end_game">
-    <EuiPanel style={{  textAlign: 'center'}}>
-      <EuiText>Finished all your tasks yay</EuiText>
-      <EuiButton fill href="#/">
-        Return
-      </EuiButton>
-    </EuiPanel>
+      <EuiPanel style={{ textAlign: "center" }}>
+        <EuiText>Finished all your tasks yay</EuiText>
+        <EuiButton fill href="#/">
+          Return
+        </EuiButton>
+      </EuiPanel>
     </div>
   );
 

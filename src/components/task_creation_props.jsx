@@ -193,9 +193,10 @@ export const CounterProp = (props) => {
 
   useEffect(() => {
     if (props.editTask) {
-      if (!isNaN(parseInt(props.editTask.unit, 10))) setCounter(props.editTask.unit)
+      if (!isNaN(parseInt(props.editTask.unit, 10)))
+        setCounter(props.editTask.unit);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     props.updateTaskValue("unit", counter);
@@ -212,9 +213,9 @@ export const CounterProp = (props) => {
 };
 export const MesureProp = (props) => {
   var taskMesureIdMapDefault = {
-    timer: props.mesure === "timer" || props.mesure === '' ? true : false,
+    timer: props.mesure === "timer" || props.mesure === "" ? true : false,
     counter: props.mesure === "counter" ? true : false,
-    none: props.mesure === "none"  ? true : false,
+    none: props.mesure === "none" ? true : false,
   };
 
   var taskMesureOptions = [
@@ -341,8 +342,8 @@ export const TitleDescProp = (props) => {
 export const GroupModal = (props) => {
   const [name, setTitle] = useState(props.name ?? "");
   const [desc, setDesc] = useState(props.desc ?? "");
-  
-  const [group_list, set_group_list] = useState([])
+
+  const [group_list, set_group_list] = useState([]);
   const db_context = useContext(databaseContext);
 
   useEffect(() => {
@@ -352,10 +353,9 @@ export const GroupModal = (props) => {
     }
 
     db_context.getSetsFromDb().then((sets) => {
-      let parseSetList = Object.keys(sets)
-      set_group_list(parseSetList)
-    })
-
+      let parseSetList = Object.keys(sets);
+      set_group_list(parseSetList);
+    });
   }, []);
 
   useEffect(() => {
@@ -363,7 +363,9 @@ export const GroupModal = (props) => {
     props.updateGroupValue("desc", desc);
   }, [name, desc]);
 
-  const groupIsValid = name !== "" && group_list.find((setName) => setName === name.toLowerCase()) === undefined;
+  const groupIsValid =
+    name !== "" &&
+    group_list.find((setName) => setName === name.toLowerCase()) === undefined;
 
   return (
     <EuiModal closeModal={props.closeModal}>
@@ -377,8 +379,10 @@ export const GroupModal = (props) => {
         <EuiForm>
           <EuiFormRow
             label="Task name"
-            isInvalid={group_list.find((setName) => setName === name.toLowerCase())}
-            error={'That Name is in use, please choose another'}
+            isInvalid={group_list.find(
+              (setName) => setName === name.toLowerCase()
+            )}
+            error={"That Name is in use, please choose another"}
             helpText={name === "" ? "Please give this set a name." : ""}
           >
             <EuiFieldText
