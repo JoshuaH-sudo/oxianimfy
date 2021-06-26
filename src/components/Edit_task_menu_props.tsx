@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Fragment } from "react";
 import {
   EuiButton,
   EuiFlexGroup,
@@ -13,6 +13,10 @@ import {
   EuiModalHeaderTitle,
   EuiConfirmModal,
   EuiButtonGroup,
+  EuiFlyout,
+  EuiFlyoutBody,
+  EuiFlyoutHeader,
+  EuiTitle,
 } from "@elastic/eui";
 import { FlexGridColumns } from "@elastic/eui/src/components/flex/flex_grid";
 import { databaseContext } from "../App";
@@ -168,7 +172,14 @@ export const Confirm_deletion_prompt: React.FC<Confirm_prop> = (props) => {
   );
 };
 
-export const Filter_flyout: React.FC<any> = (props) => {
+export const Filter_flyout_button: React.FC<any> = (props) => {
+  const db_context = useContext(databaseContext);
+  const [task_groups_list, set_task_groups_list] = useState<any>({});
+  const [columnNumIdSelected, setColumnNumIdSelected] =
+    useState<FlexGridColumns>(2);
+  const [itemTypeSelected, setItemTypeSelected] = useState<string>("tasks");
+  const [show_filter_flyout, set_show_filter_flyout] = useState(false);
+
   const itemTypeOptions = [
     {
       id: "tasks",
@@ -180,9 +191,24 @@ export const Filter_flyout: React.FC<any> = (props) => {
     },
   ];
 
-  const onItemTypeChange = (optionId: any) => {
-    props.setItemType(optionId);
-  };
+  const taskTypeOptions = [
+    {
+      id: "all",
+      label: "All",
+    },
+    {
+      id: "timer",
+      label: "Timer",
+    },
+    {
+      id: "counter",
+      label: "Counter",
+    },
+    {
+      id: "none",
+      label: "None",
+    },
+  ];
 
   const columnNum = [
     {
@@ -195,45 +221,107 @@ export const Filter_flyout: React.FC<any> = (props) => {
     },
   ];
 
-  const [columnNumIdSelected, setColumnNumIdSelected] =
-    useState<FlexGridColumns>(2);
-
-  const columnNumChange = (optionId: any) => {
-    setColumnNumIdSelected(optionId);
+  const [, render] = useState({});
+  const filter_change = (key: string, value: any) => {
+    let updatedValue = { ...props.filter_options };
+    updatedValue[key] = value;
+    props.updateFilter(updatedValue);
+    render({});
   };
 
-  return (
-    <EuiFlexGroup>
-      <EuiFlexItem>
-        <EuiButtonGroup
-          legend="Column level choices"
-          options={columnNum}
-          idSelected={columnNumIdSelected.toString()}
-          onChange={columnNumChange}
-          isFullWidth
-        />
-      </EuiFlexItem>
+  const refresh = () => {
+    db_context.getSetsFromDb().then((setGroups: any) => {
+      set_task_groups_list(setGroups);
+    });
+  };
 
-      {props.itemType == "tasks" ? (
-        <EuiFlexItem>
-          <GroupDisplayProp
-            selectedGroup={props.current_filter_set}
-            selectGroup={selectGroup}
-            change={task_groups_list}
-          />
-        </EuiFlexItem>
-      ) : (
-        ""
-      )}
-      <EuiFlexItem>
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const selectGroup = (value: string) =>
+    filter_change("current_filter_set", value);
+
+  const taskFilter = (
+    <Fragment>
+      <EuiFormRow label="Select Task Group">
+        <GroupDisplayProp
+          disable={props.filter_options.itemType != "tasks"}
+          selectedGroup={props.filter_options.current_filter_set}
+          selectGroup={selectGroup}
+          change={task_groups_list}
+        />
+      </EuiFormRow>
+
+      <EuiFormRow label="Task type">
         <EuiButtonGroup
-          legend="Item type"
-          options={itemTypeOptions}
-          idSelected={props.itemType}
-          onChange={onItemTypeChange}
+          legend="Task Type"
+          options={taskTypeOptions}
+          idSelected={props.filter_options.taskType}
+          onChange={(e: any) => filter_change("taskType", e)}
           isFullWidth
         />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+      </EuiFormRow>
+    </Fragment>
   );
+  const filterGroup = () => {
+    switch (props.filter_options.itemType) {
+      case "tasks":
+        return taskFilter;
+    }
+  };
+  if (!show_filter_flyout) {
+    return (
+      <EuiButton
+        size="m"
+        iconSide="right"
+        iconType="filter"
+        fill
+        onClick={() => set_show_filter_flyout(true)}
+      >
+        Filter
+      </EuiButton>
+    );
+  } else {
+    return (
+      <EuiFlyout
+        size="s"
+        ownFocus
+        onClose={() => set_show_filter_flyout(false)}
+      >
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle>
+            <h2>Filter</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiForm>
+            <EuiFormRow label="Number of Item Columns">
+              <EuiButtonGroup
+                legend="Column level choices"
+                options={columnNum}
+                idSelected={props.filter_options.columnNumIdSelected.toString()}
+                onChange={(e: any) => filter_change("columnNumIdSelected", e)}
+                isFullWidth
+              />
+            </EuiFormRow>
+            <EuiFormRow label="Item to Edit">
+              <EuiButtonGroup
+                legend="Item type"
+                options={itemTypeOptions}
+                idSelected={props.filter_options.itemType}
+                onChange={(e: any) => filter_change("itemType", e)}
+                isFullWidth
+              />
+            </EuiFormRow>
+
+            <EuiSpacer />
+
+            {filterGroup()}
+
+          </EuiForm>
+        </EuiFlyoutBody>
+      </EuiFlyout>
+    );
+  }
 };

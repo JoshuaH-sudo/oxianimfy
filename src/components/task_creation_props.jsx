@@ -493,6 +493,7 @@ export const GroupDisplayProp = (props) => {
 
   return (
     <EuiSuperSelect
+      disabled={props.disable}
       hasDividers
       options={taskGroups}
       valueOfSelected={props.selectedGroup}

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-pascal-case */
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Fragment } from "react";
 import {
   EuiButton,
   EuiPanel,
@@ -20,7 +20,7 @@ import {
   EuiHighlight,
 } from "@elastic/eui";
 import { databaseContext } from "../App";
-import { ITaskData, setRef } from "../utils/custom_types";
+import { ITaskData, setRef, taskRef } from "../utils/custom_types";
 import "../css/custom.css";
 import { FlexGridColumns } from "@elastic/eui/src/components/flex/flex_grid";
 import {
@@ -30,22 +30,26 @@ import {
 import {
   Confirm_deletion_prompt,
   Edit_task,
-  Filter_flyout,
+  Filter_flyout_button,
 } from "../components/Edit_task_menu_props";
+const Joi = require("joi");
 
 const Edit_task_menu: React.FC = () => {
   const db_context = useContext(databaseContext);
 
-  const [task_groups_list, set_task_groups_list] = useState<any>({});
   const [task_list, set_task_list] = useState<any>({
     misc: [],
   });
-
-  const [current_filter_set, set_current_filter_set] = useState<string>("misc");
+  const [filter_options, set_filter_options] = useState<any>({
+    current_filter_set: "misc",
+    itemType: "tasks",
+    columnNumIdSelected: 2,
+    taskType: "all",
+  });
   const [taskToEdit, setTaskToEdit] = useState<ITaskData>();
   const [groupToEdit, setGroupToEdit] = useState<setRef>();
   const [submitChange, setSubmitChange] = useState(false);
-
+  const [task_groups_list, set_task_groups_list] = useState<any>({});
   const [show_confirm, set_show_confirm] = useState<any>({});
 
   const refresh = () => {
@@ -66,8 +70,8 @@ const Edit_task_menu: React.FC = () => {
         });
 
       Promise.all(promises).then(() => {
-        set_task_list(retrivedTaskList);
         set_task_groups_list(setGroups);
+        set_task_list(retrivedTaskList);
         if (submitChange) setSubmitChange(false);
       });
     });
@@ -174,23 +178,50 @@ const Edit_task_menu: React.FC = () => {
           <EuiCard
             textAlign="left"
             image={tabBar(task.name)}
-            title={highlightFilter(task.desc)}
+            title={task.desc}
             description={cardActions(task)}
           />
         </EuiFlexItem>
       );
   };
+  const taskFilter = (tasks: any) => {
+    const search_check = new RegExp(searchValue);
+    const schema = Joi.object({
+      name: Joi.string().regex(search_check),
+      desc: Joi.string(),
+      daysOfWeek: Joi.array(),
+      id: Joi.string(),
+      mesure: Joi.string().when(Joi.ref("$show_all_task"), {
+        is: true,
+        then: Joi.valid(filter_options.taskType),
+        otherwise: Joi.string(),
+      }),
+      unit: Joi.any(),
+    });
 
-  const displayTaskCards = () =>
-    task_list[current_filter_set] && task_list[current_filter_set].length > 0
-      ? task_list[current_filter_set].map((task: ITaskData) => {
-          if (applyFilter(task)) {
-            return taskCard(task);
-          } else {
-            return noCardDisplay();
-          }
-        })
-      : noCardDisplay();
+    let filteredTasks = tasks.filter((task: taskRef) => {
+      const check = schema.validate(task, {
+        context: { show_all_task: filter_options.taskType != "all" },
+      });
+      if (!check.error) return task;
+    });
+
+    return filteredTasks;
+  };
+
+  const displayTaskCards = () => {
+    const filtered_tasks = taskFilter(
+      task_list[filter_options.current_filter_set]
+    );
+    if (filtered_tasks.length > 0) {
+      return filtered_tasks.map((task: ITaskData) => {
+        return taskCard(task);
+      });
+    } else {
+      return noCardDisplay();
+    }
+  };
+
   useEffect(() => {
     refresh();
   }, [isGroupEditModalVisible]);
@@ -213,12 +244,6 @@ const Edit_task_menu: React.FC = () => {
           if (setId != "misc") return taskSetCard(task_groups_list[setId]);
         })
       : noCardDisplay();
-  const applyFilter = (task: ITaskData) => {
-    return searchValue != ""
-      ? task.desc.indexOf(searchValue) != -1 ||
-          task.name.indexOf(searchValue) != -1
-      : true;
-  };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const closeModal = () => setIsModalVisible(false);
@@ -253,7 +278,7 @@ const Edit_task_menu: React.FC = () => {
             task={taskToEdit}
             submitChange={submitChange}
             updateTask={updateTask}
-            groupId={current_filter_set}
+            groupId={filter_options.current_filter_set}
           />
         </EuiModalBody>
 
@@ -274,9 +299,8 @@ const Edit_task_menu: React.FC = () => {
     );
   }
 
-  const selectGroup = (value: string) => set_current_filter_set(value);
   const displayCards = () => {
-    switch (itemTypeSelected) {
+    switch (filter_options.itemType) {
       case "tasks":
         return displayTaskCards();
         break;
@@ -284,17 +308,19 @@ const Edit_task_menu: React.FC = () => {
         return displayTaskGroups();
         break;
     }
-	};
-
+  };
   const [searchValue, setSearchValue] = useState("");
   const onSearchChange = (e: any) => {
     setSearchValue(e.target.value);
-	};
-
-  const [itemTypeSelected, setItemTypeSelected] = useState<string>("tasks");
+  };
+  let cards = displayCards();
   return (
     <EuiPanel>
-      <EuiFlexGroup alignItems="center">
+      <EuiFlexGroup
+        responsive={false}
+        justifyContent="spaceBetween"
+        alignItems="center"
+      >
         <EuiFlexItem>
           <EuiFieldSearch
             placeholder="Search this"
@@ -304,12 +330,24 @@ const Edit_task_menu: React.FC = () => {
           />
         </EuiFlexItem>
 
-        <Filter_flyout
-          itemType={itemTypeSelected}
-          setItemType={setItemTypeSelected}
-					current_filter_set={current_filter_set}
-        />
+        <EuiFlexItem grow={false}>
+          <Filter_flyout_button
+            filter_options={filter_options}
+            updateFilter={set_filter_options}
+          />
+        </EuiFlexItem>
       </EuiFlexGroup>
+
+      <EuiSpacer />
+
+      <EuiPanel>
+        <EuiFlexGrid
+          columns={filter_options.columnNumIdSelected}
+          responsive={false}
+        >
+          {cards}
+        </EuiFlexGrid>
+      </EuiPanel>
 
       {modal}
 
