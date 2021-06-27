@@ -259,7 +259,6 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
           options={taskTypeOptions}
           idSelected={props.filter_options.taskType}
           onChange={(e: any) => filter_change("taskType", e)}
-          isFullWidth
         />
       </EuiFormRow>
     </Fragment>
@@ -312,13 +311,13 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
                 idSelected={props.filter_options.itemType}
                 onChange={(e: any) => filter_change("itemType", e)}
                 isFullWidth
+                buttonSize="compressed"
               />
             </EuiFormRow>
 
             <EuiSpacer />
 
             {filterGroup()}
-
           </EuiForm>
         </EuiFlyoutBody>
       </EuiFlyout>

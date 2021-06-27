@@ -18,6 +18,8 @@ import {
   EuiModalHeaderTitle,
   EuiButtonIcon,
   EuiHighlight,
+  EuiCheckbox,
+	EuiHorizontalRule,
 } from "@elastic/eui";
 import { databaseContext } from "../App";
 import { ITaskData, setRef, taskRef } from "../utils/custom_types";
@@ -32,6 +34,7 @@ import {
   Edit_task,
   Filter_flyout_button,
 } from "../components/Edit_task_menu_props";
+
 const Joi = require("joi");
 
 const Edit_task_menu: React.FC = () => {
@@ -97,8 +100,32 @@ const Edit_task_menu: React.FC = () => {
     </EuiHighlight>
   );
 
+  const [items_delete, set_items_delete] = useState<any>([]);
+  const [multi_del_toggle, set_multi_del_toggle] = useState<boolean>(false);
+
+  const addItemToDelete = (item_id: string) => {
+   	let items_to_delete: any  = items_delete;
+    	//if item is already in array
+		if (items_to_delete.includes(item_id) ) {
+      items_to_delete = items_to_delete.filter(
+        (item: string) => item != item_id
+      );
+     	set_items_delete([...items_to_delete]);
+    } else {
+      items_to_delete.push(item_id);
+      set_items_delete([...items_to_delete]);
+    }
+		
+		if (items_to_delete.length > 0) {
+			set_multi_del_toggle(true)
+		} else { 
+			set_multi_del_toggle(false)
+		}
+  };
+
   const tabBar = (
     title: string,
+    select_id: string,
     barColor: string = "coral",
     textColor: string = "black"
   ) => (
@@ -109,9 +136,25 @@ const Edit_task_menu: React.FC = () => {
         color: textColor,
       }}
     >
-      <EuiText textAlign="center" size="m">
-        <p id="card_title">{highlightFilter(title)}</p>
-      </EuiText>
+      <EuiFlexGroup
+        responsive={false}
+        justifyContent="spaceAround"
+        style={{ height: "inherit" }}
+      >
+        <EuiFlexItem>
+          <EuiText textAlign="center" size="m">
+            <p id="card_title">{highlightFilter(title)}</p>
+          </EuiText>
+        </EuiFlexItem>
+
+          <EuiFlexItem grow={false}>
+            <EuiCheckbox
+              id={select_id + "checkbox"}
+              checked={items_delete.includes(select_id)}
+              onChange={() => addItemToDelete(select_id)}
+            />
+          </EuiFlexItem>
+      </EuiFlexGroup>
     </div>
   );
 
@@ -177,9 +220,16 @@ const Edit_task_menu: React.FC = () => {
         <EuiFlexItem key={task.id} grow={1} id="edit_task_card">
           <EuiCard
             textAlign="left"
-            image={tabBar(task.name)}
+            image={tabBar(task.name, task.id)}
             title={task.desc}
             description={cardActions(task)}
+            selectable={
+              multi_del_toggle
+                ? {
+                    isSelected: items_delete.includes(task.id),
+                  }
+                : undefined
+            }
           />
         </EuiFlexItem>
       );
@@ -230,7 +280,7 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={set.key} grow={1} style={{ overflow: "hidden" }}>
       <EuiCard
         textAlign="left"
-        image={tabBar(set.name)}
+        image={tabBar(set.name, set.key)}
         title={set.desc}
         description={cardActions(null, set)}
         onClick={() => {}}
@@ -315,7 +365,7 @@ const Edit_task_menu: React.FC = () => {
   };
   let cards = displayCards();
   return (
-    <EuiPanel>
+    <Fragment>
       <EuiFlexGroup
         responsive={false}
         justifyContent="spaceBetween"
@@ -330,6 +380,20 @@ const Edit_task_menu: React.FC = () => {
           />
         </EuiFlexItem>
 
+        {multi_del_toggle ? (
+          <EuiFlexItem grow={false}>
+            <EuiButtonIcon
+              iconType="trash"
+              color="danger"
+              size="m"
+              display={multi_del_toggle ? "fill" : "base"}
+              onClick={() => set_multi_del_toggle(!multi_del_toggle)}
+            />
+          </EuiFlexItem>
+        ) : (
+          ""
+        )}
+
         <EuiFlexItem grow={false}>
           <Filter_flyout_button
             filter_options={filter_options}
@@ -338,16 +402,14 @@ const Edit_task_menu: React.FC = () => {
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiSpacer />
+      <EuiHorizontalRule />
 
-      <EuiPanel>
-        <EuiFlexGrid
-          columns={filter_options.columnNumIdSelected}
-          responsive={false}
-        >
-          {cards}
-        </EuiFlexGrid>
-      </EuiPanel>
+      <EuiFlexGrid
+        columns={filter_options.columnNumIdSelected}
+        responsive={false}
+      >
+        {cards}
+      </EuiFlexGrid>
 
       {modal}
 
@@ -367,7 +429,7 @@ const Edit_task_menu: React.FC = () => {
       ) : (
         ""
       )}
-    </EuiPanel>
+    </Fragment>
   );
 };
 
