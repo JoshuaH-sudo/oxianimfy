@@ -45,7 +45,7 @@ const Edit_task_menu: React.FC = () => {
   });
   const [filter_options, set_filter_options] = useState<any>({
     current_filter_set: "misc",
-    itemType: "tasks",
+    itemType: "task",
     columnNumIdSelected: 2,
     taskType: "all",
   });
@@ -103,7 +103,12 @@ const Edit_task_menu: React.FC = () => {
   const [items_delete, set_items_delete] = useState<any>([]);
   const [multi_del_toggle, set_multi_del_toggle] = useState<boolean>(false);
 
-  const addItemToDelete = (item_id: string) => {
+	const clear_multi_delete = () => {
+    set_multi_del_toggle(false);
+    set_items_delete([]);
+  };
+
+	const addItemToDelete = (item_id: string) => {
    	let items_to_delete: any  = items_delete;
     	//if item is already in array
 		if (items_to_delete.includes(item_id) ) {
@@ -351,10 +356,10 @@ const Edit_task_menu: React.FC = () => {
 
   const displayCards = () => {
     switch (filter_options.itemType) {
-      case "tasks":
+      case "task":
         return displayTaskCards();
         break;
-      case "sets":
+      case "set":
         return displayTaskGroups();
         break;
     }
@@ -366,41 +371,69 @@ const Edit_task_menu: React.FC = () => {
   let cards = displayCards();
   return (
     <Fragment>
-      <EuiFlexGroup
-        responsive={false}
-        justifyContent="spaceBetween"
-        alignItems="center"
-      >
-        <EuiFlexItem>
-          <EuiFieldSearch
-            placeholder="Search this"
-            value={searchValue}
-            isClearable={true}
-            onChange={onSearchChange}
-          />
-        </EuiFlexItem>
-
-        {multi_del_toggle ? (
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="trash"
-              color="danger"
-              size="m"
-              display={multi_del_toggle ? "fill" : "base"}
-              onClick={() => set_multi_del_toggle(!multi_del_toggle)}
+      {!multi_del_toggle ? (
+        <EuiFlexGroup
+          responsive={false}
+          justifyContent="spaceBetween"
+          alignItems="center"
+        >
+          <EuiFlexItem>
+            <EuiFieldSearch
+              placeholder="Search this"
+              value={searchValue}
+              isClearable={true}
+              onChange={onSearchChange}
             />
           </EuiFlexItem>
-        ) : (
-          ""
-        )}
 
-        <EuiFlexItem grow={false}>
-          <Filter_flyout_button
-            filter_options={filter_options}
-            updateFilter={set_filter_options}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <Filter_flyout_button
+              filter_options={filter_options}
+              updateFilter={set_filter_options}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : (
+          <EuiFlexGroup
+            responsive={false}
+            justifyContent="spaceBetween"
+            alignItems="center"
+          >
+            <EuiFlexItem>
+              <EuiButton
+                iconType="trash"
+                iconSide="right"
+                color="danger"
+                size="m"
+                fullWidth
+                fill
+                onClick={() => set_multi_del_toggle(!multi_del_toggle)}
+              >
+                {"Delete " +
+                  items_delete.length +
+                  " " +
+                  filter_options.itemType +
+                  "(s)"}
+              </EuiButton>
+            </EuiFlexItem>
+
+  <EuiFlexItem>
+              <EuiButton
+                iconType="trash"
+                iconSide="right"
+                size="m"
+                fullWidth
+                fill
+                onClick={() => clear_multi_delete()}
+              >
+							Clear
+             </EuiButton>
+            </EuiFlexItem>
+ 
+
+          </EuiFlexGroup>
+
+      )}
 
       <EuiHorizontalRule />
 

@@ -177,16 +177,16 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
   const [task_groups_list, set_task_groups_list] = useState<any>({});
   const [columnNumIdSelected, setColumnNumIdSelected] =
     useState<FlexGridColumns>(2);
-  const [itemTypeSelected, setItemTypeSelected] = useState<string>("tasks");
+  const [itemTypeSelected, setItemTypeSelected] = useState<string>("task");
   const [show_filter_flyout, set_show_filter_flyout] = useState(false);
 
   const itemTypeOptions = [
     {
-      id: "tasks",
+      id: "task",
       label: "Tasks",
     },
     {
-      id: "sets",
+      id: "set",
       label: "Task Groups",
     },
   ];
@@ -246,7 +246,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
     <Fragment>
       <EuiFormRow label="Select Task Group">
         <GroupDisplayProp
-          disable={props.filter_options.itemType != "tasks"}
+          disable={props.filter_options.itemType != "task"}
           selectedGroup={props.filter_options.current_filter_set}
           selectGroup={selectGroup}
           change={task_groups_list}
@@ -265,7 +265,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
   );
   const filterGroup = () => {
     switch (props.filter_options.itemType) {
-      case "tasks":
+      case "task":
         return taskFilter;
     }
   };
