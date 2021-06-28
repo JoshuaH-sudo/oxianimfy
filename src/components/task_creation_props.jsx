@@ -21,7 +21,7 @@ import {
 } from "@elastic/eui";
 import moment from "moment";
 import { databaseContext } from "../App";
-
+import { every_day_set, every_second_day_sun_set, every_second_day_mon_set } from "../utils/constants.ts"
 export const DotwProp = (props) => {
   const [dotwCheckboxList, setDotwCheckboxList] = useState([
     { id: "sunday", label: "Sunday", disabled: false },
@@ -49,6 +49,12 @@ export const DotwProp = (props) => {
       inputDisplay: "Every second day, Mon",
       dropdownDisplay: "Do this task every second day starting from Monday",
     },
+		{
+      value: "other",
+      inputDisplay: "Advance",
+      dropdownDisplay: "Choose each day",
+    },
+
   ];
 				
 	const [simple_dotw, set_simple_dotw] = useState("every_day");	
@@ -125,44 +131,18 @@ export const DotwProp = (props) => {
           .map((filteredItems) => filteredItems.id)
       );
     }
-					console.log(dotwCheckboxList, dotwIdMapping)
   }, [dotwIdMapping]);
 
-	useEffect(() => {
+		useEffect(() => {
 		switch(simple_dotw) {
 			case 'every_day':
-				setDotwIdMapping({
-					sunday: true,
-          monday: true,
-          tuesday: true,
-          wednesday: true,
-          thursday: true,
-          friday: true,
-          saturday: true,
-
-				})
+				setDotwIdMapping(every_day_set)
 				break;
 		 case 'every_second_day':
-				setDotwIdMapping({
-          sunday: true,
-          monday: false,
-          tuesday: true,
-          wednesday: false,
-          thursday: true,
-          friday: false,
-          saturday: true,
-        });
+				setDotwIdMapping(every_second_day_sun_set);
 				break;
 		 case 'every_second_day_mon':
-				setDotwIdMapping({
-          sunday: false,
-          monday: true,
-          tuesday: false,
-          wednesday: true,
-          thursday: false,
-          friday: true,
-          saturday: false,
-        });
+				setDotwIdMapping(every_second_day_mon_set);
 				break;
 		}
 
@@ -172,36 +152,28 @@ export const DotwProp = (props) => {
     Object.keys(dotwIdMapping).filter((key) => dotwIdMapping[key] === true)
       .length > 0;
 
-	const [advance_options, set_advance_options] = useState(false);
-
   return (
     <EuiFormRow
       label="Days of the Week"
       helpText={!formValid ? "Please select at least one option" : ""}
     >
       <Fragment>
-        <EuiSwitch
-          label="Advance Options"
-          checked={advance_options}
-          onChange={() => set_advance_options(!advance_options)}
-        />
-
-        <EuiSpacer size="s" />
-
-        {advance_options ? (
+					<EuiSuperSelect
+            options={simple_dotw_options}
+            valueOfSelected={simple_dotw}
+            onChange={(value) => set_simple_dotw(value)}
+            hasDividers
+          />
+							<EuiSpacer size='s'/>
+        {simple_dotw == 'other' ? (
           <EuiCheckboxGroup
             options={dotwCheckboxList}
             idToSelectedMap={dotwIdMapping}
             onChange={(id) => onDotwChange(id)}
           />
         ) : (
-          <EuiSuperSelect
-            options={simple_dotw_options}
-            valueOfSelected={simple_dotw}
-            onChange={(value) => set_simple_dotw(value)}
-            hasDividers
-          />
-        )}
+								''
+       )}
       </Fragment>
     </EuiFormRow>
   );
