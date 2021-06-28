@@ -31,7 +31,6 @@ export const DotwProp = (props) => {
     { id: "thursday", label: "Thursday", disabled: false },
     { id: "friday", label: "Friday", disabled: false },
     { id: "saturday", label: "Saturday", disabled: false },
-    { id: "all", label: "Every Day", disabled: false },
   ]);
 
 	const simple_dotw_options = [
@@ -66,6 +65,7 @@ export const DotwProp = (props) => {
     }
 		onDotwChange("all");
   }, []);
+
 
   const onDotwChange = (optionId) => {
     //disable all other options and set them unchecked
@@ -106,6 +106,16 @@ export const DotwProp = (props) => {
         "daysOfWeek",
         Object.keys(dotwIdMapping).filter((key) => dotwIdMapping[key] === true)
       );
+
+      const updatedDotwList = dotwCheckboxList.map((item) => {
+        var updatedItem = item;
+        if (item.id !== "all") {
+          updatedItem.disabled = false;
+        }
+        return updatedItem;
+      });
+      setDotwCheckboxList(updatedDotwList);
+
     } else if (Object.keys(dotwIdMapping).length > 0) {
       //this is to allow retriveing only the item's id without getting undefined
       props.updateTaskValue(
@@ -115,23 +125,29 @@ export const DotwProp = (props) => {
           .map((filteredItems) => filteredItems.id)
       );
     }
-					console.log(dotwIdMapping)
-  }, [dotwCheckboxList, dotwIdMapping]);
+					console.log(dotwCheckboxList, dotwIdMapping)
+  }, [dotwIdMapping]);
 
 	useEffect(() => {
 		switch(simple_dotw) {
 			case 'every_day':
 				setDotwIdMapping({
-					all: true
+					sunday: true,
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: true,
+
 				})
 				break;
 		 case 'every_second_day':
 				setDotwIdMapping({
-					all: false,
           sunday: true,
           monday: false,
           tuesday: true,
-          wensday: false,
+          wednesday: false,
           thursday: true,
           friday: false,
           saturday: true,
@@ -139,11 +155,10 @@ export const DotwProp = (props) => {
 				break;
 		 case 'every_second_day_mon':
 				setDotwIdMapping({
-					all: false,
           sunday: false,
           monday: true,
           tuesday: false,
-          wensday: true,
+          wednesday: true,
           thursday: false,
           friday: true,
           saturday: false,
