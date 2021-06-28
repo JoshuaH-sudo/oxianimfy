@@ -52,21 +52,21 @@ export class Database_manager {
     });
   };
 
-  removeTask = (task: ITaskData) => {
+  removeTask = (task_id: string) => {
     return new Promise((resolve, reject) => {
       this.task_db
-        .deleteTask(task.id)
+        .deleteTask(task_id)
         .then(() => {
           this.task_set_db
-            .findSetsBelongingToTask(task.id)
+            .findSetsBelongingToTask(task_id)
             .then((foundSetIds) => {
               let promises: any = [];
               foundSetIds.forEach((setId: string) => {
                 promises.push(
                   this.schedule_db
-                    .removeTaskInSchedule(setId, task.id)
+                    .removeTaskInSchedule(setId, task_id)
                     .then(() =>
-                      this.task_set_db.removeTaskFromSet(setId, task.id)
+                      this.task_set_db.removeTaskFromSet(setId, task_id)
                     )
                 );
               });
@@ -78,18 +78,53 @@ export class Database_manager {
     });
   };
 
-  removeSet = (set: setRef) => {
+	promiseForEach(arr: any, cb: Function) {
+  	var i: number = 0;
+
+  	var nextPromise: any = function () {
+    	if (i >= arr.length) {
+      // Processing finished.
+      	return;
+    	}
+
+    	// Process next function. Wrap in `Promise.resolve` in case
+    	// the function does not return a promise
+    	var newPromise: any = Promise.resolve(cb(arr[i], i));
+    	i++;
+    	// Chain to finish processing.
+    	return newPromise.then(nextPromise);
+  	};
+
+  	// Kick off the chain.
+  	return Promise.resolve().then(nextPromise);
+	};
+
+
+  removeMultiTask = (taskIdArray: string[]) => {
+		return this.promiseForEach(taskIdArray, this.removeTask)
+  };
+
+  removeMultiSet = (setArray: string[]) => {
+    let promises: any = [];
+
+    setArray.forEach((set_name: string) => {
+      this.removeSet(set_name);
+    });
+    return Promise.all(promises);
+  };
+
+  removeSet = (set_name: string) => {
     return new Promise((resolve, reject) => {
       this.task_set_db
-        .getSetsTaskIds(set.name)
+        .getSetsTaskIds(set_name)
         .then((taskIds: any) => {
           let promises: any = [];
 
           promises.push(this.task_db.deleteMultiTask(taskIds));
 
-          promises.push(this.task_set_db.deleteSet(set.name));
+          promises.push(this.task_set_db.deleteSet(set_name));
 
-          promises.push(this.schedule_db.deleteSetInSchedule(set.name));
+          promises.push(this.schedule_db.deleteSetInSchedule(set_name));
 
           Promise.all(promises).then(() => resolve(true));
         })

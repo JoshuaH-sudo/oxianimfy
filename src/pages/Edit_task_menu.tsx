@@ -193,14 +193,14 @@ const Edit_task_menu: React.FC = () => {
                 show: true,
                 desc: "Are you sure you want to delete " + set.name + "?",
                 confirm: () => {
-                  db_context.removeSet(set).then(() => {
+                  db_context.removeSet(set.name).then(() => {
                     set_show_confirm({ show: false });
                     refresh();
                   });
                 },
                 cancel: () => set_show_confirm({ show: false }),
               });
-            else if (task) db_context.removeTask(task).then(() => refresh());
+            else if (task) db_context.removeTask(task.id).then(() => refresh());
           }}
         />
       </EuiFlexItem>
@@ -227,7 +227,7 @@ const Edit_task_menu: React.FC = () => {
             textAlign="left"
             image={tabBar(task.name, task.id)}
             title={task.desc}
-            description={cardActions(task)}
+            description={multi_del_toggle ? '' :  cardActions(task)}
             selectable={
               multi_del_toggle
                 ? {
@@ -364,11 +364,62 @@ const Edit_task_menu: React.FC = () => {
         break;
     }
   };
+
   const [searchValue, setSearchValue] = useState("");
+	const no_special_char_schema = Joi.string().alphanum();
+
   const onSearchChange = (e: any) => {
-    setSearchValue(e.target.value);
+		const check = no_special_char_schema.validate(e.target.value) 
+		if (!check.error || e.target.value === '') setSearchValue(e.target.value);
   };
-  let cards = displayCards();
+
+	const columnNum = [
+    {
+      id: "1",
+      label: "1",
+    },
+    {
+      id: "2",
+      label: "2",
+    },
+  ];
+
+	const filter_change = (key: string, value: any) => {
+    let updatedValue = { ...filter_options };
+    updatedValue[key] = value;
+    set_filter_options(updatedValue);
+	};
+
+  const confirm_multi_delete = () => {
+		set_show_confirm({ show: false });
+		set_items_delete([]);
+		set_multi_del_toggle(false);
+    refresh();
+	}
+
+	const delete_mutli_items = () => {
+    set_show_confirm({
+      show: true,
+      desc:
+        "Are you sure you want to delete these " +
+        filter_options.itemType +
+        "(s) ?",
+      confirm: () => {
+        if (filter_options.itemType == "set") {
+          db_context.removeMultiSet(items_delete).then(() => {
+						confirm_multi_delete()
+          });
+        } else if (filter_options.itemType == "task") {
+					db_context.removeMultiTask(items_delete).then(() => {
+						confirm_multi_delete();
+         	});
+				}
+      },
+      cancel: () => set_show_confirm({ show: false }),
+    });
+  }
+
+	let cards = displayCards();
   return (
     <Fragment>
       {!multi_del_toggle ? (
@@ -377,12 +428,22 @@ const Edit_task_menu: React.FC = () => {
           justifyContent="spaceBetween"
           alignItems="center"
         >
-          <EuiFlexItem>
+          <EuiFlexItem grow={false}>
             <EuiFieldSearch
               placeholder="Search this"
               value={searchValue}
               isClearable={true}
               onChange={onSearchChange}
+            />
+          </EuiFlexItem>
+
+          <EuiFlexItem >
+            <EuiButtonGroup
+              legend="Column level choices"
+              options={columnNum}
+              idSelected={filter_options.columnNumIdSelected.toString()}
+              onChange={(e: any) => filter_change("columnNumIdSelected", e)}
+              isFullWidth
             />
           </EuiFlexItem>
 
@@ -394,45 +455,42 @@ const Edit_task_menu: React.FC = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : (
-          <EuiFlexGroup
-            responsive={false}
-            justifyContent="spaceBetween"
-            alignItems="center"
-          >
-            <EuiFlexItem>
-              <EuiButton
-                iconType="trash"
-                iconSide="right"
-                color="danger"
-                size="m"
-                fullWidth
-                fill
-                onClick={() => set_multi_del_toggle(!multi_del_toggle)}
-              >
-                {"Delete " +
-                  items_delete.length +
-                  " " +
-                  filter_options.itemType +
-                  "(s)"}
-              </EuiButton>
-            </EuiFlexItem>
+        <EuiFlexGroup
+          responsive={false}
+          justifyContent="spaceBetween"
+          alignItems="center"
+        >
+          <EuiFlexItem>
+            <EuiButton
+              iconType="trash"
+              iconSide="right"
+              color="danger"
+              size="m"
+              fullWidth
+              fill
+              onClick={() => delete_mutli_items()}
+            >
+              {"Delete " +
+                items_delete.length +
+                " " +
+                filter_options.itemType +
+                "(s)"}
+            </EuiButton>
+          </EuiFlexItem>
 
-  <EuiFlexItem>
-              <EuiButton
-                iconType="trash"
-                iconSide="right"
-                size="m"
-                fullWidth
-                fill
-                onClick={() => clear_multi_delete()}
-              >
-							Clear
-             </EuiButton>
-            </EuiFlexItem>
- 
-
-          </EuiFlexGroup>
-
+          <EuiFlexItem>
+            <EuiButton
+              iconType="trash"
+              iconSide="right"
+              size="m"
+              fullWidth
+              fill
+              onClick={() => clear_multi_delete()}
+            >
+              Clear
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       )}
 
       <EuiHorizontalRule />

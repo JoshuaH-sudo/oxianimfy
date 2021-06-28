@@ -210,18 +210,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
     },
   ];
 
-  const columnNum = [
-    {
-      id: "1",
-      label: "1",
-    },
-    {
-      id: "2",
-      label: "2",
-    },
-  ];
-
-  const [, render] = useState({});
+    const [, render] = useState({});
   const filter_change = (key: string, value: any) => {
     let updatedValue = { ...props.filter_options };
     updatedValue[key] = value;
@@ -295,16 +284,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm>
-            <EuiFormRow label="Number of Item Columns">
-              <EuiButtonGroup
-                legend="Column level choices"
-                options={columnNum}
-                idSelected={props.filter_options.columnNumIdSelected.toString()}
-                onChange={(e: any) => filter_change("columnNumIdSelected", e)}
-                isFullWidth
-              />
-            </EuiFormRow>
-            <EuiFormRow label="Item to Edit">
+									<EuiFormRow label="Item to Edit">
               <EuiButtonGroup
                 legend="Item type"
                 options={itemTypeOptions}
