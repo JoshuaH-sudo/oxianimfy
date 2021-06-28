@@ -15,23 +15,46 @@ import {
   EuiCheckboxGroup,
   EuiFieldText,
   EuiTextArea,
+	EuiFlexGroup,
+	EuiFlexItem,
+	EuiSwitch,
 } from "@elastic/eui";
 import moment from "moment";
 import { databaseContext } from "../App";
 
 export const DotwProp = (props) => {
   const [dotwCheckboxList, setDotwCheckboxList] = useState([
+    { id: "sunday", label: "Sunday", disabled: false },
     { id: "monday", label: "Monday", disabled: false },
     { id: "tuesday", label: "Tuesday", disabled: false },
     { id: "wednesday", label: "Wednesday", disabled: false },
     { id: "thursday", label: "Thursday", disabled: false },
     { id: "friday", label: "Friday", disabled: false },
     { id: "saturday", label: "Saturday", disabled: false },
-    { id: "sunday", label: "Sunday", disabled: false },
     { id: "all", label: "Every Day", disabled: false },
   ]);
 
-  const [dotwIdMapping, setDotwIdMapping] = useState({});
+	const simple_dotw_options = [
+    {
+      value: "every_day",
+      inputDisplay: "Every day",
+      dropdownDisplay: "Do this task everyday",
+    },
+    {
+      value: "every_second_day",
+      inputDisplay: "Every second day, Sun",
+      dropdownDisplay: "Do this task every second day starting from Sunday",
+    },
+    {
+      value: "every_second_day_mon",
+      inputDisplay: "Every second day, Mon",
+      dropdownDisplay: "Do this task every second day starting from Monday",
+    },
+  ];
+				
+	const [simple_dotw, set_simple_dotw] = useState("every_day");	
+
+	const [dotwIdMapping, setDotwIdMapping] = useState([]);
 
   useEffect(() => {
     if (props.editTask) {
@@ -41,6 +64,7 @@ export const DotwProp = (props) => {
       });
       setDotwIdMapping(initMappings);
     }
+		onDotwChange("all");
   }, []);
 
   const onDotwChange = (optionId) => {
@@ -91,25 +115,83 @@ export const DotwProp = (props) => {
           .map((filteredItems) => filteredItems.id)
       );
     }
+					console.log(dotwIdMapping)
   }, [dotwCheckboxList, dotwIdMapping]);
+
+	useEffect(() => {
+		switch(simple_dotw) {
+			case 'every_day':
+				setDotwIdMapping({
+					all: true
+				})
+				break;
+		 case 'every_second_day':
+				setDotwIdMapping({
+					all: false,
+          sunday: true,
+          monday: false,
+          tuesday: true,
+          wensday: false,
+          thursday: true,
+          friday: false,
+          saturday: true,
+        });
+				break;
+		 case 'every_second_day_mon':
+				setDotwIdMapping({
+					all: false,
+          sunday: false,
+          monday: true,
+          tuesday: false,
+          wensday: true,
+          thursday: false,
+          friday: true,
+          saturday: false,
+        });
+				break;
+		}
+
+	},[simple_dotw] )
 
   const formValid =
     Object.keys(dotwIdMapping).filter((key) => dotwIdMapping[key] === true)
       .length > 0;
+
+	const [advance_options, set_advance_options] = useState(false);
 
   return (
     <EuiFormRow
       label="Days of the Week"
       helpText={!formValid ? "Please select at least one option" : ""}
     >
-      <EuiCheckboxGroup
-        options={dotwCheckboxList}
-        idToSelectedMap={dotwIdMapping}
-        onChange={(id) => onDotwChange(id)}
-      />
+      <Fragment>
+        <EuiSwitch
+          label="Advance Options"
+          checked={advance_options}
+          onChange={() => set_advance_options(!advance_options)}
+        />
+
+        <EuiSpacer size="s" />
+
+        {advance_options ? (
+          <EuiCheckboxGroup
+            options={dotwCheckboxList}
+            idToSelectedMap={dotwIdMapping}
+            onChange={(id) => onDotwChange(id)}
+          />
+        ) : (
+          <EuiSuperSelect
+            options={simple_dotw_options}
+            valueOfSelected={simple_dotw}
+            onChange={(value) => set_simple_dotw(value)}
+            hasDividers
+          />
+        )}
+      </Fragment>
     </EuiFormRow>
   );
 };
+
 export const TimerProp = (props) => {
   const [duration, setDuration] = useState({
     hours: 0,

@@ -78,39 +78,29 @@ export class Database_manager {
     });
   };
 
-	promiseForEach(arr: any, cb: Function) {
-  	var i: number = 0;
+  promiseForEach(arr: any, cb: Function) {
+    var i: number = 0;
 
-  	var nextPromise: any = function () {
-    	if (i >= arr.length) {
-      // Processing finished.
-      	return;
-    	}
+    var nextPromise: any = function () {
+      if (i >= arr.length) {
+        // Processing finished.
+        return;
+      }
 
-    	// Process next function. Wrap in `Promise.resolve` in case
-    	// the function does not return a promise
-    	var newPromise: any = Promise.resolve(cb(arr[i], i));
-    	i++;
-    	// Chain to finish processing.
-    	return newPromise.then(nextPromise);
-  	};
+      // Process next function. Wrap in `Promise.resolve` in case
+      // the function does not return a promise
+      var newPromise: any = Promise.resolve(cb(arr[i], i));
+      i++;
+      // Chain to finish processing.
+      return newPromise.then(nextPromise);
+    };
 
-  	// Kick off the chain.
-  	return Promise.resolve().then(nextPromise);
-	};
-
+    // Kick off the chain.
+    return Promise.resolve().then(nextPromise);
+  }
 
   removeMultiTask = (taskIdArray: string[]) => {
-		return this.promiseForEach(taskIdArray, this.removeTask)
-  };
-
-  removeMultiSet = (setArray: string[]) => {
-    let promises: any = [];
-
-    setArray.forEach((set_name: string) => {
-      this.removeSet(set_name);
-    });
-    return Promise.all(promises);
+    return this.promiseForEach(taskIdArray, this.removeTask);
   };
 
   removeSet = (set_name: string) => {
@@ -130,6 +120,10 @@ export class Database_manager {
         })
         .catch((error) => reject(error));
     });
+  };
+
+  removeMultiSet = (setArray: string[]) => {
+    return this.promiseForEach(setArray, this.removeSet);
   };
 
   updateTaskSetInDB = async (set: setRef) => {

@@ -285,7 +285,7 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={set.key} grow={1} style={{ overflow: "hidden" }}>
       <EuiCard
         textAlign="left"
-        image={tabBar(set.name, set.key)}
+        image={tabBar(set.name, set.name)}
         title={set.desc}
         description={cardActions(null, set)}
         onClick={() => {}}
