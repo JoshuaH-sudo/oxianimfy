@@ -437,7 +437,7 @@ const Edit_task_menu: React.FC = () => {
             />
           </EuiFlexItem>
 
-          <EuiFlexItem >
+          <EuiFlexItem>
             <EuiButtonGroup
               legend="Column level choices"
               options={columnNum}

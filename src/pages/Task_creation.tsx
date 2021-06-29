@@ -85,12 +85,12 @@ export const Task: React.FC = () => {
       />
     );
   }
-
+console.log('yeet', newTask)
   const formIsValid =
     newTask.name !== "" &&
     newTask.daysOfWeek.length > 0 &&
     newTask.unit !== "0" &&
-    newTask.unit !== "P0D";
+    newTask.unit !== "\"P0D\"";
 
   return (
     <EuiPanel paddingSize="l">

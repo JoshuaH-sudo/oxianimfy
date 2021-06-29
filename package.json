@@ -31,6 +31,7 @@
     "react-dom": "^17.0.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "react-simple-timefield": "^3.2.3",
     "sass": "^1.34.1",
     "swiper": "^6.7.0",
     "typescript": "^4.1.3",

@@ -18,7 +18,9 @@ import {
 	EuiFlexGroup,
 	EuiFlexItem,
 	EuiSwitch,
+	EuiRange,
 } from "@elastic/eui";
+import TimeField from 'react-simple-timefield';
 import moment from "moment";
 import { databaseContext } from "../App";
 import { every_day_set, every_second_day_sun_set, every_second_day_mon_set } from "../utils/constants.ts"
@@ -42,12 +44,12 @@ export const DotwProp = (props) => {
     {
       value: "every_second_day",
       inputDisplay: "Every second day, Sun",
-      dropdownDisplay: "Do this task every second day starting from Sunday",
+      dropdownDisplay: "Do every second day, starting from Sunday",
     },
     {
       value: "every_second_day_mon",
       inputDisplay: "Every second day, Mon",
-      dropdownDisplay: "Do this task every second day starting from Monday",
+      dropdownDisplay: "Do every second day, starting from Monday",
     },
 		{
       value: "other",
@@ -158,22 +160,22 @@ export const DotwProp = (props) => {
       helpText={!formValid ? "Please select at least one option" : ""}
     >
       <Fragment>
-					<EuiSuperSelect
-            options={simple_dotw_options}
-            valueOfSelected={simple_dotw}
-            onChange={(value) => set_simple_dotw(value)}
-            hasDividers
-          />
-							<EuiSpacer size='s'/>
-        {simple_dotw == 'other' ? (
+        <EuiSuperSelect
+          options={simple_dotw_options}
+          valueOfSelected={simple_dotw}
+          onChange={(value) => set_simple_dotw(value)}
+          hasDividers
+        />
+        <EuiSpacer size="s" />
+        {simple_dotw == "other" ? (
           <EuiCheckboxGroup
             options={dotwCheckboxList}
             idToSelectedMap={dotwIdMapping}
             onChange={(id) => onDotwChange(id)}
           />
         ) : (
-								''
-       )}
+          ""
+        )}
       </Fragment>
     </EuiFormRow>
   );
@@ -186,26 +188,6 @@ export const TimerProp = (props) => {
     seconds: 0,
   });
 
-  const updateTimer = (event) => {
-    let key = event.target.name;
-    let value = event.target.value;
-
-    if (!value.match(/[^$,.\d]/)) {
-      const updateDuration = {
-        ...duration,
-        ...{
-          [key]: value !== "" ? parseInt(value, 10) : 0,
-        },
-      };
-
-      setDuration(updateDuration);
-      props.updateTaskValue(
-        "unit",
-        JSON.stringify(moment.duration(updateDuration))
-      );
-    }
-  };
-
   useEffect(() => {
     if (props.editTask) {
       let preSetDuration = moment.duration(JSON.parse(props.editTask.unit));
@@ -214,41 +196,52 @@ export const TimerProp = (props) => {
         minutes: preSetDuration.minutes(),
         seconds: preSetDuration.seconds(),
       });
+
+			const time_string =
+        preSetDuration.hours().toString() +
+        preSetDuration.minutes().toString() +
+        preSetDuration.seconds().toString(); 
+			set_time(time_string);
     }
   }, []);
 
-  const timeValid =
-    duration.hours > 0 || duration.minutes > 0 || duration.seconds > 0;
+	const [time, set_time] = useState();
 
+	const onTimeChange = (event, time) => {
+    set_time(time);
+		const time_props = time.split(':')
+		const updateDuration = {
+			hours: time_props[0],
+			minutes: time_props[1],
+			seconds: time_props[2]
+		}
+
+		setDuration(updateDuration);
+    props.updateTaskValue(
+    	"unit",
+      JSON.stringify(moment.duration(updateDuration))
+    );
+  };
+
+	const timer_input = ( 
+		<EuiFieldText prepend='Time' />
+	)
+				
   return (
     <EuiForm>
-      <EuiFormRow>
-        <EuiFieldText
-          name="hours"
-          onChange={updateTimer}
-          prepend={"Hours"}
-          value={duration["hours"]}
-        />
-      </EuiFormRow>
-      <EuiFormRow>
-        <EuiFieldText
-          name="minutes"
-          onChange={updateTimer}
-          prepend={"Minutes"}
-          value={duration["minutes"]}
-        />
-      </EuiFormRow>
-      <EuiFormRow helpText={!timeValid ? "Timer can not be set to zero" : ""}>
-        <EuiFieldText
-          name="seconds"
-          onChange={updateTimer}
-          prepend={"Seconds"}
-          value={duration["seconds"]}
+						<EuiFormRow isInvalid={time == '00:00:00'} error="Cannot be set to zero" >
+        <TimeField
+          value={time}
+          onChange={onTimeChange}
+          input={timer_input}
+          colon=":"
+          showSeconds
         />
       </EuiFormRow>
     </EuiForm>
   );
-};
+}; 
+
 export const CounterProp = (props) => {
   const [counter, setCounter] = useState("0");
 
@@ -273,10 +266,9 @@ export const CounterProp = (props) => {
 
   return (
     <EuiFormRow
-      label="Counter"
       helpText={counter === "0" ? "Counter can not be set to zero" : ""}
     >
-      <EuiFieldText name="unit" value={counter} onChange={updateCounter} />
+      <EuiFieldText prepend='Counter' name="unit" value={counter} onChange={updateCounter} />
     </EuiFormRow>
   );
 };
