@@ -265,10 +265,10 @@ const Edit_task_menu: React.FC = () => {
   };
 
   const displayTaskCards = () => {
-    const filtered_tasks = taskFilter(
-      task_list[filter_options.current_filter_set]
-    );
-    if (filtered_tasks.length > 0) {
+		const task_selection = task_list[filter_options.current_filter_set] ?? []
+
+    if (task_selection.length > 0) {
+      const filtered_tasks = taskFilter(task_selection);
       return filtered_tasks.map((task: ITaskData) => {
         return taskCard(task);
       });

@@ -229,7 +229,8 @@ export const TimerProp = (props) => {
 				
   return (
     <EuiForm>
-						<EuiFormRow isInvalid={time == '00:00:00'} error="Cannot be set to zero" >
+				<EuiFormRow isInvalid={time == '00:00:00'} error="Cannot be set to zero" >
+
         <TimeField
           value={time}
           onChange={onTimeChange}
@@ -272,6 +273,7 @@ export const CounterProp = (props) => {
     </EuiFormRow>
   );
 };
+
 export const MesureProp = (props) => {
   var taskMesureIdMapDefault = {
     timer: props.mesure === "timer" || props.mesure === "" ? true : false,
