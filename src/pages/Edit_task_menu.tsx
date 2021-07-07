@@ -44,7 +44,7 @@ const Edit_task_menu: React.FC = () => {
     misc: [],
   });
   const [filter_options, set_filter_options] = useState<any>({
-    current_filter_set: "misc",
+    current_filter_set: "all",
     itemType: "task",
     columnNumIdSelected: 2,
     taskType: "all",
@@ -130,7 +130,8 @@ const Edit_task_menu: React.FC = () => {
 
   const tabBar = (
     title: string,
-    select_id: string,
+    set_name: string = "",
+    select_id: string = title,
     barColor: string = "coral",
     textColor: string = "black"
   ) => (
@@ -141,24 +142,27 @@ const Edit_task_menu: React.FC = () => {
         color: textColor,
       }}
     >
-      <EuiFlexGroup
-        responsive={false}
-        justifyContent="spaceAround"
-        style={{ height: "inherit" }}
-      >
+      <EuiFlexGroup responsive={false} justifyContent="spaceAround">
         <EuiFlexItem>
-          <EuiText textAlign="center" size="m">
-            <p id="card_title">{highlightFilter(title)}</p>
+          <EuiText id="card_title" textAlign="center" size="m">
+            {highlightFilter(title)}
+            {set_name !== "" ? (
+              <EuiText id="card_set_name" textAlign="center" size="xs">
+                {"Set: " + set_name}
+              </EuiText>
+            ) : (
+              ""
+            )}
           </EuiText>
         </EuiFlexItem>
 
-          <EuiFlexItem grow={false}>
-            <EuiCheckbox
-              id={select_id + "checkbox"}
-              checked={items_delete.includes(select_id)}
-              onChange={() => addItemToDelete(select_id)}
-            />
-          </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiCheckbox
+            id={select_id + "checkbox"}
+            checked={items_delete.includes(select_id)}
+            onChange={() => addItemToDelete(select_id)}
+          />
+        </EuiFlexItem>
       </EuiFlexGroup>
     </div>
   );
@@ -211,7 +215,7 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={"no-card"} grow={1}>
       <EuiCard
         textAlign="left"
-        image={tabBar("No Cards", "black", "white")}
+        image={tabBar("No Cards", "", "no-card", "white", "black")}
         title={"There are no items to display, try diffrent filter settings"}
         description={""}
         onClick={() => {}}
@@ -219,15 +223,15 @@ const Edit_task_menu: React.FC = () => {
     </EuiFlexItem>
   );
 
-  const taskCard = (task: ITaskData) => {
+  const taskCard = (task: ITaskData, task_set: string) => {
     if (task)
       return (
         <EuiFlexItem key={task.id} grow={1} id="edit_task_card">
           <EuiCard
             textAlign="left"
-            image={tabBar(task.name, task.id)}
+            image={tabBar(task.name, task_set, task.id)}
             title={task.desc}
-            description={multi_del_toggle ? '' :  cardActions(task)}
+            description={multi_del_toggle ? "" : cardActions(task)}
             selectable={
               multi_del_toggle
                 ? {
@@ -262,19 +266,42 @@ const Edit_task_menu: React.FC = () => {
     });
 
     return filteredTasks;
-  };
+	};
 
-  const displayTaskCards = () => {
-		const task_selection = task_list[filter_options.current_filter_set] ?? []
+	const getTaskCards = (setName: string) => {
+		const task_selection = task_list[setName] ?? []
 
     if (task_selection.length > 0) {
       const filtered_tasks = taskFilter(task_selection);
       return filtered_tasks.map((task: ITaskData) => {
-        return taskCard(task);
+        return taskCard(task, setName);
+      });
+		} else {
+			return [];
+		}
+	}
+
+	useEffect(() => {
+		db_context.getSetsFromDb().then((sets: any) => {
+			const current_set = filter_options.current_filter_set
+			console.log(sets, sets[current_set])
+			if (sets[current_set] === undefined && current_set != 'all') filter_change("current_filter_set", "all");	
+		})
+	},[filter_options])
+
+  const displayTaskCards = () => {
+    const setName = filter_options.current_filter_set;
+		let retrived_tasks: any = [];
+
+    if (setName == "all") {
+      Object.keys(task_list).forEach((task_set: string) => {
+				const retrived_card = getTaskCards(task_set)
+				if (retrived_card.length > 0) retrived_tasks.push(retrived_card);
       });
     } else {
-      return noCardDisplay();
-    }
+      retrived_tasks = getTaskCards(setName);
+		}
+		return retrived_tasks.length > 0 ? retrived_tasks : noCardDisplay();
   };
 
   useEffect(() => {

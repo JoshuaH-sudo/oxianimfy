@@ -302,9 +302,9 @@ export class Database_manager {
     });
 
     let taskDetailList = await Promise.all(promises);
-    return taskDetailList.filter(
-      (task: ITaskData) => task.daysOfWeek.indexOf(today) > -1
-    );
+    return taskDetailList.filter((task: ITaskData) => {
+      if (task && task.daysOfWeek.indexOf(today) > -1) return task;
+    });
   };
 
   getUncompletedTasks = async (setTaskRefs: taskRef[], set: string) => {

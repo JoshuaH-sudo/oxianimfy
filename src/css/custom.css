@@ -56,20 +56,26 @@ body {
   display: block;
 }
 
+#card_set_name {
+	color: grey;
+	font-size: small;	
+}
+
 #card_title {
-  padding: 10px;
-  fontweight: bold;
+  font-weight: bold;
   overflow: hidden;
-  textoverflow: ellipsis;
-  font-size: larger;
+  text-overflow: ellipsis;
 }
 
 #card_bar {
   width: 100%;
-  height: 5vh;
   min-height: 50px;
   text-align: center;
   margin: auto;
+}
+
+#card_bar > .euiFlexGroup > .euiFlexItem {
+	padding: 5px;
 }
 
 .center_text {

@@ -239,6 +239,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
           selectedGroup={props.filter_options.current_filter_set}
           selectGroup={selectGroup}
           change={task_groups_list}
+					allowAll={true}
         />
       </EuiFormRow>
 
@@ -281,10 +282,11 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
           <EuiTitle>
             <h2>Filter</h2>
           </EuiTitle>
-        </EuiFlyoutHeader>
+				</EuiFlyoutHeader>
+
         <EuiFlyoutBody>
           <EuiForm>
-									<EuiFormRow label="Item to Edit">
+						<EuiFormRow label="Item to Edit">
               <EuiButtonGroup
                 legend="Item type"
                 options={itemTypeOptions}
@@ -293,7 +295,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
                 isFullWidth
                 buttonSize="compressed"
               />
-            </EuiFormRow>
+           	 	</EuiFormRow>
 
             <EuiSpacer />
 

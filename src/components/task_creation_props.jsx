@@ -549,9 +549,14 @@ export const GroupDisplayProp = (props) => {
           dropdownDisplay: groupDisplay(title, desc),
         };
       });
-
+			if (props.allowAll) parseSetData.unshift({
+        value: "all",
+        inputDisplay: "All",
+        dropdownDisplay: groupDisplay("All", "Show all"),
+      });
       setTaskGroups(parseSetData);
     });
+		
   }, [props.change]);
 
   return (
