@@ -312,10 +312,20 @@ const Edit_task_menu: React.FC = () => {
     <EuiFlexItem key={set.key} grow={1} style={{ overflow: "hidden" }}>
       <EuiCard
         textAlign="left"
-        image={tabBar(set.name, set.name)}
+        image={tabBar(set.name, set.name, set.key)}
         title={set.desc}
-        description={cardActions(null, set)}
+        description={multi_del_toggle ? "" : cardActions(null, set)}
         onClick={() => {}}
+        selectable={
+          multi_del_toggle
+            ? {
+                isSelected: items_delete.includes(set.key),
+                onClick: () => {
+                  addItemToDelete(set.key);
+                },
+              }
+            : undefined
+        }
       />
     </EuiFlexItem>
   );
