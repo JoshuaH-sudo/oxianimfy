@@ -29,6 +29,7 @@ import {
   MesureProp,
   TitleDescProp,
 } from "./task_creation_props";
+import {validateTask} from "../utils/tools";
 
 interface PlayInterface {
   task: any;
@@ -113,7 +114,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButton onClick={createTaskGroup} fill>
+          <EuiButton onClick={createTaskGroup} fill >
             Create Group
           </EuiButton>
           <EuiButton onClick={closeModal} fill color="danger">

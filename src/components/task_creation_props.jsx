@@ -596,6 +596,7 @@ export const GroupEditProp = (props) => {
       updateGroupValue={updateValues}
       editTask={props.editSet}
       createTaskGroup={createTaskGroup}
+			closeModal={props.closeModal}
     />
   );
 };

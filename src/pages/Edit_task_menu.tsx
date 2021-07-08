@@ -386,6 +386,7 @@ const Edit_task_menu: React.FC = () => {
             onClick={() => {
               setSubmitChange(true);
             }}
+						disabled={validateTask(taskToEdit)}
           >
             Done
           </EuiButton>
