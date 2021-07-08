@@ -72,7 +72,9 @@ export class Task_set_database {
 
   getSetsTaskIds = async (setId: string) => {
     let setList = (await this.store.get("task_set")) ?? this.default_set_list;
-    return setList[setId.toLowerCase()].tasks;
+		console.log(setList, setId)
+		const setItem = setList[setId.toLowerCase()]
+    return setItem ? setItem.tasks : [];
   };
 
   findSetsBelongingToTask = async (taskId: string) => {

@@ -107,17 +107,10 @@ export class Database_manager {
     return new Promise((resolve, reject) => {
       this.task_set_db
         .getSetsTaskIds(set_name)
-        .then((taskIds: any) => {
-          let promises: any = [];
-
-          promises.push(this.task_db.deleteMultiTask(taskIds));
-
-          promises.push(this.task_set_db.deleteSet(set_name));
-
-          promises.push(this.schedule_db.deleteSetInSchedule(set_name));
-
-          Promise.all(promises).then(() => resolve(true));
-        })
+        .then((taskIds: any) => this.task_db.deleteMultiTask(taskIds))
+				.then(() => this.task_set_db.deleteSet(set_name))
+				.then(() => this.schedule_db.deleteSetInSchedule(set_name))
+				.then(() => resolve(true))
         .catch((error) => reject(error));
     });
   };
