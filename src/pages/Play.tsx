@@ -180,7 +180,7 @@ const Task_card: React.FC<PlayScreenProps> = (props) => {
             ""
           )}
           {task.mesure == "none" ? (
-            <Simple_Task task={task} changeTask={changeTask} />
+            <None_task task={task} changeTask={changeTask} />
           ) : (
             ""
           )}
@@ -190,7 +190,7 @@ const Task_card: React.FC<PlayScreenProps> = (props) => {
   );
 };
 
-const Simple_Task: React.FC<TaskProps> = (props) => {
+const None_task: React.FC<TaskProps> = (props) => {
   const task: any = props.task;
 
   const db_context = useContext(databaseContext);
@@ -201,7 +201,7 @@ const Simple_Task: React.FC<TaskProps> = (props) => {
       .then((setId: string) =>
         db_context.completeTask(task.id, setId.toLocaleLowerCase())
       )
-      .then(() => props.changeTask(1));
+      .then(() => props.changeTask(task.id));
   };
   return <EuiButton onClick={done}>Done</EuiButton>;
 };

@@ -53,7 +53,7 @@ export const DotwProp = (props) => {
     },
 		{
       value: "other",
-      inputDisplay: "Advance",
+      inputDisplay: "Custom",
       dropdownDisplay: "Choose each day",
     },
 
@@ -315,13 +315,13 @@ export const MesureProp = (props) => {
         break;
       case "none":
         newTaskMesureIdMap["none"] = true;
+				props.updateTaskValue("unit", "none");
         break;
       default:
         break;
     }
 
     props.updateTaskValue("mesure", optionId);
-    if (optionId == "none") props.updateTaskValue("unit", "none");
     setTaskMesureIdMapping(newTaskMesureIdMap);
   };
 

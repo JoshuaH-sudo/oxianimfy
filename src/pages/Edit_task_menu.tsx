@@ -236,6 +236,9 @@ const Edit_task_menu: React.FC = () => {
               multi_del_toggle
                 ? {
                     isSelected: items_delete.includes(task.id),
+                    onClick: () => {
+                      addItemToDelete(task.id);
+                    },
                   }
                 : undefined
             }

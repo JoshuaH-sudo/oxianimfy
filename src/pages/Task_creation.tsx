@@ -18,7 +18,7 @@ import {
   MesureProp,
   TitleDescProp,
 } from "../components/task_creation_props";
-
+const Joi = require("joi");
 export const Task: React.FC = () => {
   const [newTask, setNewTask] = useState<ITaskData>({
     name: "",
@@ -86,11 +86,25 @@ export const Task: React.FC = () => {
     );
   }
 console.log('yeet', newTask)
-  const formIsValid =
-    newTask.name !== "" &&
-    newTask.daysOfWeek.length > 0 &&
-    newTask.unit !== "0" &&
-    newTask.unit !== "\"P0D\"";
+
+const formSchema = Joi.object({
+  name: Joi.string().required(),
+  desc: Joi.string().empty(""),
+  daysOfWeek: Joi.array().items(Joi.string().required()).min(1),
+  mesure: Joi.string().valid("none", "timer", "counter"),
+  unit: Joi.when("mesure", {
+    switch: [
+      { is: "none", then: Joi.string() },
+      { is: "timer", then: Joi.string().invalid('"P0D"',"0") },
+      { is: "counter", then: Joi.number().min(1) },
+    ],
+  }),
+});
+	const checkForm = () => {
+		const formIsInvalid = formSchema.validate(newTask); 
+		console.log(formIsInvalid)
+		return formIsInvalid.error ? true : false 
+	}
 
   return (
     <EuiPanel paddingSize="l">
@@ -131,7 +145,7 @@ console.log('yeet', newTask)
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiButton
-                isDisabled={!formIsValid}
+                isDisabled={checkForm()}
                 fill
                 onClick={() => createTask()}
               >
