@@ -306,14 +306,26 @@ export class Database_manager {
     //get task details from task refs
     let taskToDoList: any = [];
     taskList.forEach((taskDetails: any) => {
-      let foundTask = setTaskRefs.find(
+      let foundTask: any = setTaskRefs ? setTaskRefs.find(
         (taskRefrence: taskRef) =>
           taskRefrence.taskId == taskDetails.id &&
           taskRefrence.completed == false
-      );
-      if (foundTask != undefined) taskToDoList.push(foundTask);
+      ) : [];
+      if (foundTask != undefined ) taskToDoList.push(foundTask);
     });
 
     return taskToDoList;
   };
+  
+  getSetWithTask = async (task_id: string) => {
+    const sets = await this.task_set_db.getSets()
+    let found_set = ''
+    Object.keys(sets).every((set: string) => {
+      sets[set].tasks.every((task: taskRef) => {
+       if (task.taskId === task_id) found_set = set
+      });
+    });
+
+    return found_set
+  }
 }

@@ -3,6 +3,7 @@ import {ITaskData, taskRef} from "./custom_types";
 const Joi = require("joi");
 
 const formSchema = Joi.object({
+  id: Joi.string(),
   name: Joi.string().required(),
   desc: Joi.string().empty(""),
   daysOfWeek: Joi.array().items(Joi.string().required()).min(1),
@@ -17,7 +18,7 @@ const formSchema = Joi.object({
 });
 export const validateTask = (newTask: ITaskData) => {
 		const formIsInvalid = formSchema.validate(newTask); 
-		//console.log(formIsInvalid)
+		console.log(formIsInvalid)
 		return formIsInvalid.error ? true : false 
 	}
 

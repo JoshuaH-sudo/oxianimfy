@@ -11,7 +11,7 @@ export interface setRef {
   [k: string]: any;
   name: string;
   desc: string;
-  [index: number]: { taskId: string; completed: boolean };
+  [index: number]: taskRef;
 }
 
 export interface ISetData {

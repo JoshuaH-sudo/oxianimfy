@@ -34,6 +34,7 @@ import {
   Edit_task,
   Filter_flyout_button,
 } from "../components/Edit_task_menu_props";
+import { validateTask } from "../utils/tools";
 
 const Joi = require("joi");
 
@@ -51,7 +52,6 @@ const Edit_task_menu: React.FC = () => {
   });
   const [taskToEdit, setTaskToEdit] = useState<ITaskData>();
   const [groupToEdit, setGroupToEdit] = useState<setRef>();
-  const [submitChange, setSubmitChange] = useState(false);
   const [task_groups_list, set_task_groups_list] = useState<any>({});
   const [show_confirm, set_show_confirm] = useState<any>({});
 
@@ -75,7 +75,6 @@ const Edit_task_menu: React.FC = () => {
       Promise.all(promises).then(() => {
         set_task_groups_list(setGroups);
         set_task_list(retrivedTaskList);
-        if (submitChange) setSubmitChange(false);
       });
     });
   };
@@ -347,9 +346,10 @@ const Edit_task_menu: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const updateTask = (task: ITaskData, group: string, oldGroup: string) => {
+  const updateTask = (task: ITaskData, group: string) => {
     db_context
-      .updateTaskInDB(task, group, oldGroup)
+      .getSetWithTask(task.id)
+      .then((oldGroup: any) => db_context.updateTaskInDB(task, group, oldGroup))
       .then(() => closeModal())
       .then(() => refresh())
       .catch((error: Error) => {
@@ -361,37 +361,10 @@ const Edit_task_menu: React.FC = () => {
   let modal;
   if (isModalVisible) {
     modal = (
-      <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <h1>Edit</h1>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-
-        <EuiModalBody>
-          <Edit_task
-            task={taskToEdit}
-            submitChange={submitChange}
-            updateTask={updateTask}
-            groupId={filter_options.current_filter_set}
-          />
-        </EuiModalBody>
-
-        <EuiModalFooter>
-          <EuiButton color="danger" onClick={closeModal} fill>
-            Cancel
-          </EuiButton>
-          <EuiButton
-            fill
-            onClick={() => {
-              setSubmitChange(true);
-            }}
-						disabled={validateTask(taskToEdit)}
-          >
-            Done
-          </EuiButton>
-        </EuiModalFooter>
-      </EuiModal>
+      <Edit_task
+        task={taskToEdit}
+        updateTask={updateTask}
+      />
     );
   }
 
@@ -399,10 +372,8 @@ const Edit_task_menu: React.FC = () => {
     switch (filter_options.itemType) {
       case "task":
         return displayTaskCards();
-        break;
       case "set":
         return displayTaskGroups();
-        break;
     }
   };
 

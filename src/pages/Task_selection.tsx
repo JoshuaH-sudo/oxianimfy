@@ -45,13 +45,11 @@ const Task_selection: React.FC = () => {
   useEffect(() => {
     db_Context.getSetsDetailsFromDbForToday().then((sets: setRef[] | any) => {
       sets.map(async (set: setRef) => {
-        //get task refrence from set
-        let setTaskRef = set.tasks;
-
         //check to see if this set is allready completed
-        if (await db_Context.isSetNotDoneForToday(set.name)) {
+        if (set && await db_Context.isSetNotDoneForToday(set.name)) {
+
           db_Context
-            .getUncompletedTasks(setTaskRef, set.name)
+            .getUncompletedTasks(set.tasks, set.name)
             .then((taskList: any) => {
               updateTaskToDo(taskList.length, set.name);
               //set them
@@ -59,7 +57,7 @@ const Task_selection: React.FC = () => {
               set_task_group_list(sets);
             });
         } else {
-          updateTaskToDo(0, set.name);
+          if (set) updateTaskToDo(0, set.name);
         }
       });
     });
@@ -143,7 +141,7 @@ const Task_selection: React.FC = () => {
       >
         {task_group_list.length > 0
           ? task_group_list.map((set) => {
-              return displaySetCards(set);
+              return set ? displaySetCards(set) : '';
             })
           : noCardDisplay}
       </Swiper>

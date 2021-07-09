@@ -33,9 +33,7 @@ import {validateTask} from "../utils/tools";
 
 interface PlayInterface {
   task: any;
-  submitChange: boolean;
   updateTask: any;
-  groupId: string;
 }
 
 interface Confirm_prop {
@@ -56,9 +54,8 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
     unit: props.task.unit,
   });
 
-  const oldGroup = props.groupId;
-
-  const [selectedGroup, setSelectedGroup] = useState(props.groupId);
+  let oldGroup = ''
+  const [selectedGroup, setSelectedGroup] = useState('');
   const selectGroup = (value: string) => setSelectedGroup(value);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -86,16 +83,16 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
       });
   }
 
-  useEffect(() => {
-    if (props.submitChange) props.updateTask(editTask, selectedGroup, oldGroup);
-  }, [props.submitChange]);
-
   const updateGroupValue = (field: string, value: string) => {
     let updatedTaskGroup = newTaskGroup;
     updatedTaskGroup[field] = value;
     setNewTaskGroup(updatedTaskGroup);
   };
-
+  useEffect(() => {
+    db_context.getSetWithTask(editTask.id).then((foundSet: any) => {
+      setSelectedGroup(foundSet)
+    }) 
+  },[])
   let createSetModal;
 
   if (isModalVisible) {
@@ -124,8 +121,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
       </EuiModal>
     );
   }
-
-  return (
+  const content = (
     <EuiForm component="form">
       <TitleDescProp updateTaskValue={updateTaskValue} editTask={editTask} />
 
@@ -155,6 +151,37 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiForm>
+
+
+  );
+  return (
+  <EuiModal onClose={closeModal}>
+        <EuiModalHeader>
+          <EuiModalHeaderTitle>
+            <h1>Edit</h1>
+          </EuiModalHeaderTitle>
+        </EuiModalHeader>
+
+        <EuiModalBody>
+          { content }     
+        </EuiModalBody>
+
+        <EuiModalFooter>
+          <EuiButton color="danger" onClick={closeModal} fill>
+            Cancel
+          </EuiButton>
+          <EuiButton
+            fill
+            onClick={() => {
+              props.updateTask(editTask, selectedGroup, oldGroup);
+            }}
+            disabled={validateTask(editTask)}
+          >
+            Done
+          </EuiButton>
+        </EuiModalFooter>
+      </EuiModal>
+
   );
 };
 
