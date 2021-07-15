@@ -43,7 +43,10 @@ export class Database_manager {
     return new Promise((resolve, reject) => {
       this.task_db
         .addTask(newTask)
-        .then(() => this.task_set_db.addTaskToSet(set, newTask.id))
+        .then(async () => {
+          await this.task_set_db.addTaskToSet(set, newTask.id);
+          await this.recaculateStreak(set);
+        })
         .then(() =>
           this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id)
         )
@@ -52,8 +55,16 @@ export class Database_manager {
     });
   };
 
+  recaculateStreak = async (set: string) => {
+    //if set is done for today then draw back set streak
+    if (await this.isSetDoneForToday(set)) {
+      this.stats_db.decreseSetStreak(set);
+    }
+  };
+
   removeTask = (task_id: string) => {
     return new Promise((resolve, reject) => {
+      //remove task and in any set it belongs to
       this.task_db
         .deleteTask(task_id)
         .then(() => {
@@ -69,9 +80,19 @@ export class Database_manager {
                       this.task_set_db.removeTaskFromSet(setId, task_id)
                     )
                 );
+                
+                //If there are no more tasks left to do in set. Increment streak
+                this.getTasksFromSetForToday(setId).then(
+                  async (tasks: taskRef[]) => {
+                    if (tasks.length === 0)
+                      await this.stats_db.incrementSetStreak(setId);
+                  }
+                );
               });
 
-              Promise.all(promises).then(() => resolve(true));
+              Promise.all(promises).then(async () => {
+                resolve(true);
+              });
             });
         })
         .catch((error) => reject(error));
@@ -328,7 +349,7 @@ export class Database_manager {
       const foundTask = sets[set].tasks.find(
         (task: taskRef) => task.taskId === task_id
       );
-      if (foundTask) foundSet = set
+      if (foundTask) foundSet = set;
     });
     return foundSet;
   };

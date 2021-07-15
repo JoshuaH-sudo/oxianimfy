@@ -8,7 +8,7 @@ export class Task_set_database {
     misc: {
       key: v4(),
       name: "Misc",
-      desc: "The default task set. It cannot be deleted",
+      desc: "The default task group. It cannot be deleted",
       tasks: [],
     },
   };
