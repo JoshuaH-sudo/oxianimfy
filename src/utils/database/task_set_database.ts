@@ -26,7 +26,7 @@ export class Task_set_database {
     let newSetList =
       (await this.store.get("task_set")) ?? this.default_set_list;
 
-    newSetList[setId].tasks.forEach((taskId: taskRef) => {
+    if (newSetList[setId]) newSetList[setId].tasks.forEach((taskId: taskRef) => {
       taskId.completed = false;
     });
 

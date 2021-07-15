@@ -402,6 +402,7 @@ export const TitleDescProp = (props) => {
     </Fragment>
   );
 };
+
 export const GroupModal = (props) => {
   const [name, setTitle] = useState(props.name ?? "");
   const [desc, setDesc] = useState(props.desc ?? "");
@@ -410,9 +411,9 @@ export const GroupModal = (props) => {
   const db_context = useContext(databaseContext);
 
   useEffect(() => {
-    if (props.editTask) {
-      setTitle(props.editTask.name);
-      setDesc(props.editTask.desc);
+    if (props.editGroupSet) {
+      setTitle(props.editGroupSet.name);
+      setDesc(props.editGroupSet.desc);
     }
 
     db_context.getSetsFromDb().then((sets) => {

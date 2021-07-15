@@ -85,7 +85,6 @@ export const Task: React.FC = () => {
       />
     );
   }
-console.log('yeet', newTask)
   return (
     <EuiPanel paddingSize="l">
       <EuiDescribedFormGroup
@@ -133,11 +132,6 @@ console.log('yeet', newTask)
               </EuiButton>
             </EuiFlexItem>
 
-            <EuiFlexItem grow={false}>
-              <EuiButton fill href="#/task_selection">
-                Do tasks for today
-              </EuiButton>
-            </EuiFlexItem>
           </EuiFlexGroup>
         </EuiForm>
       </EuiDescribedFormGroup>

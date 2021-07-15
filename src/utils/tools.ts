@@ -18,7 +18,6 @@ const formSchema = Joi.object({
 });
 export const validateTask = (newTask: ITaskData) => {
 		const formIsInvalid = formSchema.validate(newTask); 
-		console.log(formIsInvalid)
 		return formIsInvalid.error ? true : false 
 	}
 

@@ -108,9 +108,9 @@ export class Database_manager {
       this.task_set_db
         .getSetsTaskIds(set_name)
         .then((taskIds: any) => this.task_db.deleteMultiTask(taskIds))
-				.then(() => this.task_set_db.deleteSet(set_name))
-				.then(() => this.schedule_db.deleteSetInSchedule(set_name))
-				.then(() => resolve(true))
+        .then(() => this.task_set_db.deleteSet(set_name))
+        .then(() => this.schedule_db.deleteSetInSchedule(set_name))
+        .then(() => resolve(true))
         .catch((error) => reject(error));
     });
   };
@@ -179,7 +179,7 @@ export class Database_manager {
   betweenLastTimeToToday = (lastTimeStamp: moment.Moment, day: string) => {
     //sunday is considered the first day of the week
     let startOfWeek =
-      moment().format("dddd") == "Sunday"
+      moment().format("dddd") === "Sunday"
         ? moment().startOf("week").subtract(1, "week")
         : moment().startOf("week");
 
@@ -211,6 +211,7 @@ export class Database_manager {
     if (timeDifference <= -1) {
       Object.keys(schedule).map((day: string) => {
         Object.keys(schedule[day]).map((set: string) => {
+          set = set.toLocaleLowerCase();
           if (
             !schedule[day][set].completed &&
             this.betweenLastTimeToToday(lastTimeStamp, day)
@@ -252,7 +253,7 @@ export class Database_manager {
   isSetDoneForToday = async (setId: string) => {
     let scheduleSets = await this.getSetsFromDBForToday();
     if (scheduleSets[setId.toLowerCase()]) {
-      return scheduleSets[setId.toLowerCase()].completed == true;
+      return scheduleSets[setId.toLowerCase()].completed === true;
     } else {
       return false;
     }
@@ -289,7 +290,7 @@ export class Database_manager {
     const today = this.schedule_db.getTodaysName();
 
     taskIdList.forEach((entry: taskRef) => {
-      if (entry.completed == false) {
+      if (entry.completed === false) {
         promises.push(this.task_db.findTask(entry.taskId));
       }
     });
@@ -306,26 +307,29 @@ export class Database_manager {
     //get task details from task refs
     let taskToDoList: any = [];
     taskList.forEach((taskDetails: any) => {
-      let foundTask: any = setTaskRefs ? setTaskRefs.find(
-        (taskRefrence: taskRef) =>
-          taskRefrence.taskId == taskDetails.id &&
-          taskRefrence.completed == false
-      ) : [];
-      if (foundTask != undefined ) taskToDoList.push(foundTask);
+      let foundTask: any = setTaskRefs
+        ? setTaskRefs.find(
+            (taskRefrence: taskRef) =>
+              taskRefrence.taskId === taskDetails.id &&
+              taskRefrence.completed === false
+          )
+        : [];
+      if (foundTask != undefined) taskToDoList.push(foundTask);
     });
 
     return taskToDoList;
   };
-  
-  getSetWithTask = async (task_id: string) => {
-    const sets = await this.task_set_db.getSets()
-    let found_set = ''
-    Object.keys(sets).every((set: string) => {
-      sets[set].tasks.every((task: taskRef) => {
-       if (task.taskId === task_id) found_set = set
-      });
-    });
 
-    return found_set
-  }
+  getSetWithTask = async (task_id: string) => {
+    const sets = await this.task_set_db.getSets();
+    let foundSet = "";
+
+    Object.keys(sets).forEach((set: string) => {
+      const foundTask = sets[set].tasks.find(
+        (task: taskRef) => task.taskId === task_id
+      );
+      if (foundTask) foundSet = set
+    });
+    return foundSet;
+  };
 }

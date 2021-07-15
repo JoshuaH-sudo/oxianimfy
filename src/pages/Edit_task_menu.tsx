@@ -350,7 +350,6 @@ const Edit_task_menu: React.FC = () => {
     db_context
       .getSetWithTask(task.id)
       .then((oldGroup: any) => db_context.updateTaskInDB(task, group, oldGroup))
-      .then(() => closeModal())
       .then(() => refresh())
       .catch((error: Error) => {
         console.log(error);
@@ -364,6 +363,7 @@ const Edit_task_menu: React.FC = () => {
       <Edit_task
         task={taskToEdit}
         updateTask={updateTask}
+        close={() => closeModal()}
       />
     );
   }

@@ -28,12 +28,14 @@ import {
   GroupDisplayProp,
   MesureProp,
   TitleDescProp,
+  GroupModal,
 } from "./task_creation_props";
-import {validateTask} from "../utils/tools";
+import { validateTask } from "../utils/tools";
 
 interface PlayInterface {
   task: any;
   updateTask: any;
+  close: any;
 }
 
 interface Confirm_prop {
@@ -54,13 +56,19 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
     unit: props.task.unit,
   });
 
-  let oldGroup = ''
-  const [selectedGroup, setSelectedGroup] = useState('');
-  const selectGroup = (value: string) => setSelectedGroup(value);
+  const [selectedGroup, setSelectedGroup] = useState({
+    currentGroup: "",
+    oldGroup: "",
+  });
+  const selectGroup = (value: string) =>
+    setSelectedGroup({
+      currentGroup: value,
+      oldGroup: selectedGroup.currentGroup,
+    });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const closeModal = () => setIsModalVisible(false);
-  const showModal = () => setIsModalVisible(true);
+  const closeSetCreateModal = () => setIsModalVisible(false);
+  const showSetCreateModal = () => setIsModalVisible(true);
 
   const updateTaskValue = (key: string, value: string | any) => {
     const updatedTask = editTask;
@@ -79,7 +87,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
       .addTaskGroupToDB(newTaskGroup.name, newTaskGroup.desc)
       .then(() => {
         selectGroup(newTaskGroup.name);
-        closeModal();
+        closeSetCreateModal();
       });
   }
 
@@ -90,35 +98,18 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
   };
   useEffect(() => {
     db_context.getSetWithTask(editTask.id).then((foundSet: any) => {
-      setSelectedGroup(foundSet)
-    }) 
-  },[])
+      selectGroup(foundSet);
+    });
+  }, []);
   let createSetModal;
 
   if (isModalVisible) {
     createSetModal = (
-      <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <h1>Create A Task Set</h1>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-
-        <EuiModalBody>
-          <EuiForm>
-            <TitleDescProp updateTaskValue={updateGroupValue} />
-          </EuiForm>
-        </EuiModalBody>
-
-        <EuiModalFooter>
-          <EuiButton onClick={createTaskGroup} fill >
-            Create Group
-          </EuiButton>
-          <EuiButton onClick={closeModal} fill color="danger">
-            Cancel
-          </EuiButton>
-        </EuiModalFooter>
-      </EuiModal>
+      <GroupModal
+        updateGroupValue={updateGroupValue}
+        createTaskGroup={createTaskGroup}
+        closeModal={closeSetCreateModal}
+      />
     );
   }
   const content = (
@@ -132,9 +123,9 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
           <DotwProp updateTaskValue={updateTaskValue} editTask={editTask} />
           <EuiFormRow label="Group this task">
             <GroupSelectProp
-              selectedGroup={selectedGroup}
+              selectedGroup={selectedGroup.currentGroup}
               selectGroup={selectGroup}
-              showModal={showModal}
+              showModal={showSetCreateModal}
               isModalVisible={isModalVisible}
             />
           </EuiFormRow>
@@ -151,37 +142,44 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiForm>
-
-
   );
+
+  const closeEditModal = () => props.close();
   return (
-  <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <h1>Edit</h1>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
+    <EuiModal onClose={closeEditModal}>
+      <EuiModalHeader>
+        <EuiModalHeaderTitle>
+          <h1>Edit</h1>
+        </EuiModalHeaderTitle>
+      </EuiModalHeader>
 
-        <EuiModalBody>
-          { content }     
-        </EuiModalBody>
+      <EuiModalBody>{content}</EuiModalBody>
 
-        <EuiModalFooter>
-          <EuiButton color="danger" onClick={closeModal} fill>
-            Cancel
-          </EuiButton>
-          <EuiButton
-            fill
-            onClick={() => {
-              props.updateTask(editTask, selectedGroup, oldGroup);
-            }}
-            disabled={validateTask(editTask)}
-          >
-            Done
-          </EuiButton>
-        </EuiModalFooter>
-      </EuiModal>
-
+      <EuiModalFooter>
+        <EuiButton color="danger" onClick={closeEditModal} fill>
+          Cancel
+        </EuiButton>
+        <EuiButton
+          fill
+          onClick={() => {
+            console.log(
+              "yeet",
+              selectedGroup.oldGroup,
+              selectedGroup.currentGroup
+            );
+            props.updateTask(
+              editTask,
+              selectedGroup.currentGroup,
+              selectedGroup.oldGroup
+            );
+            closeEditModal();
+          }}
+          disabled={validateTask(editTask)}
+        >
+          Done
+        </EuiButton>
+      </EuiModalFooter>
+    </EuiModal>
   );
 };
 
@@ -203,9 +201,6 @@ export const Confirm_deletion_prompt: React.FC<Confirm_prop> = (props) => {
 export const Filter_flyout_button: React.FC<any> = (props) => {
   const db_context = useContext(databaseContext);
   const [task_groups_list, set_task_groups_list] = useState<any>({});
-  const [columnNumIdSelected, setColumnNumIdSelected] =
-    useState<FlexGridColumns>(2);
-  const [itemTypeSelected, setItemTypeSelected] = useState<string>("task");
   const [show_filter_flyout, set_show_filter_flyout] = useState(false);
 
   const itemTypeOptions = [
@@ -238,7 +233,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
     },
   ];
 
-    const [, render] = useState({});
+  const [, render] = useState({});
   const filter_change = (key: string, value: any) => {
     let updatedValue = { ...props.filter_options };
     updatedValue[key] = value;
@@ -267,7 +262,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
           selectedGroup={props.filter_options.current_filter_set}
           selectGroup={selectGroup}
           change={task_groups_list}
-					allowAll={true}
+          allowAll={true}
         />
       </EuiFormRow>
 
@@ -310,11 +305,11 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
           <EuiTitle>
             <h2>Filter</h2>
           </EuiTitle>
-				</EuiFlyoutHeader>
+        </EuiFlyoutHeader>
 
         <EuiFlyoutBody>
           <EuiForm>
-						<EuiFormRow label="Item to Edit">
+            <EuiFormRow label="Item to Edit">
               <EuiButtonGroup
                 legend="Item type"
                 options={itemTypeOptions}
@@ -323,7 +318,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
                 isFullWidth
                 buttonSize="compressed"
               />
-           	 	</EuiFormRow>
+            </EuiFormRow>
 
             <EuiSpacer />
 
