@@ -22,7 +22,7 @@
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
     "ionicons": "^5.4.0",
-    "joi": "^17.4.0",
+    "joi": "^17.4.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "prop-types": "^15.7.2",
@@ -53,7 +53,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watch --verbose false",
     "eject": "react-scripts eject",
     "electron": "ionic cap sync && npx cap open @capacitor-community/electron",
     "sync": "ionic cap sync"
@@ -81,6 +81,5 @@
     "@types/uuid": "^8.3.0",
     "react-scripts": "4.0.2"
   },
-
   "description": "An Ionic project"
 }
