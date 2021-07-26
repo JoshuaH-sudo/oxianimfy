@@ -162,7 +162,7 @@ export class Database_manager {
         .editTask(updatedTask)
         .then(() => {
           if (updatedGroup != oldGroup)
-            this.task_set_db.updatedSetTasks(
+          this.task_set_db.updatedSetTasks(
               oldGroup,
               updatedGroup,
               updatedTask.id
