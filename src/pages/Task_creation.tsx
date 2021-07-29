@@ -24,7 +24,7 @@ export const Task: React.FC = () => {
     name: "",
     desc: "",
     daysOfWeek: [],
-    mesure: "timer",
+    measure: "timer",
     unit: "0",
   });
 
@@ -51,7 +51,7 @@ export const Task: React.FC = () => {
 
   useEffect(() => {
     updateTaskValue("unit", "0");
-  }, [newTask.mesure]);
+  }, [newTask.measure]);
 
   function createTaskGroup() {
     db_context
@@ -115,7 +115,7 @@ export const Task: React.FC = () => {
             <EuiFlexItem>
               <MesureProp
                 updateTaskValue={updateTaskValue}
-                mesure={newTask["mesure"]}
+                mesure={newTask["measure"]}
               />
             </EuiFlexItem>
           </EuiFlexGroup>

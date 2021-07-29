@@ -3,7 +3,7 @@ export interface ITaskData {
   name: string;
   desc: string;
   [index: number]: { day: string };
-  mesure: string | any;
+  measure: string | any;
   unit: number | string;
 }
 

@@ -416,7 +416,7 @@ export const GroupModal = (props) => {
       setDesc(props.editGroupSet.desc);
     }
 
-    db_context.getSetsFromDb().then((sets) => {
+    db_context.getSetsFromDB().then((sets) => {
       let parseSetList = Object.keys(sets);
       set_group_list(parseSetList);
     });
@@ -495,7 +495,7 @@ export const GroupSelectProp = (props) => {
   };
 
   useEffect(() => {
-    db_context.getSetsFromDb().then((sets) => {
+    db_context.getSetsFromDB().then((sets) => {
       let parseSetData = Object.keys(sets).map((setName) => {
         let title = setName.charAt(0).toUpperCase() + setName.slice(1);
         let desc = sets[setName].desc;
@@ -539,7 +539,7 @@ export const GroupDisplayProp = (props) => {
   };
 
   useEffect(() => {
-    db_context.getSetsFromDb().then((sets) => {
+    db_context.getSetsFromDB().then((sets) => {
       let parseSetData = Object.keys(sets).map((setName) => {
         let title = setName.charAt(0).toUpperCase() + setName.slice(1);
         let desc = sets[setName].desc;

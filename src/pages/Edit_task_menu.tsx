@@ -56,7 +56,7 @@ const Edit_task_menu: React.FC = () => {
   const [show_confirm, set_show_confirm] = useState<any>({});
 
   const refresh = () => {
-    db_context.getSetsFromDb().then((setGroups: any) => {
+    db_context.getSetsFromDB().then((setGroups: any) => {
       let retrivedTaskList: any = {};
 
       let promises: any = [];
@@ -284,7 +284,7 @@ const Edit_task_menu: React.FC = () => {
 	}
 
 	useEffect(() => {
-		db_context.getSetsFromDb().then((sets: any) => {
+		db_context.getSetsFromDB().then((sets: any) => {
 			const current_set = filter_options.current_filter_set
 			console.log(sets, sets[current_set])
 			if (sets[current_set] === undefined && current_set != 'all') filter_change("current_filter_set", "all");	

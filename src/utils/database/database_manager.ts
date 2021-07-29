@@ -45,7 +45,7 @@ export class Database_manager {
         .addTask(newTask)
         .then(async () => {
           await this.task_set_db.addTaskToSet(set, newTask.id);
-          await this.recaculateStreak(set);
+          await this.recalculateStreak(set);
         })
         .then(() =>
           this.schedule_db.addSetToSchedule(set, newTask.daysOfWeek, newTask.id)
@@ -55,7 +55,7 @@ export class Database_manager {
     });
   };
 
-  recaculateStreak = async (set: string) => {
+  recalculateStreak = async (set: string) => {
     //if set is done for today then draw back set streak
     if (await this.isSetDoneForToday(set)) {
       this.stats_db.decreseSetStreak(set);
@@ -185,7 +185,7 @@ export class Database_manager {
     });
   };
 
-  getSetsFromDb = async () => {
+  getSetsFromDB = async () => {
     return await this.task_set_db.getSets();
   };
 
@@ -353,4 +353,9 @@ export class Database_manager {
     });
     return foundSet;
   };
+
+  getSchedule = async () => {
+    let result = await this.schedule_db.getSchedule()
+    return result
+  }
 }

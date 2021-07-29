@@ -52,7 +52,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
     name: props.task.name,
     desc: props.task.desc,
     daysOfWeek: props.task.daysOfWeek,
-    mesure: props.task.mesure,
+    measure: props.task.mesure,
     unit: props.task.unit,
   });
 
@@ -136,7 +136,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
         <EuiFlexItem>
           <MesureProp
             updateTaskValue={updateTaskValue}
-            mesure={editTask["mesure"]}
+            mesure={editTask["measure"]}
             editTask={editTask}
           />
         </EuiFlexItem>
@@ -242,7 +242,7 @@ export const Filter_flyout_button: React.FC<any> = (props) => {
   };
 
   const refresh = () => {
-    db_context.getSetsFromDb().then((setGroups: any) => {
+    db_context.getSetsFromDB().then((setGroups: any) => {
       set_task_groups_list(setGroups);
     });
   };

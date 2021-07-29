@@ -17,7 +17,7 @@ export class Schedule_database {
   constructor(app_database: Database) {
     this.store = app_database.store;
     this.createScheduleDB()
-      .then(() => this.resetTaskSetCompletenss())
+      .then(() => this.resetTaskSetCompleteness())
       .then(() => this.getSchedule());
     this.store.get("schedule").then((result: any) => {
       console.log("schedule", result);
@@ -37,7 +37,7 @@ export class Schedule_database {
     }
   };
 
-  resetTaskSetCompletenss = async () => {
+  resetTaskSetCompleteness = async () => {
     let newSchedule: IScheduleData = await this.store.get("schedule");
     const today = this.getTodaysName();
 
@@ -45,13 +45,13 @@ export class Schedule_database {
       Object.keys(newSchedule).forEach((day: string) => {
         if (day != today) {
           Object.keys(newSchedule[day]).forEach((set: any) => {
-            let exsistingTasks = [];
+            let existingTasks = [];
             if (newSchedule[day][set])
-              exsistingTasks = newSchedule[day][set].tasks;
+              existingTasks = newSchedule[day][set].tasks;
 
             const newRecord = {
               completed: false,
-              tasks: exsistingTasks,
+              tasks: existingTasks,
             };
             newSchedule[day][set] = newRecord;
           });
@@ -65,10 +65,10 @@ export class Schedule_database {
   };
 
   getScheduleForSet = async (setId: string) => {
-    let retrivedSchedule: IScheduleData = await this.store.get("schedule");
+    let retrievedSchedule: IScheduleData = await this.store.get("schedule");
     let listOfDays = [];
-    Object.keys(retrivedSchedule).forEach((day: string) => {
-      if (retrivedSchedule[day][setId]) listOfDays.push(day);
+    Object.keys(retrievedSchedule).forEach((day: string) => {
+      if (retrievedSchedule[day][setId]) listOfDays.push(day);
     });
   };
 
@@ -102,72 +102,72 @@ export class Schedule_database {
   };
 
   removeTaskInSchedule = async (setId: string, taskId: string) => {
-    var retrivedSchedule: IScheduleData = await this.store.get("schedule");
+    var retrievedSchedule: IScheduleData = await this.store.get("schedule");
 
-    Object.keys(retrivedSchedule).forEach((day: string) => {
-      let exsistingTasks: any = [];
-      if (retrivedSchedule[day][setId]) {
-        delete retrivedSchedule[day][setId].tasks[taskId];
-        exsistingTasks = { ...retrivedSchedule[day][setId].tasks };
+    Object.keys(retrievedSchedule).forEach((day: string) => {
+      let existingTasks: any = [];
+      if (retrievedSchedule[day][setId]) {
+        delete retrievedSchedule[day][setId].tasks[taskId];
+        existingTasks = { ...retrievedSchedule[day][setId].tasks };
       }
 
       //see if set is now complete
-      let isSetCompleted = Object.keys(exsistingTasks).find(
-        (taskRef: any) => exsistingTasks[taskRef].completed == false
+      let isSetCompleted = Object.keys(existingTasks).find(
+        (taskRef: any) => existingTasks[taskRef].completed == false
       )
         ? false
         : true;
-      if (Object.keys(exsistingTasks).length > 0) {
+      if (Object.keys(existingTasks).length > 0) {
         const newRecord = {
           completed: isSetCompleted,
-          tasks: exsistingTasks,
+          tasks: existingTasks,
         };
 
-        retrivedSchedule[day][setId] = newRecord;
+        retrievedSchedule[day][setId] = newRecord;
       } else {
-        delete retrivedSchedule[day][setId];
+        delete retrievedSchedule[day][setId];
       }
     });
 
-    return await this.store.set("schedule", retrivedSchedule);
+    return await this.store.set("schedule", retrievedSchedule);
   };
 
   deleteSetInSchedule = async (setName: string) => {
-    var retrivedSchedule: IScheduleData = await this.store.get("schedule");
+    var retrievedSchedule: IScheduleData = await this.store.get("schedule");
 
-    Object.keys(retrivedSchedule).forEach((day: string) => {
-      if (retrivedSchedule[day][setName]) {
-        delete retrivedSchedule[day][setName];
+    Object.keys(retrievedSchedule).forEach((day: string) => {
+      if (retrievedSchedule[day][setName]) {
+        delete retrievedSchedule[day][setName];
       }
     });
 
-    return await this.store.set("schedule", retrivedSchedule);
+    return await this.store.set("schedule", retrievedSchedule);
   };
 
   replaceSetInSchedule = async (oldSetId: string, newSetId: string) => {
-    var retrivedSchedule: IScheduleData = await this.store.get("schedule");
+    var retrievedSchedule: IScheduleData = await this.store.get("schedule");
 
-    Object.keys(retrivedSchedule).forEach((day: string) => {
-      if (retrivedSchedule[day][oldSetId]) {
-        retrivedSchedule[day][newSetId] = retrivedSchedule[day][oldSetId];
-        delete retrivedSchedule[day][oldSetId];
+    Object.keys(retrievedSchedule).forEach((day: string) => {
+      if (retrievedSchedule[day][oldSetId]) {
+        retrievedSchedule[day][newSetId] = retrievedSchedule[day][oldSetId];
+        delete retrievedSchedule[day][oldSetId];
       }
     });
 
-    return await this.store.set("schedule", retrivedSchedule);
+    return await this.store.set("schedule", retrievedSchedule);
   };
 
-  addSetToSchedule = async (set: string, daysOfWeek: [], taskId: string) => {
+  addSetToSchedule = async (set: string, daysOfWeek: any[], taskId: string) => {
     var newSchedule: IScheduleData = await this.store.get("schedule");
 
     daysOfWeek.forEach((day: string) => {
-      let exsistingTasks = [];
-      if (newSchedule[day][set]) exsistingTasks = newSchedule[day][set].tasks;
-      exsistingTasks[taskId] = { completed: false };
+      let existingTasks = [];
+      if (newSchedule[day][set]) existingTasks = newSchedule[day][set].tasks;
+      existingTasks[taskId] = { completed: false };
 
       const newRecord = {
         completed: false,
-        tasks: exsistingTasks,
+        tasks: existingTasks,
       };
       newSchedule[day][set] = newRecord;
     });

@@ -26,9 +26,10 @@ export class Task_set_database {
     let newSetList =
       (await this.store.get("task_set")) ?? this.default_set_list;
 
-    if (newSetList[setId]) newSetList[setId].tasks.forEach((taskId: taskRef) => {
-      taskId.completed = false;
-    });
+    if (newSetList[setId])
+      newSetList[setId].tasks.forEach((taskId: taskRef) => {
+        taskId.completed = false;
+      });
 
     return await this.store.set("task_set", newSetList);
   };
@@ -54,7 +55,9 @@ export class Task_set_database {
   };
 
   getSets = async () => {
-    return (await this.store.get("task_set")) ?? this.default_set_list;
+    let result: ISetData =
+      (await this.store.get("task_set")) ?? this.default_set_list;
+    return result;
   };
 
   getSetWithId = async (setId: string) => {
@@ -72,8 +75,8 @@ export class Task_set_database {
 
   getSetsTaskIds = async (setId: string) => {
     let setList = (await this.store.get("task_set")) ?? this.default_set_list;
-		console.log(setList, setId)
-		const setItem = setList[setId.toLowerCase()]
+    console.log(setList, setId);
+    const setItem = setList[setId.toLowerCase()];
     return setItem ? setItem.tasks : [];
   };
 
@@ -132,10 +135,12 @@ export class Task_set_database {
   };
 
   deleteSet = async (setName: string) => {
-    let newSetList =
-      (await this.store.get("task_set")) ?? this.default_set_list;
-    delete newSetList[setName];
+    if (setName !== "misc") {
+      let newSetList =
+        (await this.store.get("task_set")) ?? this.default_set_list;
+      delete newSetList[setName];
 
-    await this.store.set("task_set", newSetList);
+      await this.store.set("task_set", newSetList);
+    }
   };
 }
