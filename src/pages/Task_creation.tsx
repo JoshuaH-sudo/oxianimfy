@@ -86,10 +86,8 @@ export const Task: React.FC = () => {
     );
   }
   return (
-    <EuiPanel paddingSize="l">
       <EuiDescribedFormGroup
-        title={<h3>New taskcreation</h3>}
-        description={<Fragment>fillout each task</Fragment>}
+        title={<h3>New task</h3>}
       >
         <EuiForm component="form">
           <TitleDescProp updateTaskValue={updateTaskValue} />
@@ -135,7 +133,6 @@ export const Task: React.FC = () => {
           </EuiFlexGroup>
         </EuiForm>
       </EuiDescribedFormGroup>
-    </EuiPanel>
   );
 };
 

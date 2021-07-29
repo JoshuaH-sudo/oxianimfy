@@ -125,7 +125,7 @@ export const DotwProp = (props) => {
       setDotwCheckboxList(updatedDotwList);
 
     } else if (Object.keys(dotwIdMapping).length > 0) {
-      //this is to allow retriveing only the item's id without getting undefined
+      //this is to allow retrieving only the item's id without getting undefined
       props.updateTaskValue(
         "daysOfWeek",
         dotwCheckboxList
@@ -276,7 +276,7 @@ export const CounterProp = (props) => {
 
 export const MeasureProp = (props) => {
   var taskMeasureIdMapDefault = {
-    timer: props.measure === "timer" || props.mesure === "" ? true : false,
+    timer: props.measure === "timer" || props.measure === "" ? true : false,
     counter: props.measure === "counter" ? true : false,
     none: props.measure === "none" ? true : false,
   };
@@ -336,7 +336,7 @@ export const MeasureProp = (props) => {
 
   return (
     <Fragment>
-      <EuiFormRow label="Timed or Counted Task">
+      <EuiFormRow label="Task type">
         <EuiCheckboxGroup
           options={taskMeasureOptions}
           idToSelectedMap={taskMeasureIdMapping}
