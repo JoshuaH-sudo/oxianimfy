@@ -26,7 +26,7 @@ import {
   DotwProp,
   GroupSelectProp,
   GroupDisplayProp,
-  MesureProp,
+  MeasureProp,
   TitleDescProp,
   GroupModal,
 } from "./task_creation_props";
@@ -134,7 +134,7 @@ export const Edit_task: React.FC<PlayInterface> = (props) => {
         {createSetModal}
 
         <EuiFlexItem>
-          <MesureProp
+          <MeasureProp
             updateTaskValue={updateTaskValue}
             mesure={editTask["measure"]}
             editTask={editTask}

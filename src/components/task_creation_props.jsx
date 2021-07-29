@@ -274,14 +274,14 @@ export const CounterProp = (props) => {
   );
 };
 
-export const MesureProp = (props) => {
-  var taskMesureIdMapDefault = {
-    timer: props.mesure === "timer" || props.mesure === "" ? true : false,
-    counter: props.mesure === "counter" ? true : false,
-    none: props.mesure === "none" ? true : false,
+export const MeasureProp = (props) => {
+  var taskMeasureIdMapDefault = {
+    timer: props.measure === "timer" || props.mesure === "" ? true : false,
+    counter: props.measure === "counter" ? true : false,
+    none: props.measure === "none" ? true : false,
   };
 
-  var taskMesureOptions = [
+  var taskMeasureOptions = [
     {
       id: "timer",
       label: "Timer",
@@ -296,57 +296,57 @@ export const MesureProp = (props) => {
     },
   ];
 
-  const [taskMesureIdMapping, setTaskMesureIdMapping] = useState(
-    taskMesureIdMapDefault
+  const [taskMeasureIdMapping, setTaskMeasureIdMapping] = useState(
+    taskMeasureIdMapDefault
   );
 
-  const onTaskMesureChange = (optionId) => {
-    var newTaskMesureIdMap = {
+  const onTaskMeasureChange = (optionId) => {
+    var newTaskMeasureIdMap = {
       timer: false,
       counter: false,
       none: false,
     };
     switch (optionId) {
       case "timer":
-        newTaskMesureIdMap["timer"] = true;
+        newTaskMeasureIdMap["timer"] = true;
         break;
       case "counter":
-        newTaskMesureIdMap["counter"] = true;
+        newTaskMeasureIdMap["counter"] = true;
         break;
       case "none":
-        newTaskMesureIdMap["none"] = true;
+        newTaskMeasureIdMap["none"] = true;
 				props.updateTaskValue("unit", "none");
         break;
       default:
         break;
     }
 
-    props.updateTaskValue("mesure", optionId);
-    setTaskMesureIdMapping(newTaskMesureIdMap);
+    props.updateTaskValue("measure", optionId);
+    setTaskMeasureIdMapping(newTaskMeasureIdMap);
   };
 
   useEffect(() => {
     props.updateTaskValue(
-      "mesure",
-      Object.keys(taskMesureIdMapping).find(
-        (item) => taskMesureIdMapping[item] == true
+      "measure",
+      Object.keys(taskMeasureIdMapping).find(
+        (item) => taskMeasureIdMapping[item] == true
       )
     );
-  }, [taskMesureIdMapping]);
+  }, [taskMeasureIdMapping]);
 
   return (
     <Fragment>
       <EuiFormRow label="Timed or Counted Task">
         <EuiCheckboxGroup
-          options={taskMesureOptions}
-          idToSelectedMap={taskMesureIdMapping}
-          onChange={(id) => onTaskMesureChange(id)}
+          options={taskMeasureOptions}
+          idToSelectedMap={taskMeasureIdMapping}
+          onChange={(id) => onTaskMeasureChange(id)}
         />
       </EuiFormRow>
 
       <EuiSpacer />
 
-      {props.mesure == "timer" ? (
+      {props.measure == "timer" ? (
         <TimerProp
           updateTaskValue={props.updateTaskValue}
           editTask={props.editTask}
@@ -354,7 +354,7 @@ export const MesureProp = (props) => {
       ) : (
         ""
       )}
-      {props.mesure == "counter" ? (
+      {props.measure == "counter" ? (
         <CounterProp
           updateTaskValue={props.updateTaskValue}
           editTask={props.editTask}

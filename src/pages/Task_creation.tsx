@@ -15,7 +15,7 @@ import {
   DotwProp,
   GroupModal,
   GroupSelectProp,
-  MesureProp,
+  MeasureProp,
   TitleDescProp,
 } from "../components/task_creation_props";
 import {validateTask} from "../utils/tools";
@@ -113,9 +113,9 @@ export const Task: React.FC = () => {
             {createSetModal}
 
             <EuiFlexItem>
-              <MesureProp
+              <MeasureProp
                 updateTaskValue={updateTaskValue}
-                mesure={newTask["measure"]}
+                measure={newTask["measure"]}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
