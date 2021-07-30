@@ -63,8 +63,10 @@ export const Task: React.FC = () => {
   }
 
   function createTask() {
+    console.log('yeet', newTask, selectedGroup)
     db_context.addTaskToDB(newTask, selectedGroup).catch((error: Error) => {
       console.log(error);
+      console.log('yeet', error)
     });
   }
 

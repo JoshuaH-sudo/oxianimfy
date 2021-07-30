@@ -10,6 +10,15 @@ body {
 
 #main_content {
   margin: 0;
+  overflow: auto;
+}
+
+#main_content_flexbox {
+  overflow: auto;
+}
+
+#main_content_flexbox > .euiPanel {
+  overflow: auto;
 }
 
 #control_bar_nav {

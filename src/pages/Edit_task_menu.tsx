@@ -107,25 +107,28 @@ const Edit_task_menu: React.FC = () => {
     set_items_delete([]);
   };
 
-	const addItemToDelete = (item_id: string) => {
+  //the isDisabled param is to prevent the function being called twice from the checkbox and card's select method.
+	const addItemToDelete = (item_id: string, isDisabled:boolean = false) => {
    	let items_to_delete: any  = items_delete;
     	//if item is already in array
-		if (items_to_delete.includes(item_id) ) {
+		if (items_to_delete.includes(item_id) && !isDisabled) {
       items_to_delete = items_to_delete.filter(
         (item: string) => item != item_id
       );
      	set_items_delete([...items_to_delete]);
-    } else {
+    } else if (!isDisabled) {
       items_to_delete.push(item_id);
       set_items_delete([...items_to_delete]);
     }
-		
-		if (items_to_delete.length > 0) {
+ };
+
+  useEffect(() => {
+ 		if (items_delete.length > 0) {
 			set_multi_del_toggle(true)
 		} else { 
 			set_multi_del_toggle(false)
 		}
-  };
+  }, [items_delete])
 
   const tabBar = (
     title: string,
@@ -159,7 +162,7 @@ const Edit_task_menu: React.FC = () => {
           <EuiCheckbox
             id={select_id + "checkbox"}
             checked={items_delete.includes(select_id)}
-            onChange={() => addItemToDelete(select_id)}
+            onChange={() => addItemToDelete(select_id, multi_del_toggle)}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -252,7 +255,7 @@ const Edit_task_menu: React.FC = () => {
       desc: Joi.string(),
       daysOfWeek: Joi.array(),
       id: Joi.string(),
-      mesure: Joi.string().when(Joi.ref("$show_all_task"), {
+      measure: Joi.string().when(Joi.ref("$show_all_task"), {
         is: true,
         then: Joi.valid(filter_options.taskType),
         otherwise: Joi.string(),

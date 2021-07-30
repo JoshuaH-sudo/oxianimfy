@@ -21,7 +21,7 @@ ReactDOM.render(
       id="main_content"
       responsive={false}
     >
-      <EuiFlexItem>
+      <EuiFlexItem id="main_content_flexbox">
         <EuiPanel>
           <HashRouter>
             <Switch>
