@@ -13,11 +13,12 @@ export const Stats: React.FC = () => {
   const display = () => {
     switch (current_stat_view) {
       case "week_workload":
-        return <Week_workload />
+        return <Week_workload />;
       case "app_stats":
         return (
           <Fragment>
             <Set_streak_stats />
+            <EuiSpacer />
             <App_stats />
           </Fragment>
         );

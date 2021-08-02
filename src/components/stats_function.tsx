@@ -17,7 +17,8 @@ import {
   EUI_CHARTS_THEME_LIGHT,
 } from "@elastic/eui/dist/eui_charts_theme";
 
-import { EuiStat, EuiFlexItem, EuiFlexGroup } from "@elastic/eui";
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiText } from "@elastic/eui";
+import numeral from "numeral";
 
 export const Set_streak_stats = () => {
   const db_Context = useContext(databaseContext);
@@ -37,30 +38,38 @@ export const Set_streak_stats = () => {
       set_taskset_size_data(setMap);
     });
   }, []);
-
-  return (
-    <Chart size={{ height: 300 }}>
-      <Settings
-        theme={EUI_CHARTS_THEME_DARK.theme}
-        rotation={0}
-        showLegend={true}
-        legendPosition="right"
-      />
-      <BarSeries
-        id="setStats"
-        name="Set Stats"
-        data={taskset_size_data}
-        xScaleType={ScaleType.Linear}
-        yScaleType={ScaleType.Linear}
-        xAccessor="vizType"
-        yAccessors={["count"]}
-        splitSeriesAccessors={["issueType"]}
-        color={euiPaletteColorBlind()}
-      />
-      <Axis id="bottom-axis" position={"bottom"} />
-      <Axis id="left-axis" position={"left"} />
-    </Chart>
-  );
+  if (taskset_size_data.length > 0) {
+    return (
+      <Chart size={{ height: 300 }}>
+        <Settings
+          theme={EUI_CHARTS_THEME_DARK.theme}
+          rotation={0}
+          showLegend={true}
+          legendPosition="right"
+        />
+        <BarSeries
+          id="setStats"
+          name="Set Stats"
+          data={taskset_size_data}
+          xScaleType={ScaleType.Linear}
+          yScaleType={ScaleType.Linear}
+          xAccessor="vizType"
+          yAccessors={["count"]}
+          splitSeriesAccessors={["issueType"]}
+          color={euiPaletteColorBlind()}
+        />
+        <Axis id="bottom-axis" position={"bottom"} />
+        <Axis id="left-axis" position={"left"} />
+      </Chart>
+    );
+  } else {
+    return (
+      <EuiText>
+        You have not completed any sets yet. complete some tasks to start
+        earning streaks.
+      </EuiText>
+    );
+  }
 };
 
 export const Week_workload = () => {
@@ -85,9 +94,9 @@ export const Week_workload = () => {
     <Chart size={{ height: 300 }}>
       <Settings
         theme={EUI_CHARTS_THEME_DARK.theme}
-        rotation={0}
-        showLegend={true}
-        legendPosition="right"
+        rotation={90}
+        showLegend
+        legendPosition="bottom"
       />
       <BarSeries
         id="week-workload"
@@ -101,12 +110,19 @@ export const Week_workload = () => {
         stackAccessors={["issueType"]}
         color={euiPaletteColorBlind()}
       />
-      <Axis id="bottom-axis" position={"bottom"} />
       <Axis
-        id="left-axis"
-        position={"left"}
-        tickFormat={(d: any) => Number(d).toFixed(0)}
+        id="bottom-axis"
+        position={"bottom"}
+        tickFormat={(d) => {
+          if (d % 1 == 0) {
+            return Number(d).toString();
+          } else {
+            return "";
+          }
+        }}
       />
+
+      <Axis id="left-axis" position={"left"} />
     </Chart>
   );
 };
