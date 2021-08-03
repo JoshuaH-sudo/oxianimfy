@@ -38,7 +38,7 @@ export class Schedule_database {
   };
 
   resetTaskSetCompleteness = async () => {
-    let newSchedule: IScheduleData = await this.store.get("schedule");
+    let newSchedule: IScheduleData = await this.store.get("schedule") ?? this.schedule;
     const today = this.getTodaysName();
 
     if (newSchedule)

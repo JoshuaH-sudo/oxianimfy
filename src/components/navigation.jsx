@@ -95,17 +95,7 @@ export const Control_bar = () => {
         <EuiText>Home</EuiText>
       </EuiFlexItem>
 
-      <EuiFlexItem>
-        <EuiButtonIcon
-          iconType="play"
-          href={pageUrls.task_select}
-          display={current_hash === pageUrls.task_select ? "fill" : ""}
-          className="control_bar_item"
-        />
-        <EuiText>Play</EuiText>
-      </EuiFlexItem>
-
-      <EuiFlexItem>
+     <EuiFlexItem>
         <EuiButtonIcon
           iconType="plus"
           href={pageUrls.task_create}
