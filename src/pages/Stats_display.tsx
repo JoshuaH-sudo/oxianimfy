@@ -1,5 +1,11 @@
 import React, { Fragment, useState } from "react";
-import { EuiPanel, EuiTabs, EuiTab, EuiSpacer } from "@elastic/eui";
+import {
+  EuiPanel,
+  EuiTabs,
+  EuiTab,
+  EuiSpacer,
+  EuiTabbedContent,
+} from "@elastic/eui";
 import {
   Set_streak_stats,
   Week_workload,
@@ -13,8 +19,7 @@ import SwiperCore, {
   A11y,
   Controller,
 } from "swiper";
-import { Swiper, SwiperSlide } from "swiper/react";
-
+import Swiper from "swiper";
 import "swiper/swiper.scss";
 import "swiper/components/navigation/navigation.scss";
 import "swiper/components/pagination/pagination.scss";
@@ -24,63 +29,78 @@ import "swiper/components/scrollbar/scrollbar.scss";
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Controller]);
 
 export const Stats: React.FC = () => {
-  const [current_stat_view, set_current_stat_view] = useState<any>({
-    index: 0,
-    name: "week_workload",
+  const swiper: any = new Swiper(".swiper-container", {
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      type: "bullets",
+    },
   });
-  const [controlledSwiper, setControlledSwiper] = useState(null);
-  return (
-    <EuiPanel paddingSize="l">
-      <EuiTabs>
-        <EuiTab
-          isSelected={current_stat_view.name === "week_workload"}
-          onClick={() => {
-            set_current_stat_view({ index: 0, name: "week_workload" });
-            console.log(controlledSwiper);
-          }}
-        >
-          Week Workload
-        </EuiTab>
+  const tabs: any = [
+    {
+      id: "0",
+      name: "Weekly Workload",
+      disabled: false,
+    },
+    {
+      id: "1",
+      name: "Stats",
+      disabled: false,
+    },
+  ];
 
+  const [current_stat_view, set_current_stat_view] = useState<any>(tabs[0]);
+  const onTabClick = (selectedTab: any) => {
+    swiper.slideTo(selectedTab.id.toString(), 300, () => {
+      console.log("yeet");
+    });
+  };
+
+  swiper.on("activeIndexChange", (swiper: any) => {
+    console.log(swiper.activeIndex);
+    set_current_stat_view(tabs[swiper.activeIndex]);
+  });
+				
+  return (
+    <Fragment>
+      {tabs.map((tab: any, index: any) => (
         <EuiTab
-          isSelected={current_stat_view.name === "app_stats"}
-          onClick={() => set_current_stat_view({ index: 1, name: "app_stats" })}
+          onClick={() => onTabClick(tab)}
+          isSelected={tab.id === current_stat_view.id}
+          disabled={tab.disabled}
+          key={index}
         >
-          Stats
+          {tab.name}
         </EuiTab>
-      </EuiTabs>
+      ))}
 
       <EuiSpacer />
 
-      <Swiper
-        spaceBetween={50}
-        slidesPerView={1}
-        navigation
-        pagination={{ dynamicBullets: true }}
-        onSlideChange={(swiper) => {
-          switch (swiper.activeIndex) {
-            case 0:
-              set_current_stat_view({ index: 0, name: "week_workload" });
-              break;
-            case 1:
-              set_current_stat_view({ index: 1, name: "app_stats" });
-              break;
-            default:
-              set_current_stat_view({ index: 0, name: "week_workload" });
-              break;
-          }
-        }}
-      >
-        <SwiperSlide>
-          <Week_workload />
-        </SwiperSlide>
+      <div className="swiper-container">
 
-        <SwiperSlide>
-          <Set_streak_stats />
-          <EuiSpacer />
-          <App_stats />
-        </SwiperSlide>
-      </Swiper>
-    </EuiPanel>
+        <div className="swiper-wrapper">
+
+          <div className="swiper-slide">
+            <Week_workload />
+          </div>
+
+          <div className="swiper-slide">
+            <Set_streak_stats />
+            <EuiSpacer />
+            <App_stats />
+          </div>
+
+        </div>
+        <div className="swiper-pagination"></div>
+
+        <div className="swiper-button-prev"></div>
+        <div className="swiper-button-next"></div>
+
+        <div className="swiper-scrollbar"></div>
+      </div>
+    </Fragment>
   );
 };

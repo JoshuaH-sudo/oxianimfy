@@ -42,9 +42,9 @@ export const Set_streak_stats = () => {
     <Chart size={{ height: 300 }}>
       <Settings
         theme={EUI_CHARTS_THEME_DARK.theme}
-        rotation={0}
+        rotation={90}
         showLegend={true}
-        legendPosition="right"
+        legendPosition="left"
         noResults={
           "You have not completed any sets yet. complete some tasks to start earning streaks."
         }
@@ -88,7 +88,7 @@ export const Week_workload = () => {
   }, []);
 
   return (
-    <Chart size={{ height: 400 }}>
+    <Chart size={{ height: 500 }}>
       <Settings
         theme={EUI_CHARTS_THEME_DARK.theme}
         rotation={90}
