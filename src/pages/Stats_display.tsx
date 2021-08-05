@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
   EuiPanel,
   EuiTabs,
@@ -19,7 +19,7 @@ import SwiperCore, {
   A11y,
   Controller,
 } from "swiper";
-import Swiper from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.scss";
 import "swiper/components/navigation/navigation.scss";
 import "swiper/components/pagination/pagination.scss";
@@ -29,16 +29,6 @@ import "swiper/components/scrollbar/scrollbar.scss";
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Controller]);
 
 export const Stats: React.FC = () => {
-  const swiper: any = new Swiper(".swiper-container", {
-    navigation: {
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    },
-    pagination: {
-      el: ".swiper-pagination",
-      type: "bullets",
-    },
-  });
   const tabs: any = [
     {
       id: "0",
@@ -52,6 +42,13 @@ export const Stats: React.FC = () => {
     },
   ];
 
+  const [swiper, set_swiper] = useState<any>();
+  useEffect(() => {
+    let el: any = document.querySelector(".swiper-container");
+    let new_swiper = el !== null ? el.swiper : "";
+    set_swiper(new_swiper);
+  }, []);
+
   const [current_stat_view, set_current_stat_view] = useState<any>(tabs[0]);
   const onTabClick = (selectedTab: any) => {
     swiper.slideTo(selectedTab.id.toString(), 300, () => {
@@ -59,13 +56,8 @@ export const Stats: React.FC = () => {
     });
   };
 
-  swiper.on("activeIndexChange", (swiper: any) => {
-    console.log(swiper.activeIndex);
-    set_current_stat_view(tabs[swiper.activeIndex]);
-  });
-				
   return (
-    <Fragment>
+    <div id='stats_swiper'>
       {tabs.map((tab: any, index: any) => (
         <EuiTab
           onClick={() => onTabClick(tab)}
@@ -77,30 +69,22 @@ export const Stats: React.FC = () => {
         </EuiTab>
       ))}
 
-      <EuiSpacer />
+      <Swiper
+        pagination
+        onActiveIndexChange={(swiper) => {
+          set_current_stat_view(tabs[swiper.activeIndex]);
+        }}
+      >
+        <SwiperSlide>
+          <Week_workload />
+        </SwiperSlide>
 
-      <div className="swiper-container">
-
-        <div className="swiper-wrapper">
-
-          <div className="swiper-slide">
-            <Week_workload />
-          </div>
-
-          <div className="swiper-slide">
-            <Set_streak_stats />
-            <EuiSpacer />
-            <App_stats />
-          </div>
-
-        </div>
-        <div className="swiper-pagination"></div>
-
-        <div className="swiper-button-prev"></div>
-        <div className="swiper-button-next"></div>
-
-        <div className="swiper-scrollbar"></div>
-      </div>
-    </Fragment>
+        <SwiperSlide>
+          <Set_streak_stats />
+          <EuiSpacer />
+          <App_stats />
+        </SwiperSlide>
+      </Swiper>
+    </div>
   );
 };

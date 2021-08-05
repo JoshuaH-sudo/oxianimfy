@@ -110,3 +110,11 @@ body {
 #set_selection > .swiper-wrapper {
   height: 45vh;
 }
+
+#stats_swiper {
+	height: 100%;
+}
+
+#stats_swiper > .swiper-container {
+	height: 93%;
+}

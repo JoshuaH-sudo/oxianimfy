@@ -24,7 +24,7 @@ export const Task: React.FC = () => {
     name: "",
     desc: "",
     daysOfWeek: [],
-    measure: "timer",
+    measure: "none",
     unit: "0",
   });
 

@@ -15,15 +15,19 @@ import {
   EuiCheckboxGroup,
   EuiFieldText,
   EuiTextArea,
-	EuiFlexGroup,
-	EuiFlexItem,
-	EuiSwitch,
-	EuiRange,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSwitch,
+  EuiRange,
 } from "@elastic/eui";
-import TimeField from 'react-simple-timefield';
+import TimeField from "react-simple-timefield";
 import moment from "moment";
 import { databaseContext } from "../App";
-import { every_day_set, every_second_day_sun_set, every_second_day_mon_set } from "../utils/constants.ts"
+import {
+  every_day_set,
+  every_second_day_sun_set,
+  every_second_day_mon_set,
+} from "../utils/constants.ts";
 export const DotwProp = (props) => {
   const [dotwCheckboxList, setDotwCheckboxList] = useState([
     { id: "sunday", label: "Sunday", disabled: false },
@@ -35,7 +39,7 @@ export const DotwProp = (props) => {
     { id: "saturday", label: "Saturday", disabled: false },
   ]);
 
-	const simple_dotw_options = [
+  const simple_dotw_options = [
     {
       value: "every_day",
       inputDisplay: "Every day",
@@ -51,17 +55,16 @@ export const DotwProp = (props) => {
       inputDisplay: "Every second day, Mon",
       dropdownDisplay: "Do every second day, starting from Monday",
     },
-		{
+    {
       value: "other",
       inputDisplay: "Custom",
       dropdownDisplay: "Choose each day",
     },
-
   ];
-				
-	const [simple_dotw, set_simple_dotw] = useState("every_day");	
 
-	const [dotwIdMapping, setDotwIdMapping] = useState([]);
+  const [simple_dotw, set_simple_dotw] = useState("every_day");
+
+  const [dotwIdMapping, setDotwIdMapping] = useState([]);
 
   useEffect(() => {
     if (props.editTask) {
@@ -71,9 +74,8 @@ export const DotwProp = (props) => {
       });
       setDotwIdMapping(initMappings);
     }
-		onDotwChange("all");
+    onDotwChange("all");
   }, []);
-
 
   const onDotwChange = (optionId) => {
     //disable all other options and set them unchecked
@@ -123,7 +125,6 @@ export const DotwProp = (props) => {
         return updatedItem;
       });
       setDotwCheckboxList(updatedDotwList);
-
     } else if (Object.keys(dotwIdMapping).length > 0) {
       //this is to allow retrieving only the item's id without getting undefined
       props.updateTaskValue(
@@ -135,20 +136,19 @@ export const DotwProp = (props) => {
     }
   }, [dotwIdMapping]);
 
-		useEffect(() => {
-		switch(simple_dotw) {
-			case 'every_day':
-				setDotwIdMapping(every_day_set)
-				break;
-		 case 'every_second_day':
-				setDotwIdMapping(every_second_day_sun_set);
-				break;
-		 case 'every_second_day_mon':
-				setDotwIdMapping(every_second_day_mon_set);
-				break;
-		}
-
-	},[simple_dotw] )
+  useEffect(() => {
+    switch (simple_dotw) {
+      case "every_day":
+        setDotwIdMapping(every_day_set);
+        break;
+      case "every_second_day":
+        setDotwIdMapping(every_second_day_sun_set);
+        break;
+      case "every_second_day_mon":
+        setDotwIdMapping(every_second_day_mon_set);
+        break;
+    }
+  }, [simple_dotw]);
 
   const formValid =
     Object.keys(dotwIdMapping).filter((key) => dotwIdMapping[key] === true)
@@ -197,40 +197,37 @@ export const TimerProp = (props) => {
         seconds: preSetDuration.seconds(),
       });
 
-			const time_string =
+      const time_string =
         preSetDuration.hours().toString() +
         preSetDuration.minutes().toString() +
-        preSetDuration.seconds().toString(); 
-			set_time(time_string);
+        preSetDuration.seconds().toString();
+      set_time(time_string);
     }
   }, []);
 
-	const [time, set_time] = useState();
+  const [time, set_time] = useState();
 
-	const onTimeChange = (event, time) => {
+  const onTimeChange = (event, time) => {
     set_time(time);
-		const time_props = time.split(':')
-		const updateDuration = {
-			hours: time_props[0],
-			minutes: time_props[1],
-			seconds: time_props[2]
-		}
+    const time_props = time.split(":");
+    const updateDuration = {
+      hours: time_props[0],
+      minutes: time_props[1],
+      seconds: time_props[2],
+    };
 
-		setDuration(updateDuration);
+    setDuration(updateDuration);
     props.updateTaskValue(
-    	"unit",
+      "unit",
       JSON.stringify(moment.duration(updateDuration))
     );
   };
 
-	const timer_input = ( 
-		<EuiFieldText prepend='Time' />
-	)
-				
+  const timer_input = <EuiFieldText prepend="Time" />;
+
   return (
     <EuiForm>
-				<EuiFormRow isInvalid={time == '00:00:00'} error="Cannot be set to zero" >
-
+      <EuiFormRow isInvalid={time == "00:00:00"} error="Cannot be set to zero">
         <TimeField
           value={time}
           onChange={onTimeChange}
@@ -241,7 +238,7 @@ export const TimerProp = (props) => {
       </EuiFormRow>
     </EuiForm>
   );
-}; 
+};
 
 export const CounterProp = (props) => {
   const [counter, setCounter] = useState("0");
@@ -269,7 +266,12 @@ export const CounterProp = (props) => {
     <EuiFormRow
       helpText={counter === "0" ? "Counter can not be set to zero" : ""}
     >
-      <EuiFieldText prepend='Counter' name="unit" value={counter} onChange={updateCounter} />
+      <EuiFieldText
+        prepend="Counter"
+        name="unit"
+        value={counter}
+        onChange={updateCounter}
+      />
     </EuiFormRow>
   );
 };
@@ -283,16 +285,17 @@ export const MeasureProp = (props) => {
 
   var taskMeasureOptions = [
     {
+      id: "none",
+      label: "None",
+    },
+
+    {
       id: "timer",
       label: "Timer",
     },
     {
       id: "counter",
       label: "Counter",
-    },
-    {
-      id: "none",
-      label: "None",
     },
   ];
 
@@ -315,7 +318,7 @@ export const MeasureProp = (props) => {
         break;
       case "none":
         newTaskMeasureIdMap["none"] = true;
-				props.updateTaskValue("unit", "none");
+        props.updateTaskValue("unit", "none");
         break;
       default:
         break;
@@ -550,14 +553,14 @@ export const GroupDisplayProp = (props) => {
           dropdownDisplay: groupDisplay(title, desc),
         };
       });
-			if (props.allowAll) parseSetData.unshift({
-        value: "all",
-        inputDisplay: "All",
-        dropdownDisplay: groupDisplay("All", "Show all"),
-      });
+      if (props.allowAll)
+        parseSetData.unshift({
+          value: "all",
+          inputDisplay: "All",
+          dropdownDisplay: groupDisplay("All", "Show all"),
+        });
       setTaskGroups(parseSetData);
     });
-		
   }, [props.change]);
 
   return (
@@ -597,7 +600,7 @@ export const GroupEditProp = (props) => {
       updateGroupValue={updateValues}
       editTask={props.editSet}
       createTaskGroup={createTaskGroup}
-			closeModal={props.closeModal}
+      closeModal={props.closeModal}
     />
   );
 };
