@@ -7,10 +7,8 @@ import {
   Chart,
   Axis,
   BarSeries,
-  Position,
   Settings,
   ScaleType,
-  DataGenerator,
 } from "@elastic/charts";
 import {
   EUI_CHARTS_THEME_DARK,
@@ -32,7 +30,7 @@ export const Set_streak_stats = () => {
         setMap.push({
           vizType: setId,
           count: setStreaks[setId].streak,
-          issueType: "Current Streak",
+          issueType: setId 
         });
       });
       set_taskset_size_data(setMap);
@@ -43,8 +41,6 @@ export const Set_streak_stats = () => {
       <Settings
         theme={EUI_CHARTS_THEME_DARK.theme}
         rotation={90}
-        showLegend={true}
-        legendPosition="left"
         noResults={
           "You have not completed any sets yet. complete some tasks to start earning streaks."
         }
@@ -52,15 +48,22 @@ export const Set_streak_stats = () => {
       <BarSeries
         id="setStats"
         name="Set Stats"
-        data={taskset_size_data}
+				data={taskset_size_data.sort((a:any, b: any) => b.count-a.count)}
         xScaleType={ScaleType.Linear}
         yScaleType={ScaleType.Linear}
         xAccessor="vizType"
         yAccessors={["count"]}
-        splitSeriesAccessors={["issueType"]}
         color={euiPaletteColorBlind()}
       />
-      <Axis id="bottom-axis" position={"bottom"} />
+      <Axis id="bottom-axis" position={"bottom"} 
+        tickFormat={(d) => {
+          if (d % 1 == 0) {
+            return Number(d).toString();
+          } else {
+            return "";
+          }
+        }}
+								/>
       <Axis id="left-axis" position={"left"} />
     </Chart>
   );
