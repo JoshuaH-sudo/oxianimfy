@@ -169,17 +169,17 @@ const Task_card: React.FC<PlayScreenProps> = (props) => {
       >
         <EuiFlexItem style={{ height: "100%" }}>{task_intro}</EuiFlexItem>
         <EuiFlexItem id="play_tasks">
-          {task.mesure == "counter" ? (
+          {task.measure == "counter" ? (
             <Counter_task task={task} changeTask={changeTask} />
           ) : (
             ""
           )}
-          {task.mesure == "timer" ? (
+          {task.measure == "timer" ? (
             <Timer_task task={task} changeTask={changeTask} />
           ) : (
             ""
           )}
-          {task.mesure == "none" ? (
+          {task.measure == "none" ? (
             <None_task task={task} changeTask={changeTask} />
           ) : (
             ""
